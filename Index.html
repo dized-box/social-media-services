@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        /* Sidebar & UI */
+        .platform-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0.75rem 1rem; border-radius: 0.5rem;
+            color: #334155; font-weight: 600; cursor: pointer;
+            transition: all 0.2s; border: 1px solid transparent;
+        }
+        .platform-header:hover { background-color: #f1f5f9; }
+        .platform-header.open { background-color: #eff6ff; color: #2563eb; border-color: #dbeafe; }
+        .platform-header.open .arrow { transform: rotate(90deg); color: #3b82f6; }
+        .platform-header .arrow { transition: transform 0.2s; color: #94a3b8; }
+
+        .tracker-link {
+            display: flex; align-items: center;
+            padding: 0.5rem 1rem 0.5rem 2.25rem;
+            margin: 2px 0; border-radius: 0.5rem; color: #64748b;
+            font-weight: 500; cursor: pointer; transition: all 0.15s; font-size: 0.9rem;
+        }
+        .tracker-link:hover { background-color: #f8fafc; color: #0f172a; }
+        .tracker-link.active { background-color: #fff; color: #4f46e5; font-weight: 600; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        
+        .tracker-sub-list { display: none; padding: 0.25rem 0; }
+        
+        .tab-delete { margin-left: auto; color: #cbd5e1; display: none; padding: 2px; }
+        .tracker-link:hover .tab-delete, .platform-header:hover .tab-delete { display: inline-block; }
+        .tab-delete:hover { color: #ef4444; }
+
+        /* Inputs */
+        .data-input { 
+            border: 1px solid #e2e8f0; border-radius: 0.375rem; padding: 0.35rem 0.5rem;
+            font-size: 0.875rem; width: 100%; transition: all 0.2s;
+            background-color: #fff; color: #1e293b;
+        }
+        .data-input:focus { border-color: #6366f1; outline: none; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1); }
+        td .data-input { min-width: 70px; }
+
+        #loading { display: none; position: fixed; top: 1rem; right: 1rem; background: #fff; padding: 0.75rem 1.25rem; border-radius: 0.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-weight: 500; color: #4f46e5; z-index: 50; align-items: center; gap: 0.5rem; }
+        
+        #sidebar { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .auth-bg { background: linear-gradient(135deg, #4f46e5 0%, #818cf8 100%); }
+    </style>
+</head>
+<body class="h-screen overflow-hidden text-slate-800">
+
+    <div id="loading">
+        <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        Working...
+    </div>
+
+    <!-- LOGIN SCREEN -->
+    <div id="auth-container" class="fixed inset-0 z-50 flex items-center justify-center auth-bg">
+        <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden mx-4 p-8">
+            <div class="text-center mb-8">
+                <h1 class="text-2xl font-bold text-slate-900">Social Media Tracker</h1>
+                <p class="text-slate-500 text-sm mt-1">Manage your business pricing</p>
+            </div>
+            <div id="auth-error" class="hidden bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4 text-center"></div>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase">Email</label>
+                    <input type="email" id="auth-email" class="data-input w-full mt-1 py-2.5">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase">Password</label>
+                    <input type="password" id="auth-password" class="data-input w-full mt-1 py-2.5">
+                </div>
+                <div class="pt-4 flex flex-col gap-3">
+                    <button onclick="window.handleLogin()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg transition">Login</button>
+                    <button onclick="window.handleRegister()" class="w-full py-3 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl font-bold transition">Create Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP SCREEN -->
+    <div id="app-container" class="hidden h-screen w-full flex relative bg-slate-50">
+        
+        <!-- Mobile Overlay -->
+        <div id="sidebar-overlay" onclick="window.toggleMobileMenu()" class="fixed inset-0 z-20 bg-slate-900/20 backdrop-blur-sm hidden md:hidden"></div>
+
+        <!-- SIDEBAR -->
+        <div id="sidebar" class="w-72 flex-shrink-0 bg-white flex flex-col border-r border-slate-200 fixed inset-y-0 left-0 z-30 transform -translate-x-full md:relative md:translate-x-0">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+                 <h1 class="text-lg font-bold text-slate-800">My<span class="text-indigo-600">Tracker</span></h1>
+                 <button onclick="window.toggleMobileMenu()" class="md:hidden p-2 text-slate-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            
+            <div class="p-4 flex-1 overflow-y-auto">
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3">Platforms</div>
+                <div id="platform-list" class="space-y-1">
+                    <div class="text-center py-10 text-slate-400 text-sm">Loading...</div>
+                </div>
+                <button onclick="window.addNewPlatform()" class="mt-4 w-full py-2 border-2 border-dashed border-slate-300 text-slate-500 rounded-lg hover:border-indigo-400 hover:text-indigo-600 text-sm font-medium transition">+ Add Platform</button>
+            </div>
+
+            <div class="p-4 border-t border-slate-100 bg-slate-50">
+                <div class="flex items-center gap-3">
+                    <div class="h-8 w-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold">U</div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-medium text-slate-900 truncate" id="userIdDisplay">...</p>
+                    </div>
+                    <button onclick="window.handleLogout()" class="text-slate-400 hover:text-red-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="flex-1 flex flex-col overflow-hidden w-full">
+            
+            <!-- Header -->
+            <div class="bg-white border-b border-slate-200 px-4 py-3 flex justify-between items-center shadow-sm z-10">
+                <div class="flex items-center gap-4">
+                    <button onclick="window.toggleMobileMenu()" class="md:hidden text-slate-500"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
+                    <div class="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-lg">
+                        <span class="text-xs font-bold text-slate-500 uppercase">USD Rate:</span>
+                        <input type="number" id="usdToDaRate" value="255.00" oninput="window.updateGlobalSettings()" class="bg-transparent border-none p-0 w-16 text-sm font-bold text-indigo-600 focus:ring-0 text-right">
+                        <span class="text-xs text-slate-400 font-bold">DA</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div id="welcome-view" class="flex-1 flex flex-col items-center justify-center p-10 text-center text-slate-400">
+                <svg class="w-16 h-16 text-slate-200 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                <p>Select a service from the sidebar to start.</p>
+            </div>
+
+            <!-- TRACKER CONTENT -->
+            <div id="tracker-view" class="hidden flex-1 overflow-y-auto p-4 md:p-6"> 
+                <div class="max-w-6xl mx-auto space-y-6">
+                    
+                    <!-- Settings -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-xs font-bold text-slate-400 uppercase">Provider</label>
+                            <input type="text" id="provider" oninput="window.updatePlatformSettings()" class="data-input mt-1">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-400 uppercase">Platform</label>
+                            <input type="text" id="platform" oninput="window.updatePlatformSettings()" class="data-input mt-1">
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden flex flex-col">
+                        <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-white">
+                            <h3 class="font-bold text-slate-800" id="tracker-table-title">Service Items</h3>
+                            <button onclick="window.addServiceItemRow()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1.5 px-4 rounded-lg text-sm shadow-sm transition">+ Item</button>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full" id="trackerTable">
+                                <thead class="bg-slate-50 text-xs uppercase font-bold text-slate-500">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left border-b w-16">ID</th> <!-- ID First -->
+                                        <th class="px-4 py-3 text-left border-b w-32">Category</th>
+                                        <th class="px-4 py-3 text-left border-b min-w-[150px]">Service</th>
+                                        
+                                        <th class="px-4 py-3 text-left border-b w-24 bg-blue-50/50">Buy $</th>
+                                        <th class="px-4 py-3 text-left border-b w-24 bg-blue-50/50">Buy DA</th>
+                                        <th class="px-4 py-3 text-left border-b w-24 bg-green-50/50">Sell DA</th>
+                                        <th class="px-4 py-3 text-left border-b w-24 bg-green-50/50">Sell $</th>
+                                        
+                                        <th class="px-4 py-3 text-left border-b w-16">Qty</th>
+                                        <th class="px-4 py-3 text-right border-b w-24 text-slate-400">T.Buy</th>
+                                        <th class="px-4 py-3 text-right border-b w-24 text-slate-400">T.Sell</th>
+                                        
+                                        <th class="px-4 py-3 text-right border-b w-28">Profit DA</th>
+                                        <th class="px-4 py-3 text-right border-b w-20">%</th>
+                                        <th class="px-4 py-3 border-b w-10"></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 text-sm"></tbody>
+                                <tfoot class="bg-slate-50 font-bold text-slate-700 border-t-2 border-slate-200 text-xs">
+                                    <tr>
+                                        <td class="px-4 py-3 text-right uppercase" colspan="7">Totals:</td>
+                                        <td class="px-4 py-3 text-left" id="total-Q">0</td>
+                                        <td class="px-4 py-3 text-right" id="total-J">0.00</td>
+                                        <td class="px-4 py-3 text-right" id="total-K">0.00</td>
+                                        <td class="px-4 py-3 text-right text-green-600" id="total-M">0.00</td>
+                                        <td class="px-4 py-3 text-right" id="total-N">0%</td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const appId = 'social-media-tracker-app'; 
+        // --- FIREBASE CONFIG ---
+        const firebaseConfig = {
+          apiKey: "AIzaSyCdB5SZ9Xi6MVZl-DsmTgWjJPK5EId-4F8",
+          authDomain: "dized-box.firebaseapp.com",
+          projectId: "dized-box",
+          storageBucket: "dized-box.firebasestorage.app",
+          messagingSenderId: "163199308320",
+          appId: "1:163199308320:web:7e8217dabae7668d016245",
+          measurementId: "G-Q9GFSXFZG8"
+        };
+
+        let db, auth, userId;
+        let globalSettingsDoc, platformsCollection;
+        let currentPlatformId, currentTrackerId;
+        
+        // Listeners variables
+        let globalSettingsListener = null;
+        let platformsListener = null;
+        let trackersListeners = {}; 
+        let trackerSettingsListener = null;
+        let itemsListener = null;
+
+        try {
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+        } catch (e) { console.error(e); }
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                userId = user.uid;
+                document.getElementById('auth-container').style.display = 'none';
+                document.getElementById('app-container').classList.remove('hidden');
+                document.getElementById('userIdDisplay').innerText = user.email;
+                
+                globalSettingsDoc = doc(db, `artifacts/${appId}/users/${userId}/settings/globalSettings`);
+                platformsCollection = collection(db, `artifacts/${appId}/users/${userId}/platforms`);
+                
+                initApp();
+            } else {
+                userId = null;
+                document.getElementById('auth-container').style.display = 'flex';
+                document.getElementById('app-container').classList.add('hidden');
+                cleanupListeners();
+            }
+        });
+
+        function cleanupListeners() {
+            if (globalSettingsListener) globalSettingsListener();
+            if (platformsListener) platformsListener();
+            if (trackerSettingsListener) trackerSettingsListener();
+            if (itemsListener) itemsListener();
+            Object.values(trackersListeners).forEach(l => l());
+            trackersListeners = {};
+        }
+
+        function initApp() {
+            // Global Rate
+            if (globalSettingsListener) globalSettingsListener();
+            globalSettingsListener = onSnapshot(globalSettingsDoc, (doc) => {
+                if (doc.exists()) document.getElementById('usdToDaRate').value = doc.data().rate || 255;
+                else setDoc(globalSettingsDoc, { rate: 255 }, { merge: true });
+                if(currentTrackerId) calculateAll();
+            });
+
+            // Platforms List
+            if (platformsListener) platformsListener();
+            const q = query(platformsCollection, where("isDeleted", "==", false), orderBy("createdAt", "asc"));
+            platformsListener = onSnapshot(q, (snapshot) => {
+                const list = document.getElementById('platform-list');
+                list.innerHTML = '';
+                
+                if(snapshot.empty) {
+                    window.addNewPlatform(true); 
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const p = doc.data();
+                    const div = document.createElement('div');
+                    div.innerHTML = `
+                        <div class="platform-header group" id="ph-${doc.id}" onclick="window.togglePlatform('${doc.id}')">
+                            <span class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-indigo-400"></div>${p.name}</span>
+                            <div class="flex items-center gap-1">
+                                <span class="tab-delete cursor-pointer hover:text-red-500" onclick="event.stopPropagation(); window.deletePlatform('${doc.id}', '${p.name}')">&times;</span>
+                                <svg class="arrow w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            </div>
+                        </div>
+                        <div class="tracker-sub-list" id="sub-${doc.id}"></div>
+                        <button onclick="window.addNewTracker('${doc.id}')" class="hidden text-xs text-indigo-600 hover:text-indigo-800 font-medium py-2 px-8 w-full text-left transition-colors" id="btn-${doc.id}">+ Add Service Type</button>
+                    `;
+                    list.appendChild(div);
+                });
+                
+                if(currentPlatformId) window.togglePlatform(currentPlatformId, true);
+            });
+        }
+
+        // --- EXPORTED FUNCTIONS ---
+        window.handleLogin = async () => {
+            try { await signInWithEmailAndPassword(auth, document.getElementById('auth-email').value, document.getElementById('auth-password').value); }
+            catch (e) { document.getElementById('auth-error').innerText = e.message; document.getElementById('auth-error').classList.remove('hidden'); }
+        };
+        window.handleRegister = async () => {
+            try { await createUserWithEmailAndPassword(auth, document.getElementById('auth-email').value, document.getElementById('auth-password').value); }
+            catch (e) { document.getElementById('auth-error').innerText = e.message; document.getElementById('auth-error').classList.remove('hidden'); }
+        };
+        window.handleLogout = () => signOut(auth);
+        window.toggleMobileMenu = () => {
+            const sb = document.getElementById('sidebar');
+            const ol = document.getElementById('sidebar-overlay');
+            sb.classList.toggle('-translate-x-full');
+            ol.classList.toggle('hidden');
+        };
+        window.updateGlobalSettings = () => {
+            const val = parseFloat(document.getElementById('usdToDaRate').value);
+            setDoc(globalSettingsDoc, { rate: val }, { merge: true });
+        };
+        window.addNewPlatform = async (isFirst = false) => {
+            const name = isFirst ? 'Instagram' : prompt("Platform Name (e.g., TikTok):");
+            if(!name) return;
+            const ref = await addDoc(platformsCollection, { name, provider: 'Secsers', platform: name, createdAt: Date.now(), isDeleted: false });
+            if(isFirst) window.addNewTracker(ref.id, true);
+        };
+        window.deletePlatform = async (id, name) => {
+            if(confirm(`Delete ${name}?`)) await deleteDoc(doc(db, platformsCollection.path, id));
+        };
+        window.togglePlatform = (pid, forceOpen = false) => {
+            const sub = document.getElementById(`sub-${pid}`);
+            const btn = document.getElementById(`btn-${pid}`);
+            const header = document.getElementById(`ph-${pid}`);
+            if(!sub) return;
+            const isOpen = header.classList.contains('open');
+            if(!forceOpen && isOpen) {
+                header.classList.remove('open'); sub.style.display = 'none'; btn.classList.add('hidden');
+            } else {
+                header.classList.add('open'); sub.style.display = 'block'; btn.classList.remove('hidden');
+                if (trackersListeners[pid]) return; 
+                const q = query(collection(db, platformsCollection.path, pid, "trackers"), where("isDeleted", "==", false), orderBy("createdAt", "asc"));
+                trackersListeners[pid] = onSnapshot(q, (snap) => {
+                    sub.innerHTML = '';
+                    snap.forEach(tDoc => {
+                        const t = tDoc.data();
+                        sub.innerHTML += `<div class="tracker-link group ${tDoc.id === currentTrackerId ? 'active' : ''}" onclick="window.selectTracker('${pid}', '${tDoc.id}')">
+                            <span class="truncate">${t.name}</span>
+                            <span class="tab-delete cursor-pointer hover:text-red-500 opacity-0 group-hover:opacity-100" onclick="event.stopPropagation(); window.deleteTracker('${pid}', '${tDoc.id}')">&times;</span>
+                        </div>`;
+                    });
+                });
+            }
+        };
+        window.addNewTracker = async (pid, isFirst = false) => {
+            const name = isFirst ? 'Followers' : prompt("Category Name (e.g., Likes):");
+            if(!name) return;
+            const ref = await addDoc(collection(db, platformsCollection.path, pid, "trackers"), { name, createdAt: Date.now(), isDeleted: false });
+            if(isFirst) window.addServiceItemRow(pid, ref.id, true);
+            window.selectTracker(pid, ref.id);
+        };
+        window.deleteTracker = async (pid, tid) => {
+            if(confirm("Delete category?")) await deleteDoc(doc(db, platformsCollection.path, pid, "trackers", tid));
+        };
+        window.selectTracker = (pid, tid) => {
+            currentPlatformId = pid; currentTrackerId = tid;
+            document.getElementById('welcome-view').classList.add('hidden');
+            document.getElementById('tracker-view').classList.remove('hidden');
+            document.querySelectorAll('.tracker-link').forEach(l => l.classList.remove('active'));
+            
+            if (trackerSettingsListener) trackerSettingsListener();
+            trackerSettingsListener = onSnapshot(doc(db, platformsCollection.path, pid), (d) => {
+                if(d.exists()) {
+                    document.getElementById('provider').value = d.data().provider || "";
+                    document.getElementById('platform').value = d.data().platform || "";
+                }
+            });
+
+            if (itemsListener) itemsListener();
+            // SORTING ASC = Oldest First = New Items added at bottom of list
+            const q = query(collection(db, platformsCollection.path, pid, "trackers", tid, "items"), where("isDeleted", "==", false), orderBy("createdAt", "asc"));
+            itemsListener = onSnapshot(q, (snap) => {
+                const tbody = document.getElementById('trackerTable').getElementsByTagName('tbody')[0];
+                tbody.innerHTML = '';
+                if(snap.empty) tbody.innerHTML = '<tr><td colspan="14" class="p-8 text-center text-slate-400">No items.</td></tr>';
+                
+                snap.forEach(iDoc => {
+                    const i = iDoc.data();
+                    tbody.innerHTML += `
+                    <tr id="${iDoc.id}" class="hover:bg-slate-50">
+                        <!-- ID COLUMN FIRST -->
+                        <td class="px-4 py-2"><input class="data-input font-mono text-slate-500" value="${i.id||''}" onchange="window.updateItem('${iDoc.id}', 'id', this.value)"></td>
+                        
+                        <td class="px-4 py-2"><input class="data-input" value="${i.cat||''}" onchange="window.updateItem('${iDoc.id}', 'cat', this.value)"></td>
+                        <td class="px-4 py-2"><input class="data-input w-full font-medium text-slate-700" value="${i.service||''}" onchange="window.updateItem('${iDoc.id}', 'service', this.value)"></td>
+                        
+                        <td class="px-4 py-2"><input type="number" class="data-input text-slate-700" value="${i.buyUSD||0}" onchange="window.updateItem('${iDoc.id}', 'buyUSD', this.value)"></td>
+                        <td class="px-4 py-2"><span class="calc-output text-xs" id="E-${iDoc.id}">0</span></td>
+                        
+                        <!-- SELL DA FIRST -->
+                        <td class="px-4 py-2"><input type="number" class="data-input font-bold text-green-700" value="${i.sellDA||0}" onchange="window.updateItem('${iDoc.id}', 'sellDA', this.value)"></td>
+                        <td class="px-4 py-2"><span class="calc-output text-xs" id="F-${iDoc.id}">0</span></td>
+                        
+                        <td class="px-4 py-2"><input type="number" class="data-input w-16 text-center" value="${i.qty||0}" onchange="window.updateItem('${iDoc.id}', 'qty', this.value)"></td>
+                        
+                        <td class="px-4 py-2 text-right text-xs text-slate-400" id="J-${iDoc.id}">0</td>
+                        <td class="px-4 py-2 text-right text-xs text-slate-400" id="K-${iDoc.id}">0</td>
+                        
+                        <td class="px-4 py-2 text-right font-bold text-sm" id="M-${iDoc.id}">0</td>
+                        <td class="px-4 py-2 text-right font-bold text-xs" id="N-${iDoc.id}">0%</td>
+                        <td class="px-4 py-2 text-center"><button class="text-slate-300 hover:text-red-500" onclick="window.deleteItem('${iDoc.id}')">&times;</button></td>
+                    </tr>`;
+                });
+                calculateAll();
+            });
+            if(window.innerWidth < 768) window.toggleMobileMenu();
+        };
+
+        window.addServiceItemRow = async (pid=currentPlatformId, tid=currentTrackerId, isDefault=false) => {
+            const d = isDefault ? { id: '101', cat: 'General', service: '1k Followers', buyUSD: 1, sellDA: 500, qty: 1 } 
+                                  : { id: '', cat: '', service: 'New Item', buyUSD: 0, sellDA: 0, qty: 1 };
+            await addDoc(collection(db, platformsCollection.path, pid, "trackers", tid, "items"), { ...d, createdAt: Date.now(), isDeleted: false });
+        };
+
+        window.updateItem = (id, f, v) => {
+            updateDoc(doc(db, platformsCollection.path, currentPlatformId, "trackers", currentTrackerId, "items", id), { [f]: (f==='service'||f==='cat'||f==='id')?v:Number(v) });
+        };
+
+        window.deleteItem = async (id) => {
+            if(confirm("Delete item permanently?")) {
+                await deleteDoc(doc(db, platformsCollection.path, currentPlatformId, "trackers", currentTrackerId, "items", id));
+            }
+        };
+        
+        window.updatePlatformSettings = () => {
+            if(!currentPlatformId) return;
+            updateDoc(doc(db, platformsCollection.path, currentPlatformId), {
+                provider: document.getElementById('provider').value,
+                platform: document.getElementById('platform').value
+            });
+        };
+
+        function calculateAll() {
+            const rate = parseFloat(document.getElementById('usdToDaRate').value) || 1;
+            const rows = document.querySelectorAll('#trackerTable tbody tr');
+            let tBuyTotal=0, tSellTotal=0, tProfitTotal=0, tQtyTotal=0;
+
+            rows.forEach(row => {
+                if(!row.id) return;
+                const inputs = row.getElementsByTagName('input');
+                // Updated input count to match new row structure (6 inputs)
+                if(inputs.length < 6) return; 
+
+                // Inputs indices: 0=ID, 1=Cat, 2=Service, 3=BuyUSD, 4=SellDA, 5=Qty
+                const buyUSD = parseFloat(inputs[3].value)||0;
+                const sellDA = parseFloat(inputs[4].value)||0;
+                const qty = parseFloat(inputs[5].value)||0;
+
+                const buyDA = buyUSD * rate;
+                const sellUSD = sellDA / rate;
+                const totalBuyUSD = buyUSD * qty;
+                const totalSellUSD = sellUSD * qty; 
+                
+                const profitDA = (sellDA * qty) - (buyDA * qty);
+                
+                // Fix percentage calc (Margin based on Total Sell DA)
+                const totalSellDA = sellDA * qty;
+                const profitPerc = totalSellDA ? profitDA / totalSellDA : 0;
+
+                document.getElementById(`E-${row.id}`).innerText = buyDA.toFixed(2);
+                document.getElementById(`F-${row.id}`).innerText = sellUSD.toFixed(2);
+                document.getElementById(`J-${row.id}`).innerText = totalBuyUSD.toFixed(2);
+                document.getElementById(`K-${row.id}`).innerText = totalSellUSD.toFixed(2);
+                
+                const elM = document.getElementById(`M-${row.id}`);
+                elM.innerText = profitDA.toFixed(2);
+                elM.className = `calc-output text-right font-bold text-sm ${profitDA >= 0 ? 'text-green-600' : 'text-red-600'}`;
+                document.getElementById(`N-${row.id}`).innerText = (profitPerc * 100).toFixed(1) + '%';
+
+                tBuyTotal += totalBuyUSD; 
+                tSellTotal += totalSellUSD; 
+                tProfitTotal += profitDA;
+                tQtyTotal += qty;
+            });
+
+            document.getElementById('total-Q').innerText = tQtyTotal;
+            document.getElementById('total-J').innerText = tBuyTotal.toFixed(2);
+            document.getElementById('total-K').innerText = tSellTotal.toFixed(2);
+            document.getElementById('total-M').innerText = tProfitTotal.toFixed(2);
+            
+            // Calculate Global Percentage (Total Profit DA / Total Sell DA)
+            const totalSellDA_Global = tSellTotal * rate;
+            const totalPerc = totalSellDA_Global ? (tProfitTotal / totalSellDA_Global * 100).toFixed(1) : "0.0";
+            document.getElementById('total-N').innerText = totalPerc + '%';
+        }
+    </script>
+</body>
+</html>
