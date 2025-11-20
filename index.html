@@ -129,7 +129,7 @@
                     <button onclick="window.toggleMobileMenu()" class="md:hidden text-slate-500"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
                     <div class="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-lg">
                         <span class="text-xs font-bold text-slate-500 uppercase">USD Rate:</span>
-                        <input type="number" id="usdToDaRate" value="255.00" oninput="window.updateGlobalSettings()" class="bg-transparent border-none p-0 w-16 text-sm font-bold text-indigo-600 focus:ring-0 text-right">
+                        <input type="text" id="usdToDaRate" value="255.00" oninput="window.updateGlobalSettings()" class="bg-transparent border-none p-0 w-16 text-sm font-bold text-indigo-600 focus:ring-0 text-right">
                         <span class="text-xs text-slate-400 font-bold">DA</span>
                     </div>
                 </div>
@@ -172,14 +172,15 @@
                                         <th class="px-4 py-3 text-left border-b w-32">Category</th>
                                         <th class="px-4 py-3 text-left border-b min-w-[150px]">Service</th>
                                         
+                                        <!-- FIXED ORDER: Sell $ then Sell DA -->
                                         <th class="px-4 py-3 text-left border-b w-24 bg-blue-50/50">Buy $</th>
                                         <th class="px-4 py-3 text-left border-b w-24 bg-blue-50/50">Buy DA</th>
                                         <th class="px-4 py-3 text-left border-b w-24 bg-green-50/50">Sell DA</th>
                                         <th class="px-4 py-3 text-left border-b w-24 bg-green-50/50">Sell $</th>
                                         
                                         <th class="px-4 py-3 text-left border-b w-16">Qty</th>
-                                        <th class="px-4 py-3 text-right border-b w-24 text-slate-400">T.Buy</th>
-                                        <th class="px-4 py-3 text-right border-b w-24 text-slate-400">T.Sell</th>
+                                        <th class="px-4 py-3 text-right border-b w-24 text-slate-400">T.Buy $</th>
+                                        <th class="px-4 py-3 text-right border-b w-24 text-slate-400">T.Sell $</th>
                                         
                                         <th class="px-4 py-3 text-right border-b w-28">Profit DA</th>
                                         <th class="px-4 py-3 text-right border-b w-20">%</th>
@@ -212,7 +213,6 @@
         import { getFirestore, doc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const appId = 'social-media-tracker-app'; 
-        // --- FIREBASE CONFIG ---
         const firebaseConfig = {
           apiKey: "AIzaSyCdB5SZ9Xi6MVZl-DsmTgWjJPK5EId-4F8",
           authDomain: "dized-box.firebaseapp.com",
@@ -227,7 +227,7 @@
         let globalSettingsDoc, platformsCollection;
         let currentPlatformId, currentTrackerId;
         
-        // Listeners variables
+        // DEFINED LISTENERS (Fixed Error)
         let globalSettingsListener = null;
         let platformsListener = null;
         let trackersListeners = {}; 
@@ -310,6 +310,14 @@
             });
         }
 
+        // --- UTILS ---
+        // Smart number parser: replaces comma with dot
+        const parseNum = (v) => {
+            if (!v) return 0;
+            const s = String(v).replace(',', '.');
+            return parseFloat(s) || 0;
+        };
+
         // --- EXPORTED FUNCTIONS ---
         window.handleLogin = async () => {
             try { await signInWithEmailAndPassword(auth, document.getElementById('auth-email').value, document.getElementById('auth-password').value); }
@@ -327,7 +335,7 @@
             ol.classList.toggle('hidden');
         };
         window.updateGlobalSettings = () => {
-            const val = parseFloat(document.getElementById('usdToDaRate').value);
+            const val = parseNum(document.getElementById('usdToDaRate').value);
             setDoc(globalSettingsDoc, { rate: val }, { merge: true });
         };
         window.addNewPlatform = async (isFirst = false) => {
@@ -360,6 +368,10 @@
                             <span class="tab-delete cursor-pointer hover:text-red-500 opacity-0 group-hover:opacity-100" onclick="event.stopPropagation(); window.deleteTracker('${pid}', '${tDoc.id}')">&times;</span>
                         </div>`;
                     });
+                    if(currentTrackerId && currentPlatformId === pid) {
+                         const link = document.getElementById(`link-${currentTrackerId}`);
+                         if(link) link.classList.add('active');
+                    }
                 });
             }
         };
@@ -377,6 +389,7 @@
             currentPlatformId = pid; currentTrackerId = tid;
             document.getElementById('welcome-view').classList.add('hidden');
             document.getElementById('tracker-view').classList.remove('hidden');
+            
             document.querySelectorAll('.tracker-link').forEach(l => l.classList.remove('active'));
             
             if (trackerSettingsListener) trackerSettingsListener();
@@ -388,7 +401,7 @@
             });
 
             if (itemsListener) itemsListener();
-            // SORTING ASC = Oldest First = New Items added at bottom of list
+            // SORT ASCENDING = New items will be at the bottom (rendered last)
             const q = query(collection(db, platformsCollection.path, pid, "trackers", tid, "items"), where("isDeleted", "==", false), orderBy("createdAt", "asc"));
             itemsListener = onSnapshot(q, (snap) => {
                 const tbody = document.getElementById('trackerTable').getElementsByTagName('tbody')[0];
@@ -399,20 +412,18 @@
                     const i = iDoc.data();
                     tbody.innerHTML += `
                     <tr id="${iDoc.id}" class="hover:bg-slate-50">
-                        <!-- ID COLUMN FIRST -->
                         <td class="px-4 py-2"><input class="data-input font-mono text-slate-500" value="${i.id||''}" onchange="window.updateItem('${iDoc.id}', 'id', this.value)"></td>
-                        
                         <td class="px-4 py-2"><input class="data-input" value="${i.cat||''}" onchange="window.updateItem('${iDoc.id}', 'cat', this.value)"></td>
                         <td class="px-4 py-2"><input class="data-input w-full font-medium text-slate-700" value="${i.service||''}" onchange="window.updateItem('${iDoc.id}', 'service', this.value)"></td>
                         
-                        <td class="px-4 py-2"><input type="number" class="data-input text-slate-700" value="${i.buyUSD||0}" onchange="window.updateItem('${iDoc.id}', 'buyUSD', this.value)"></td>
+                        <td class="px-4 py-2"><input type="text" class="data-input text-slate-700" value="${i.buyUSD||0}" onchange="window.updateItem('${iDoc.id}', 'buyUSD', this.value)"></td>
                         <td class="px-4 py-2"><span class="calc-output text-xs" id="E-${iDoc.id}">0</span></td>
                         
-                        <!-- SELL DA FIRST -->
-                        <td class="px-4 py-2"><input type="number" class="data-input font-bold text-green-700" value="${i.sellDA||0}" onchange="window.updateItem('${iDoc.id}', 'sellDA', this.value)"></td>
+                        <!-- FIXED: Sell DA first, Sell $ second -->
+                        <td class="px-4 py-2"><input type="text" class="data-input font-bold text-green-700" value="${i.sellDA||0}" onchange="window.updateItem('${iDoc.id}', 'sellDA', this.value)"></td>
                         <td class="px-4 py-2"><span class="calc-output text-xs" id="F-${iDoc.id}">0</span></td>
                         
-                        <td class="px-4 py-2"><input type="number" class="data-input w-16 text-center" value="${i.qty||0}" onchange="window.updateItem('${iDoc.id}', 'qty', this.value)"></td>
+                        <td class="px-4 py-2"><input type="text" class="data-input w-16 text-center" value="${i.qty||0}" onchange="window.updateItem('${iDoc.id}', 'qty', this.value)"></td>
                         
                         <td class="px-4 py-2 text-right text-xs text-slate-400" id="J-${iDoc.id}">0</td>
                         <td class="px-4 py-2 text-right text-xs text-slate-400" id="K-${iDoc.id}">0</td>
@@ -434,7 +445,7 @@
         };
 
         window.updateItem = (id, f, v) => {
-            updateDoc(doc(db, platformsCollection.path, currentPlatformId, "trackers", currentTrackerId, "items", id), { [f]: (f==='service'||f==='cat'||f==='id')?v:Number(v) });
+            updateDoc(doc(db, platformsCollection.path, currentPlatformId, "trackers", currentTrackerId, "items", id), { [f]: (f==='service'||f==='cat'||f==='id')?v:v });
         };
 
         window.deleteItem = async (id) => {
@@ -452,20 +463,19 @@
         };
 
         function calculateAll() {
-            const rate = parseFloat(document.getElementById('usdToDaRate').value) || 1;
+            const rate = parseNum(document.getElementById('usdToDaRate').value) || 1;
             const rows = document.querySelectorAll('#trackerTable tbody tr');
             let tBuyTotal=0, tSellTotal=0, tProfitTotal=0, tQtyTotal=0;
 
             rows.forEach(row => {
                 if(!row.id) return;
                 const inputs = row.getElementsByTagName('input');
-                // Updated input count to match new row structure (6 inputs)
+                // 0:ID, 1:Cat, 2:Service, 3:BuyUSD, 4:SellDA, 5:Qty
                 if(inputs.length < 6) return; 
 
-                // Inputs indices: 0=ID, 1=Cat, 2=Service, 3=BuyUSD, 4=SellDA, 5=Qty
-                const buyUSD = parseFloat(inputs[3].value)||0;
-                const sellDA = parseFloat(inputs[4].value)||0;
-                const qty = parseFloat(inputs[5].value)||0;
+                const buyUSD = parseNum(inputs[3].value);
+                const sellDA = parseNum(inputs[4].value);
+                const qty = parseNum(inputs[5].value);
 
                 const buyDA = buyUSD * rate;
                 const sellUSD = sellDA / rate;
@@ -474,7 +484,6 @@
                 
                 const profitDA = (sellDA * qty) - (buyDA * qty);
                 
-                // Fix percentage calc (Margin based on Total Sell DA)
                 const totalSellDA = sellDA * qty;
                 const profitPerc = totalSellDA ? profitDA / totalSellDA : 0;
 
@@ -499,7 +508,6 @@
             document.getElementById('total-K').innerText = tSellTotal.toFixed(2);
             document.getElementById('total-M').innerText = tProfitTotal.toFixed(2);
             
-            // Calculate Global Percentage (Total Profit DA / Total Sell DA)
             const totalSellDA_Global = tSellTotal * rate;
             const totalPerc = totalSellDA_Global ? (tProfitTotal / totalSellDA_Global * 100).toFixed(1) : "0.0";
             document.getElementById('total-N').innerText = totalPerc + '%';
