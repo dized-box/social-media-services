@@ -8,8 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        
-        /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
@@ -17,7 +15,7 @@
         /* Sidebar & UI */
         .platform-header {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 0.75rem 1rem; border-radius: 0.5rem;
+            padding: 0.75rem 0.5rem; border-radius: 0.5rem;
             color: #334155; font-weight: 600; cursor: pointer;
             transition: all 0.2s; border: 1px solid transparent;
         }
@@ -28,18 +26,24 @@
 
         .tracker-link {
             display: flex; align-items: center;
-            padding: 0.5rem 1rem 0.5rem 2.25rem;
+            padding: 0.5rem 0.5rem 0.5rem 0.5rem;
             margin: 2px 0; border-radius: 0.5rem; color: #64748b;
             font-weight: 500; cursor: pointer; transition: all 0.15s; font-size: 0.9rem;
         }
         .tracker-link:hover { background-color: #f8fafc; color: #0f172a; }
         .tracker-link.active { background-color: #fff; color: #4f46e5; font-weight: 600; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
         
-        .tracker-sub-list { display: none; padding: 0.25rem 0; }
+        .tracker-sub-list { display: none; padding: 0.25rem 0 0.25rem 1rem; }
         
         .tab-delete { margin-left: auto; color: #cbd5e1; display: none; padding: 2px; }
         .tracker-link:hover .tab-delete, .platform-header:hover .tab-delete { display: inline-block; }
         .tab-delete:hover { color: #ef4444; }
+
+        /* Drag & Drop Styles */
+        .drag-handle { cursor: grab; color: #cbd5e1; padding: 0.25rem; margin-right: 0.25rem; }
+        .drag-handle:hover { color: #64748b; }
+        .dragging { opacity: 0.5; border: 2px dashed #6366f1; background-color: #eef2ff; }
+        .drag-over { border-top: 2px solid #4f46e5; }
 
         /* Inputs */
         .data-input { 
@@ -129,7 +133,7 @@
                     <button onclick="window.toggleMobileMenu()" class="md:hidden text-slate-500"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
                     <div class="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-lg">
                         <span class="text-xs font-bold text-slate-500 uppercase">USD Rate:</span>
-                        <input type="text" id="usdToDaRate" value="255.00" oninput="window.updateGlobalSettings()" class="bg-transparent border-none p-0 w-16 text-sm font-bold text-indigo-600 focus:ring-0 text-right">
+                        <input type="number" id="usdToDaRate" value="255.00" oninput="window.updateGlobalSettings()" class="bg-transparent border-none p-0 w-16 text-sm font-bold text-indigo-600 focus:ring-0 text-right">
                         <span class="text-xs text-slate-400 font-bold">DA</span>
                     </div>
                 </div>
@@ -168,20 +172,17 @@
                             <table class="min-w-full" id="trackerTable">
                                 <thead class="bg-slate-50 text-xs uppercase font-bold text-slate-500">
                                     <tr>
-                                        <th class="px-4 py-3 text-left border-b w-16">ID</th> <!-- ID First -->
+                                        <th class="w-10"></th> <!-- Drag Handle -->
+                                        <th class="px-4 py-3 text-left border-b w-16">ID</th> 
                                         <th class="px-4 py-3 text-left border-b w-32">Category</th>
                                         <th class="px-4 py-3 text-left border-b min-w-[150px]">Service</th>
-                                        
-                                        <!-- FIXED ORDER: Sell $ then Sell DA -->
                                         <th class="px-4 py-3 text-left border-b w-24 bg-blue-50/50">Buy $</th>
                                         <th class="px-4 py-3 text-left border-b w-24 bg-blue-50/50">Buy DA</th>
                                         <th class="px-4 py-3 text-left border-b w-24 bg-green-50/50">Sell DA</th>
                                         <th class="px-4 py-3 text-left border-b w-24 bg-green-50/50">Sell $</th>
-                                        
                                         <th class="px-4 py-3 text-left border-b w-16">Qty</th>
-                                        <th class="px-4 py-3 text-right border-b w-24 text-slate-400">T.Buy $</th>
-                                        <th class="px-4 py-3 text-right border-b w-24 text-slate-400">T.Sell $</th>
-                                        
+                                        <th class="px-4 py-3 text-right border-b w-24 text-slate-400">T.Buy</th>
+                                        <th class="px-4 py-3 text-right border-b w-24 text-slate-400">T.Sell</th>
                                         <th class="px-4 py-3 text-right border-b w-28">Profit DA</th>
                                         <th class="px-4 py-3 text-right border-b w-20">%</th>
                                         <th class="px-4 py-3 border-b w-10"></th>
@@ -190,7 +191,7 @@
                                 <tbody class="divide-y divide-slate-100 text-sm"></tbody>
                                 <tfoot class="bg-slate-50 font-bold text-slate-700 border-t-2 border-slate-200 text-xs">
                                     <tr>
-                                        <td class="px-4 py-3 text-right uppercase" colspan="7">Totals:</td>
+                                        <td class="px-4 py-3 text-right uppercase" colspan="8">Totals:</td>
                                         <td class="px-4 py-3 text-left" id="total-Q">0</td>
                                         <td class="px-4 py-3 text-right" id="total-J">0.00</td>
                                         <td class="px-4 py-3 text-right" id="total-K">0.00</td>
@@ -210,7 +211,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, addDoc, updateDoc, deleteDoc, writeBatch, onSnapshot, collection, query, where, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const appId = 'social-media-tracker-app'; 
         const firebaseConfig = {
@@ -227,7 +228,7 @@
         let globalSettingsDoc, platformsCollection;
         let currentPlatformId, currentTrackerId;
         
-        // DEFINED LISTENERS (Fixed Error)
+        // Listeners variables
         let globalSettingsListener = null;
         let platformsListener = null;
         let trackersListeners = {}; 
@@ -277,7 +278,7 @@
                 if(currentTrackerId) calculateAll();
             });
 
-            // Platforms List
+            // Platforms List - Fetched by createdAt (Sort handled in JS)
             if (platformsListener) platformsListener();
             const q = query(platformsCollection, where("isDeleted", "==", false), orderBy("createdAt", "asc"));
             platformsListener = onSnapshot(q, (snapshot) => {
@@ -289,19 +290,35 @@
                     return;
                 }
 
-                snapshot.forEach(doc => {
-                    const p = doc.data();
+                let docs = [];
+                snapshot.forEach(doc => docs.push({id: doc.id, ...doc.data()}));
+                // Client-side sort by 'order' field if available, else 'createdAt'
+                docs.sort((a, b) => (a.order || a.createdAt) - (b.order || b.createdAt));
+
+                docs.forEach(p => {
                     const div = document.createElement('div');
+                    // Platform Item with Drag Handle
+                    div.className = "mb-1";
+                    div.draggable = true;
+                    div.dataset.id = p.id;
+                    div.ondragstart = (e) => dragStart(e, 'platform');
+                    div.ondragover = (e) => dragOver(e);
+                    div.ondrop = (e) => drop(e, 'platform');
+
                     div.innerHTML = `
-                        <div class="platform-header group" id="ph-${doc.id}" onclick="window.togglePlatform('${doc.id}')">
-                            <span class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-indigo-400"></div>${p.name}</span>
+                        <div class="platform-header group" id="ph-${p.id}" onclick="window.togglePlatform('${p.id}')">
+                            <div class="flex items-center gap-2">
+                                <span class="drag-handle group-hover:text-slate-400">&#8942;&#8942;</span>
+                                <div class="w-1.5 h-1.5 rounded-full bg-indigo-400"></div>
+                                <span class="font-medium">${p.name}</span>
+                            </div>
                             <div class="flex items-center gap-1">
-                                <span class="tab-delete cursor-pointer hover:text-red-500" onclick="event.stopPropagation(); window.deletePlatform('${doc.id}', '${p.name}')">&times;</span>
+                                <span class="tab-delete cursor-pointer hover:text-red-500" onclick="event.stopPropagation(); window.deletePlatform('${p.id}', '${p.name}')">&times;</span>
                                 <svg class="arrow w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                             </div>
                         </div>
-                        <div class="tracker-sub-list" id="sub-${doc.id}"></div>
-                        <button onclick="window.addNewTracker('${doc.id}')" class="hidden text-xs text-indigo-600 hover:text-indigo-800 font-medium py-2 px-8 w-full text-left transition-colors" id="btn-${doc.id}">+ Add Service Type</button>
+                        <div class="tracker-sub-list" id="sub-${p.id}"></div>
+                        <button onclick="window.addNewTracker('${p.id}')" class="hidden text-xs text-indigo-600 hover:text-indigo-800 font-medium py-2 px-8 w-full text-left transition-colors" id="btn-${p.id}">+ Add Service Type</button>
                     `;
                     list.appendChild(div);
                 });
@@ -310,12 +327,75 @@
             });
         }
 
-        // --- UTILS ---
-        // Smart number parser: replaces comma with dot
-        const parseNum = (v) => {
-            if (!v) return 0;
-            const s = String(v).replace(',', '.');
-            return parseFloat(s) || 0;
+        // --- DRAG & DROP LOGIC ---
+        let dragSrcEl = null;
+        
+        const dragStart = (e, type) => {
+            dragSrcEl = e.currentTarget;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', e.currentTarget.outerHTML);
+            e.currentTarget.classList.add('dragging');
+        };
+
+        const dragOver = (e) => {
+            if (e.preventDefault) e.preventDefault(); 
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        };
+
+        const drop = async (e, type) => {
+            if (e.stopPropagation) e.stopPropagation();
+            const target = e.currentTarget;
+            
+            if (dragSrcEl !== target) {
+                // Simple visual swap is not enough, we need to reorder data
+                // Get all items in the container
+                const container = target.parentNode;
+                const items = Array.from(container.children).filter(child => child.tagName === target.tagName || child.className === target.className);
+                
+                // Find indexes
+                const fromIndex = items.indexOf(dragSrcEl);
+                const toIndex = items.indexOf(target);
+                
+                // Move in DOM
+                if (fromIndex < toIndex) {
+                    target.after(dragSrcEl);
+                } else {
+                    target.before(dragSrcEl);
+                }
+                
+                // Re-calculate orders
+                const newOrderIds = Array.from(container.children).map(el => el.dataset.id).filter(id => id);
+                await reorderDocs(type, newOrderIds);
+            }
+            
+            dragSrcEl.classList.remove('dragging');
+            return false;
+        };
+
+        const reorderDocs = async (type, ids) => {
+            // Update 'order' field in Firestore for all items in the list
+            const batch = writeBatch(db);
+            const now = Date.now();
+            
+            ids.forEach((id, index) => {
+                let ref;
+                if (type === 'platform') {
+                    ref = doc(db, platformsCollection.path, id);
+                } else if (type === 'tracker') {
+                    ref = doc(db, platformsCollection.path, currentPlatformId, "trackers", id);
+                } else if (type === 'item') {
+                    ref = doc(db, platformsCollection.path, currentPlatformId, "trackers", currentTrackerId, "items", id);
+                }
+                
+                if (ref) {
+                    // Use a large base number + index to keep relative order valid compared to createdAt
+                    // or just use index if we sort strictly by 'order'.
+                    // We will use a simple index but ensure our query sorts by it.
+                    batch.update(ref, { order: index }); 
+                }
+            });
+            await batch.commit();
         };
 
         // --- EXPORTED FUNCTIONS ---
@@ -341,7 +421,8 @@
         window.addNewPlatform = async (isFirst = false) => {
             const name = isFirst ? 'Instagram' : prompt("Platform Name (e.g., TikTok):");
             if(!name) return;
-            const ref = await addDoc(platformsCollection, { name, provider: 'Secsers', platform: name, createdAt: Date.now(), isDeleted: false });
+            // Add 'order' field. Use Date.now() to put at bottom initially.
+            const ref = await addDoc(platformsCollection, { name, provider: 'Secsers', platform: name, createdAt: Date.now(), order: Date.now(), isDeleted: false });
             if(isFirst) window.addNewTracker(ref.id, true);
         };
         window.deletePlatform = async (id, name) => {
@@ -358,27 +439,38 @@
             } else {
                 header.classList.add('open'); sub.style.display = 'block'; btn.classList.remove('hidden');
                 if (trackersListeners[pid]) return; 
+                
                 const q = query(collection(db, platformsCollection.path, pid, "trackers"), where("isDeleted", "==", false), orderBy("createdAt", "asc"));
                 trackersListeners[pid] = onSnapshot(q, (snap) => {
                     sub.innerHTML = '';
-                    snap.forEach(tDoc => {
-                        const t = tDoc.data();
-                        sub.innerHTML += `<div class="tracker-link group ${tDoc.id === currentTrackerId ? 'active' : ''}" onclick="window.selectTracker('${pid}', '${tDoc.id}')">
-                            <span class="truncate">${t.name}</span>
-                            <span class="tab-delete cursor-pointer hover:text-red-500 opacity-0 group-hover:opacity-100" onclick="event.stopPropagation(); window.deleteTracker('${pid}', '${tDoc.id}')">&times;</span>
-                        </div>`;
+                    let docs = [];
+                    snap.forEach(doc => docs.push({id: doc.id, ...doc.data()}));
+                    docs.sort((a, b) => (a.order || a.createdAt) - (b.order || b.createdAt));
+
+                    docs.forEach(t => {
+                        const div = document.createElement('div');
+                        div.className = `tracker-link group ${t.id === currentTrackerId ? 'active' : ''}`;
+                        div.draggable = true;
+                        div.dataset.id = t.id;
+                        div.onclick = () => window.selectTracker(pid, t.id);
+                        div.ondragstart = (e) => dragStart(e, 'tracker');
+                        div.ondragover = (e) => dragOver(e);
+                        div.ondrop = (e) => drop(e, 'tracker');
+
+                        div.innerHTML = `
+                            <span class="drag-handle opacity-0 group-hover:opacity-100">&#8942;&#8942;</span>
+                            <span class="truncate flex-1">${t.name}</span>
+                            <span class="tab-delete cursor-pointer hover:text-red-500 opacity-0 group-hover:opacity-100" onclick="event.stopPropagation(); window.deleteTracker('${pid}', '${t.id}')">&times;</span>
+                        `;
+                        sub.appendChild(div);
                     });
-                    if(currentTrackerId && currentPlatformId === pid) {
-                         const link = document.getElementById(`link-${currentTrackerId}`);
-                         if(link) link.classList.add('active');
-                    }
                 });
             }
         };
         window.addNewTracker = async (pid, isFirst = false) => {
             const name = isFirst ? 'Followers' : prompt("Category Name (e.g., Likes):");
             if(!name) return;
-            const ref = await addDoc(collection(db, platformsCollection.path, pid, "trackers"), { name, createdAt: Date.now(), isDeleted: false });
+            const ref = await addDoc(collection(db, platformsCollection.path, pid, "trackers"), { name, createdAt: Date.now(), order: Date.now(), isDeleted: false });
             if(isFirst) window.addServiceItemRow(pid, ref.id, true);
             window.selectTracker(pid, ref.id);
         };
@@ -389,7 +481,6 @@
             currentPlatformId = pid; currentTrackerId = tid;
             document.getElementById('welcome-view').classList.add('hidden');
             document.getElementById('tracker-view').classList.remove('hidden');
-            
             document.querySelectorAll('.tracker-link').forEach(l => l.classList.remove('active'));
             
             if (trackerSettingsListener) trackerSettingsListener();
@@ -401,37 +492,47 @@
             });
 
             if (itemsListener) itemsListener();
-            // SORT ASCENDING = New items will be at the bottom (rendered last)
             const q = query(collection(db, platformsCollection.path, pid, "trackers", tid, "items"), where("isDeleted", "==", false), orderBy("createdAt", "asc"));
             itemsListener = onSnapshot(q, (snap) => {
                 const tbody = document.getElementById('trackerTable').getElementsByTagName('tbody')[0];
                 tbody.innerHTML = '';
                 if(snap.empty) tbody.innerHTML = '<tr><td colspan="14" class="p-8 text-center text-slate-400">No items.</td></tr>';
                 
-                snap.forEach(iDoc => {
-                    const i = iDoc.data();
-                    tbody.innerHTML += `
-                    <tr id="${iDoc.id}" class="hover:bg-slate-50">
-                        <td class="px-4 py-2"><input class="data-input font-mono text-slate-500" value="${i.id||''}" onchange="window.updateItem('${iDoc.id}', 'id', this.value)"></td>
-                        <td class="px-4 py-2"><input class="data-input" value="${i.cat||''}" onchange="window.updateItem('${iDoc.id}', 'cat', this.value)"></td>
-                        <td class="px-4 py-2"><input class="data-input w-full font-medium text-slate-700" value="${i.service||''}" onchange="window.updateItem('${iDoc.id}', 'service', this.value)"></td>
+                let items = [];
+                snap.forEach(doc => items.push({id: doc.id, ...doc.data()}));
+                items.sort((a, b) => (a.order || a.createdAt) - (b.order || b.createdAt));
+
+                items.forEach(i => {
+                    const row = tbody.insertRow();
+                    row.id = i.id;
+                    row.className = "hover:bg-slate-50";
+                    row.draggable = true;
+                    row.dataset.id = i.id;
+                    row.ondragstart = (e) => dragStart(e, 'item');
+                    row.ondragover = (e) => dragOver(e);
+                    row.ondrop = (e) => drop(e, 'item');
+
+                    row.innerHTML = `
+                        <td class="p-2"><span class="drag-handle">&#8942;&#8942;</span></td>
+                        <td class="px-4 py-2"><input class="data-input font-mono text-slate-500" value="${i.id||''}" onchange="window.updateItem('${i.id}', 'id', this.value)"></td>
+                        <td class="px-4 py-2"><input class="data-input" value="${i.cat||''}" onchange="window.updateItem('${i.id}', 'cat', this.value)"></td>
+                        <td class="px-4 py-2"><input class="data-input w-full font-medium text-slate-700" value="${i.service||''}" onchange="window.updateItem('${i.id}', 'service', this.value)"></td>
                         
-                        <td class="px-4 py-2"><input type="text" class="data-input text-slate-700" value="${i.buyUSD||0}" onchange="window.updateItem('${iDoc.id}', 'buyUSD', this.value)"></td>
-                        <td class="px-4 py-2"><span class="calc-output text-xs" id="E-${iDoc.id}">0</span></td>
+                        <td class="px-4 py-2"><input type="text" class="data-input text-slate-700" value="${i.buyUSD||0}" onchange="window.updateItem('${i.id}', 'buyUSD', this.value)"></td>
+                        <td class="px-4 py-2"><span class="calc-output text-xs" id="E-${i.id}">0</span></td>
                         
-                        <!-- FIXED: Sell DA first, Sell $ second -->
-                        <td class="px-4 py-2"><input type="text" class="data-input font-bold text-green-700" value="${i.sellDA||0}" onchange="window.updateItem('${iDoc.id}', 'sellDA', this.value)"></td>
-                        <td class="px-4 py-2"><span class="calc-output text-xs" id="F-${iDoc.id}">0</span></td>
+                        <td class="px-4 py-2"><input type="text" class="data-input font-bold text-green-700" value="${i.sellDA||0}" onchange="window.updateItem('${i.id}', 'sellDA', this.value)"></td>
+                        <td class="px-4 py-2"><span class="calc-output text-xs" id="F-${i.id}">0</span></td>
                         
-                        <td class="px-4 py-2"><input type="text" class="data-input w-16 text-center" value="${i.qty||0}" onchange="window.updateItem('${iDoc.id}', 'qty', this.value)"></td>
+                        <td class="px-4 py-2"><input type="text" class="data-input w-16 text-center" value="${i.qty||0}" onchange="window.updateItem('${i.id}', 'qty', this.value)"></td>
                         
-                        <td class="px-4 py-2 text-right text-xs text-slate-400" id="J-${iDoc.id}">0</td>
-                        <td class="px-4 py-2 text-right text-xs text-slate-400" id="K-${iDoc.id}">0</td>
+                        <td class="px-4 py-2 text-right text-xs text-slate-400" id="J-${i.id}">0</td>
+                        <td class="px-4 py-2 text-right text-xs text-slate-400" id="K-${i.id}">0</td>
                         
-                        <td class="px-4 py-2 text-right font-bold text-sm" id="M-${iDoc.id}">0</td>
-                        <td class="px-4 py-2 text-right font-bold text-xs" id="N-${iDoc.id}">0%</td>
-                        <td class="px-4 py-2 text-center"><button class="text-slate-300 hover:text-red-500" onclick="window.deleteItem('${iDoc.id}')">&times;</button></td>
-                    </tr>`;
+                        <td class="px-4 py-2 text-right font-bold text-sm" id="M-${i.id}">0</td>
+                        <td class="px-4 py-2 text-right font-bold text-xs" id="N-${i.id}">0%</td>
+                        <td class="px-4 py-2 text-center"><button class="text-slate-300 hover:text-red-500" onclick="window.deleteItem('${i.id}')">&times;</button></td>
+                    `;
                 });
                 calculateAll();
             });
@@ -441,7 +542,7 @@
         window.addServiceItemRow = async (pid=currentPlatformId, tid=currentTrackerId, isDefault=false) => {
             const d = isDefault ? { id: '101', cat: 'General', service: '1k Followers', buyUSD: 1, sellDA: 500, qty: 1 } 
                                   : { id: '', cat: '', service: 'New Item', buyUSD: 0, sellDA: 0, qty: 1 };
-            await addDoc(collection(db, platformsCollection.path, pid, "trackers", tid, "items"), { ...d, createdAt: Date.now(), isDeleted: false });
+            await addDoc(collection(db, platformsCollection.path, pid, "trackers", tid, "items"), { ...d, createdAt: Date.now(), order: Date.now(), isDeleted: false });
         };
 
         window.updateItem = (id, f, v) => {
@@ -462,6 +563,9 @@
             });
         };
 
+        // UTILS
+        const parseNum = (v) => { if (!v) return 0; const s = String(v).replace(',', '.'); return parseFloat(s) || 0; };
+
         function calculateAll() {
             const rate = parseNum(document.getElementById('usdToDaRate').value) || 1;
             const rows = document.querySelectorAll('#trackerTable tbody tr');
@@ -470,7 +574,6 @@
             rows.forEach(row => {
                 if(!row.id) return;
                 const inputs = row.getElementsByTagName('input');
-                // 0:ID, 1:Cat, 2:Service, 3:BuyUSD, 4:SellDA, 5:Qty
                 if(inputs.length < 6) return; 
 
                 const buyUSD = parseNum(inputs[3].value);
