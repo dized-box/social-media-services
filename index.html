@@ -8,12 +8,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         
-        /* UI Components */
         .platform-header { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; border-radius: 0.5rem; color: #334155; font-weight: 600; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
         .platform-header:hover { background-color: #f1f5f9; }
         .platform-header.open { background-color: #eff6ff; color: #2563eb; border-color: #dbeafe; }
@@ -29,17 +27,14 @@
         .tracker-link:hover .tab-delete, .platform-header:hover .tab-delete { display: inline-block; }
         .tab-delete:hover { color: #ef4444; }
 
-        /* Drag & Drop Visuals */
         .drag-handle { cursor: grab; color: #cbd5e1; padding: 0.25rem; margin-right: 0.25rem; user-select: none; }
         .drag-handle:hover { color: #64748b; }
         .dragging { opacity: 0.5; border: 2px dashed #6366f1; background-color: #eef2ff; }
         .drag-over { border-top: 3px solid #4f46e5 !important; }
 
-        /* Inputs */
         .data-input { border: 1px solid #e2e8f0; border-radius: 0.375rem; padding: 0.35rem 0.5rem; font-size: 0.875rem; width: 100%; transition: all 0.2s; background-color: #fff; color: #1e293b; }
         .data-input:focus { border-color: #6366f1; outline: none; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1); }
         
-        /* Loading Overlay */
         #loading { display: none; position: fixed; top: 1rem; right: 1rem; background: #fff; padding: 0.75rem 1.25rem; border-radius: 0.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-weight: 500; color: #4f46e5; z-index: 50; align-items: center; gap: 0.5rem; }
         #sidebar { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .auth-bg { background: linear-gradient(135deg, #4f46e5 0%, #818cf8 100%); }
@@ -156,7 +151,6 @@
     </div>
 
     <script type="module">
-        // FIXED: Using the 11.0.2 version that definitely works
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
         import { getFirestore, doc, setDoc, addDoc, updateDoc, deleteDoc, writeBatch, onSnapshot, collection, query, where, orderBy } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
@@ -225,7 +219,7 @@
                 } else {
                     setDoc(globalSettingsDoc, { rate: 255 }, { merge: true });
                 }
-                window.calculateAll(); // Calc immediately on load
+                window.calculateAll(); 
             });
 
             if (platformsListener) platformsListener();
@@ -236,15 +230,14 @@
                 if(snapshot.empty) { window.addNewPlatform(true); return; }
 
                 let docs = [];
-                snapshot.forEach(doc => docs.push({id: doc.id, ...doc.data()}));
+                snapshot.forEach(doc => docs.push({_fid: doc.id, ...doc.data()}));
                 docs.sort((a, b) => (a.order || a.createdAt) - (b.order || b.createdAt));
 
                 docs.forEach(p => {
                     const div = document.createElement('div');
                     div.className = "mb-1";
                     div.draggable = true;
-                    div.dataset.id = p.id;
-                    // FIX: Check target to prevent preventing button clicks
+                    div.dataset.id = p._fid;
                     div.ondragstart = (e) => { 
                         if(e.target.closest('.tab-delete') || e.target.closest('.tracker-sub-list')) { e.preventDefault(); return; }
                         dragStart(e, 'platform'); 
@@ -254,19 +247,19 @@
                     div.ondragleave = (e) => dragLeave(e);
 
                     div.innerHTML = `
-                        <div class="platform-header group" id="ph-${p.id}" onclick="window.togglePlatform('${p.id}')">
+                        <div class="platform-header group" id="ph-${p._fid}" onclick="window.togglePlatform('${p._fid}')">
                             <div class="flex items-center gap-2 pointer-events-none">
                                 <span class="drag-handle group-hover:text-slate-400 pointer-events-auto">&#8942;&#8942;</span>
                                 <div class="w-1.5 h-1.5 rounded-full bg-indigo-400"></div>
                                 <span class="font-medium">${p.name}</span>
                             </div>
                             <div class="flex items-center gap-1">
-                                <span class="tab-delete cursor-pointer hover:text-red-500" onclick="event.stopPropagation(); window.deletePlatform('${p.id}', '${p.name}')">&times;</span>
+                                <span class="tab-delete cursor-pointer hover:text-red-500" onclick="event.stopPropagation(); window.deletePlatform('${p._fid}', '${p.name}')">&times;</span>
                                 <svg class="arrow w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                             </div>
                         </div>
-                        <div class="tracker-sub-list" id="sub-${p.id}"></div>
-                        <button onclick="window.addNewTracker('${p.id}')" class="hidden text-xs text-indigo-600 hover:text-indigo-800 font-medium py-2 px-8 w-full text-left transition-colors" id="btn-${p.id}">+ Add Service Type</button>
+                        <div class="tracker-sub-list" id="sub-${p._fid}"></div>
+                        <button onclick="window.addNewTracker('${p._fid}')" class="hidden text-xs text-indigo-600 hover:text-indigo-800 font-medium py-2 px-8 w-full text-left transition-colors" id="btn-${p._fid}">+ Add Service Type</button>
                     `;
                     list.appendChild(div);
                 });
@@ -350,24 +343,25 @@
                 trackersListeners[pid] = onSnapshot(q, (snap) => {
                     sub.innerHTML = '';
                     let docs = [];
-                    snap.forEach(doc => docs.push({id: doc.id, ...doc.data()}));
+                    // FIX: Use _fid to avoid collisions with user data "id"
+                    snap.forEach(doc => docs.push({_fid: doc.id, ...doc.data()}));
                     docs.sort((a, b) => (a.order || a.createdAt) - (b.order || b.createdAt));
 
                     docs.forEach(t => {
                         const div = document.createElement('div');
-                        div.className = `tracker-link group ${t.id === currentTrackerId ? 'active' : ''}`;
+                        div.className = `tracker-link group ${t._fid === currentTrackerId ? 'active' : ''}`;
                         div.draggable = true;
-                        div.dataset.id = t.id;
-                        // FIX: Drag check
+                        div.dataset.id = t._fid;
+                        
                         div.ondragstart = (e) => { 
                              if(e.target.closest('.tab-delete')) { e.preventDefault(); return; }
                              dragStart(e, 'tracker'); 
                         };
                         div.ondragover = (e) => dragOver(e);
                         div.ondrop = (e) => drop(e, 'tracker');
-                        div.onclick = () => window.selectTracker(pid, t.id);
+                        div.onclick = () => window.selectTracker(pid, t._fid);
                         
-                        div.innerHTML = `<span class="drag-handle opacity-0 group-hover:opacity-100">&#8942;&#8942;</span><span class="truncate flex-1 pointer-events-none">${t.name}</span><span class="tab-delete cursor-pointer hover:text-red-500 opacity-0 group-hover:opacity-100" onclick="event.stopPropagation(); window.deleteTracker('${pid}', '${t.id}')">&times;</span>`;
+                        div.innerHTML = `<span class="drag-handle opacity-0 group-hover:opacity-100">&#8942;&#8942;</span><span class="truncate flex-1 pointer-events-none">${t.name}</span><span class="tab-delete cursor-pointer hover:text-red-500 opacity-0 group-hover:opacity-100" onclick="event.stopPropagation(); window.deleteTracker('${pid}', '${t._fid}')">&times;</span>`;
                         sub.appendChild(div);
                     });
                 });
@@ -407,17 +401,17 @@
                 if(snap.empty) tbody.innerHTML = '<tr><td colspan="14" class="p-8 text-center text-slate-400">No items.</td></tr>';
                 
                 let items = [];
-                snap.forEach(doc => items.push({id: doc.id, ...doc.data()}));
+                // IMPORTANT FIX: Use _fid (system ID) vs id (user display ID)
+                snap.forEach(doc => items.push({_fid: doc.id, ...doc.data()}));
                 items.sort((a, b) => (a.order || a.createdAt) - (b.order || b.createdAt));
 
                 items.forEach(i => {
                     const row = tbody.insertRow();
-                    row.id = i.id; // This is the FIRESTORE ID
+                    row.id = i._fid; 
                     row.className = "hover:bg-slate-50 item-row";
                     row.draggable = true;
-                    row.dataset.id = i.id;
+                    row.dataset.id = i._fid;
                     
-                    // FIX: Prevent drag when clicking inputs or buttons
                     row.ondragstart = (e) => { 
                         if(e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') { e.preventDefault(); return; }
                         dragStart(e, 'item'); 
@@ -425,28 +419,27 @@
                     row.ondragover = (e) => dragOver(e);
                     row.ondrop = (e) => drop(e, 'item');
 
-                    // FIX: Added classes (input-buy-usd, etc) to make selection inside calculateAll robust
-                    // FIX: Changed onchange to oninput for real-time math
+                    // FIX: Use _fid in updateItem and deleteItem calls
                     row.innerHTML = `
                         <td class="p-2"><span class="drag-handle">&#8942;&#8942;</span></td>
-                        <td class="px-4 py-2"><input class="data-input font-mono text-slate-500" value="${i.id||''}" placeholder="ID" oninput="window.updateItem('${i.id}', 'id', this.value)"></td>
-                        <td class="px-4 py-2"><input class="data-input" value="${i.cat||''}" placeholder="Cat" oninput="window.updateItem('${i.id}', 'cat', this.value)"></td>
-                        <td class="px-4 py-2"><input class="data-input w-full font-medium text-slate-700" value="${i.service||''}" oninput="window.updateItem('${i.id}', 'service', this.value)"></td>
+                        <td class="px-4 py-2"><input class="data-input font-mono text-slate-500" value="${i.id||''}" placeholder="ID" oninput="window.updateItem('${i._fid}', 'id', this.value)"></td>
+                        <td class="px-4 py-2"><input class="data-input" value="${i.cat||''}" placeholder="Cat" oninput="window.updateItem('${i._fid}', 'cat', this.value)"></td>
+                        <td class="px-4 py-2"><input class="data-input w-full font-medium text-slate-700" value="${i.service||''}" oninput="window.updateItem('${i._fid}', 'service', this.value)"></td>
                         
-                        <td class="px-4 py-2"><input type="text" class="data-input text-slate-700 input-buy-usd" value="${i.buyUSD||0}" oninput="window.updateItem('${i.id}', 'buyUSD', this.value)"></td>
+                        <td class="px-4 py-2"><input type="text" class="data-input text-slate-700 input-buy-usd" value="${i.buyUSD||0}" oninput="window.updateItem('${i._fid}', 'buyUSD', this.value)"></td>
                         <td class="px-4 py-2"><span class="calc-buy-da">0</span></td>
                         
-                        <td class="px-4 py-2"><input type="text" class="data-input font-bold text-green-700 input-sell-da" value="${i.sellDA||0}" oninput="window.updateItem('${i.id}', 'sellDA', this.value)"></td>
+                        <td class="px-4 py-2"><input type="text" class="data-input font-bold text-green-700 input-sell-da" value="${i.sellDA||0}" oninput="window.updateItem('${i._fid}', 'sellDA', this.value)"></td>
                         <td class="px-4 py-2"><span class="calc-sell-usd text-xs">0</span></td>
                         
-                        <td class="px-4 py-2"><input type="text" class="data-input w-16 text-center input-qty" value="${i.qty||1}" oninput="window.updateItem('${i.id}', 'qty', this.value)"></td>
+                        <td class="px-4 py-2"><input type="text" class="data-input w-16 text-center input-qty" value="${i.qty||1}" oninput="window.updateItem('${i._fid}', 'qty', this.value)"></td>
                         
                         <td class="px-4 py-2 text-right text-xs text-slate-400 calc-total-buy">0</td>
                         <td class="px-4 py-2 text-right text-xs text-slate-400 calc-total-sell">0</td>
                         <td class="px-4 py-2 text-right font-bold text-sm calc-profit">0</td>
                         <td class="px-4 py-2 text-right font-bold text-xs calc-perc">0%</td>
                         <td class="px-4 py-2 text-center">
-                            <button class="text-slate-300 hover:text-red-500 p-2 font-bold text-lg" onclick="event.stopPropagation(); window.deleteItem('${i.id}')">&times;</button>
+                            <button class="text-slate-300 hover:text-red-500 p-2 font-bold text-lg" onclick="event.stopPropagation(); window.deleteItem('${i._fid}')">&times;</button>
                         </td>
                     `;
                 });
@@ -461,25 +454,23 @@
             await addDoc(collection(db, platformsCollection.path, pid, "trackers", tid, "items"), { ...d, createdAt: Date.now(), order: Date.now(), isDeleted: false });
         };
 
-        // FIX: Ensure value is saved as string for text fields, but updateItem itself doesn't force numbers. 
-        // The calculation logic handles the string-to-number conversion.
-        window.updateItem = (id, f, v) => { 
-            updateDoc(doc(db, platformsCollection.path, currentPlatformId, "trackers", currentTrackerId, "items", id), { [f]: v }); 
-            window.calculateAll(); // Recalculate immediately on update
+        window.updateItem = (fid, f, v) => { 
+            if (!fid) return;
+            updateDoc(doc(db, platformsCollection.path, currentPlatformId, "trackers", currentTrackerId, "items", fid), { [f]: v }); 
+            window.calculateAll();
         };
         
-        window.deleteItem = async (id) => { 
+        window.deleteItem = async (fid) => { 
+            if(!fid) return;
             if(confirm("Delete item permanently?")) {
-                await deleteDoc(doc(db, platformsCollection.path, currentPlatformId, "trackers", currentTrackerId, "items", id)); 
+                await deleteDoc(doc(db, platformsCollection.path, currentPlatformId, "trackers", currentTrackerId, "items", fid)); 
             }
         };
         
         window.updatePlatformSettings = () => { if(!currentPlatformId) return; updateDoc(doc(db, platformsCollection.path, currentPlatformId), { provider: document.getElementById('provider').value, platform: document.getElementById('platform').value }); };
 
-        // UTILS
         const parseNum = (v) => { 
             if (!v) return 0; 
-            // Handle commas as decimals
             const s = String(v).replace(',', '.'); 
             return parseFloat(s) || 0; 
         };
@@ -490,7 +481,6 @@
             let tBuyTotal=0, tSellTotal=0, tProfitTotal=0, tQtyTotal=0;
 
             rows.forEach(row => {
-                // FIX: Use class selectors instead of index to find inputs reliably
                 const buyInput = row.querySelector('.input-buy-usd');
                 const sellInput = row.querySelector('.input-sell-da');
                 const qtyInput = row.querySelector('.input-qty');
@@ -504,14 +494,13 @@
                 const buyDA = buyUSD * rate;
                 const sellUSD = rate > 0 ? sellDA / rate : 0;
                 const totalBuyUSD = buyUSD * qty;
-                const totalSellUSD = sellUSD * qty; // Sell in USD total
+                const totalSellUSD = sellUSD * qty; 
                 
                 const profitDA = (sellDA * qty) - (buyDA * qty);
                 
                 const totalSellDA = sellDA * qty;
                 const profitPerc = totalSellDA ? profitDA / totalSellDA : 0;
 
-                // Update DOM
                 row.querySelector('.calc-buy-da').innerText = buyDA.toFixed(2);
                 row.querySelector('.calc-sell-usd').innerText = sellUSD.toFixed(2);
                 row.querySelector('.calc-total-buy').innerText = totalBuyUSD.toFixed(2);
@@ -534,7 +523,6 @@
             document.getElementById('total-K').innerText = tSellTotal.toFixed(2);
             document.getElementById('total-M').innerText = tProfitTotal.toFixed(2);
             
-            // Total Percentage logic: (Total Profit DA) / (Total Sales DA)
             const totalGlobalSellDA = tSellTotal * rate; 
             const totalPerc = totalGlobalSellDA ? (tProfitTotal / totalGlobalSellDA * 100).toFixed(1) : "0.0";
             document.getElementById('total-N').innerText = totalPerc + '%';
