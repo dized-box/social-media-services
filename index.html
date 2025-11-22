@@ -6,9 +6,54 @@
     <title>Social Media Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        /* Sidebar & UI */
+        .platform-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0.75rem 1rem; border-radius: 0.5rem;
+            color: #334155; font-weight: 600; cursor: pointer;
+            transition: all 0.2s; border: 1px solid transparent;
+        }
+        .platform-header:hover { background-color: #f1f5f9; }
+        .platform-header.open { background-color: #eff6ff; color: #2563eb; border-color: #dbeafe; }
+        .platform-header.open .arrow { transform: rotate(90deg); color: #3b82f6; }
+        .platform-header .arrow { transition: transform 0.2s; color: #94a3b8; }
+
+        .tracker-link {
+            display: flex; align-items: center;
+            padding: 0.5rem 1rem 0.5rem 2.25rem;
+            margin: 2px 0; border-radius: 0.5rem; color: #64748b;
+            font-weight: 500; cursor: pointer; transition: all 0.15s; font-size: 0.9rem;
+        }
+        .tracker-link:hover { background-color: #f8fafc; color: #0f172a; }
+        .tracker-link.active { background-color: #fff; color: #4f46e5; font-weight: 600; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        
+        .tracker-sub-list { display: none; padding: 0.25rem 0; }
+        
+        .tab-delete { margin-left: auto; color: #cbd5e1; display: none; padding: 2px; }
+        .tracker-link:hover .tab-delete, .platform-header:hover .tab-delete { display: inline-block; }
+        .tab-delete:hover { color: #ef4444; }
+
+        /* Inputs */
+        .data-input { 
+            border: 1px solid #e2e8f0; border-radius: 0.375rem; padding: 0.35rem 0.5rem;
+            font-size: 0.875rem; width: 100%; transition: all 0.2s;
+            background-color: #fff; color: #1e293b;
+        }
+        .data-input:focus { border-color: #6366f1; outline: none; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1); }
+        td .data-input { min-width: 70px; }
+
+        #loading { display: none; position: fixed; top: 1rem; right: 1rem; background: #fff; padding: 0.75rem 1.25rem; border-radius: 0.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-weight: 500; color: #4f46e5; z-index: 50; align-items: center; gap: 0.5rem; }
+        
+        #sidebar { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .auth-bg { background: linear-gradient(135deg, #4f46e5 0%, #818cf8 100%); }
     </style>
 </head>
 <body class="h-screen overflow-hidden text-slate-800">
@@ -36,8 +81,8 @@
                     <input type="password" id="auth-password" class="data-input w-full mt-1 py-2.5">
                 </div>
                 <div class="pt-4 flex flex-col gap-3">
-                    <button id="btn-login" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg transition">Login</button>
-                    <button id="btn-register" class="w-full py-3 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl font-bold transition">Create Account</button>
+                    <button onclick="window.handleLogin()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg transition">Login</button>
+                    <button onclick="window.handleRegister()" class="w-full py-3 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl font-bold transition">Create Account</button>
                 </div>
             </div>
         </div>
@@ -47,13 +92,13 @@
     <div id="app-container" class="hidden h-screen w-full flex relative bg-slate-50">
         
         <!-- Mobile Overlay -->
-        <div id="sidebar-overlay" class="fixed inset-0 z-20 bg-slate-900/20 backdrop-blur-sm hidden md:hidden"></div>
+        <div id="sidebar-overlay" onclick="window.toggleMobileMenu()" class="fixed inset-0 z-20 bg-slate-900/20 backdrop-blur-sm hidden md:hidden"></div>
 
         <!-- SIDEBAR -->
         <div id="sidebar" class="w-72 flex-shrink-0 bg-white flex flex-col border-r border-slate-200 fixed inset-y-0 left-0 z-30 transform -translate-x-full md:relative md:translate-x-0">
             <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
                  <h1 class="text-lg font-bold text-slate-800">My<span class="text-indigo-600">Tracker</span></h1>
-                 <button id="btn-close-sidebar" class="md:hidden p-2 text-slate-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                 <button onclick="window.toggleMobileMenu()" class="md:hidden p-2 text-slate-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
             
             <div class="p-4 flex-1 overflow-y-auto">
@@ -61,7 +106,7 @@
                 <div id="platform-list" class="space-y-1">
                     <div class="text-center py-10 text-slate-400 text-sm">Loading...</div>
                 </div>
-                <button id="btn-add-platform" class="mt-4 w-full py-2 border-2 border-dashed border-slate-300 text-slate-500 rounded-lg hover:border-indigo-400 hover:text-indigo-600 text-sm font-medium transition">+ Add Platform</button>
+                <button onclick="window.addNewPlatform()" class="mt-4 w-full py-2 border-2 border-dashed border-slate-300 text-slate-500 rounded-lg hover:border-indigo-400 hover:text-indigo-600 text-sm font-medium transition">+ Add Platform</button>
             </div>
 
             <div class="p-4 border-t border-slate-100 bg-slate-50">
@@ -70,7 +115,7 @@
                     <div class="flex-1 min-w-0">
                         <p class="text-xs font-medium text-slate-900 truncate" id="userIdDisplay">...</p>
                     </div>
-                    <button id="btn-logout" class="text-slate-400 hover:text-red-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg></button>
+                    <button onclick="window.handleLogout()" class="text-slate-400 hover:text-red-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg></button>
                 </div>
             </div>
         </div>
@@ -81,10 +126,10 @@
             <!-- Header -->
             <div class="bg-white border-b border-slate-200 px-4 py-3 flex justify-between items-center shadow-sm z-10">
                 <div class="flex items-center gap-4">
-                    <button id="btn-mobile-menu" class="md:hidden text-slate-500"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
+                    <button onclick="window.toggleMobileMenu()" class="md:hidden text-slate-500"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
                     <div class="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-lg">
                         <span class="text-xs font-bold text-slate-500 uppercase">USD Rate:</span>
-                        <input type="number" id="usdToDaRate" value="255.00" class="bg-transparent border-none p-0 w-16 text-sm font-bold text-indigo-600 focus:ring-0 text-right">
+                        <input type="number" id="usdToDaRate" value="255.00" oninput="window.updateGlobalSettings()" class="bg-transparent border-none p-0 w-16 text-sm font-bold text-indigo-600 focus:ring-0 text-right">
                         <span class="text-xs text-slate-400 font-bold">DA</span>
                     </div>
                 </div>
@@ -104,11 +149,11 @@
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="text-xs font-bold text-slate-400 uppercase">Provider</label>
-                            <input type="text" id="provider" class="data-input mt-1">
+                            <input type="text" id="provider" oninput="window.updatePlatformSettings()" class="data-input mt-1">
                         </div>
                         <div>
                             <label class="text-xs font-bold text-slate-400 uppercase">Platform</label>
-                            <input type="text" id="platform" class="data-input mt-1">
+                            <input type="text" id="platform" oninput="window.updatePlatformSettings()" class="data-input mt-1">
                         </div>
                     </div>
 
@@ -116,14 +161,14 @@
                     <div class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden flex flex-col">
                         <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-white">
                             <h3 class="font-bold text-slate-800" id="tracker-table-title">Service Items</h3>
-                            <button id="btn-add-item" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1.5 px-4 rounded-lg text-sm shadow-sm transition">+ Item</button>
+                            <button onclick="window.addServiceItemRow()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1.5 px-4 rounded-lg text-sm shadow-sm transition">+ Item</button>
                         </div>
                         
                         <div class="overflow-x-auto">
                             <table class="min-w-full" id="trackerTable">
                                 <thead class="bg-slate-50 text-xs uppercase font-bold text-slate-500">
                                     <tr>
-                                        <th class="px-4 py-3 text-left border-b w-16">ID</th> 
+                                        <th class="px-4 py-3 text-left border-b w-16">ID</th> <!-- ID First -->
                                         <th class="px-4 py-3 text-left border-b w-32">Category</th>
                                         <th class="px-4 py-3 text-left border-b min-w-[150px]">Service</th>
                                         
@@ -161,6 +206,371 @@
         </div>
     </div>
 
-    <script type="module" src="app.js"></script>
+    <script type="module">
+        <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    const appId = 'social-media-tracker-app'; 
+    
+    // --- FIREBASE CONFIG ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyCdB5SZ9Xi6MVZl-DsmTgWjJPK5EId-4F8",
+      authDomain: "dized-box.firebaseapp.com",
+      projectId: "dized-box",
+      storageBucket: "dized-box.firebasestorage.app",
+      messagingSenderId: "163199308320",
+      appId: "1:163199308320:web:7e8217dabae7668d016245",
+      measurementId: "G-Q9GFSXFZG8"
+    };
+
+    let db, auth, userId;
+    let currentPlatformId, currentTrackerId;
+    
+    // Listeners variables
+    let globalSettingsListener = null;
+    let platformsListener = null;
+    let trackersListeners = {}; 
+    let trackerSettingsListener = null;
+    let itemsListener = null;
+
+    try {
+        const app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        auth = getAuth(app);
+    } catch (e) { console.error("Firebase Init Error:", e); }
+
+    // --- HELPER: Get Paths Safely ---
+    // This fixes the "Invalid Collection Reference" errors
+    const getUserPath = () => `artifacts/${appId}/users/${userId}`;
+    const getPlatPath = (pid) => `${getUserPath()}/platforms/${pid}`;
+    const getTrackerPath = (pid, tid) => `${getPlatPath(pid)}/trackers/${tid}`;
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            userId = user.uid;
+            document.getElementById('auth-container').style.display = 'none';
+            document.getElementById('app-container').classList.remove('hidden');
+            document.getElementById('userIdDisplay').innerText = user.email;
+            initApp();
+        } else {
+            userId = null;
+            document.getElementById('auth-container').style.display = 'flex';
+            document.getElementById('app-container').classList.add('hidden');
+            cleanupListeners();
+        }
+    });
+
+    function cleanupListeners() {
+        if (globalSettingsListener) globalSettingsListener();
+        if (platformsListener) platformsListener();
+        if (trackerSettingsListener) trackerSettingsListener();
+        if (itemsListener) itemsListener();
+        Object.values(trackersListeners).forEach(l => l());
+        trackersListeners = {};
+    }
+
+    function initApp() {
+        // 1. Global Rate Listener
+        if (globalSettingsListener) globalSettingsListener();
+        const globalRef = doc(db, `${getUserPath()}/settings/globalSettings`);
+        
+        globalSettingsListener = onSnapshot(globalRef, (docSnap) => {
+            if (docSnap.exists()) {
+                document.getElementById('usdToDaRate').value = docSnap.data().rate || 255;
+            } else {
+                setDoc(globalRef, { rate: 255 }, { merge: true });
+            }
+            // Recalculate if we are currently viewing a table
+            if(currentTrackerId) calculateAll();
+        });
+
+        // 2. Platforms List Listener
+        if (platformsListener) platformsListener();
+        const platformsRef = collection(db, `${getUserPath()}/platforms`);
+        const q = query(platformsRef, where("isDeleted", "==", false), orderBy("createdAt", "asc"));
+        
+        platformsListener = onSnapshot(q, (snapshot) => {
+            const list = document.getElementById('platform-list');
+            list.innerHTML = '';
+            
+            if(snapshot.empty) {
+                // Only add default if it's a brand new user with absolutely no data
+                // checks preventing infinite loop handled by UI usually
+                list.innerHTML = '<div class="text-center py-4 text-slate-400 text-xs">No platforms found.</div>';
+                return; 
+            }
+
+            snapshot.forEach(docSnap => {
+                const p = docSnap.data();
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <div class="platform-header group" id="ph-${docSnap.id}" onclick="window.togglePlatform('${docSnap.id}')">
+                        <span class="flex items-center gap-2"><div class="w-1.5 h-1.5 rounded-full bg-indigo-400"></div>${p.name}</span>
+                        <div class="flex items-center gap-1">
+                            <span class="tab-delete cursor-pointer hover:text-red-500" onclick="event.stopPropagation(); window.deletePlatform('${docSnap.id}', '${p.name}')">&times;</span>
+                            <svg class="arrow w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </div>
+                    </div>
+                    <div class="tracker-sub-list" id="sub-${docSnap.id}"></div>
+                    <button onclick="window.addNewTracker('${docSnap.id}')" class="hidden text-xs text-indigo-600 hover:text-indigo-800 font-medium py-2 px-8 w-full text-left transition-colors" id="btn-${docSnap.id}">+ Add Service Type</button>
+                `;
+                list.appendChild(div);
+            });
+            
+            if(currentPlatformId) window.togglePlatform(currentPlatformId, true);
+        });
+    }
+
+    // --- EXPORTED FUNCTIONS ---
+    window.handleLogin = async () => {
+        try { await signInWithEmailAndPassword(auth, document.getElementById('auth-email').value, document.getElementById('auth-password').value); }
+        catch (e) { showError(e.message); }
+    };
+    window.handleRegister = async () => {
+        try { await createUserWithEmailAndPassword(auth, document.getElementById('auth-email').value, document.getElementById('auth-password').value); }
+        catch (e) { showError(e.message); }
+    };
+    function showError(msg) {
+        const err = document.getElementById('auth-error');
+        err.innerText = msg; err.classList.remove('hidden');
+    }
+    window.handleLogout = () => signOut(auth);
+    
+    window.toggleMobileMenu = () => {
+        const sb = document.getElementById('sidebar');
+        const ol = document.getElementById('sidebar-overlay');
+        sb.classList.toggle('-translate-x-full');
+        ol.classList.toggle('hidden');
+    };
+
+    window.updateGlobalSettings = () => {
+        const val = parseFloat(document.getElementById('usdToDaRate').value);
+        const globalRef = doc(db, `${getUserPath()}/settings/globalSettings`);
+        setDoc(globalRef, { rate: val }, { merge: true });
+    };
+
+    window.addNewPlatform = async (isFirst = false) => {
+        const name = isFirst ? 'Instagram' : prompt("Platform Name (e.g., TikTok):");
+        if(!name) return;
+        const platformsRef = collection(db, `${getUserPath()}/platforms`);
+        const ref = await addDoc(platformsRef, { name, provider: 'Secsers', platform: name, createdAt: Date.now(), isDeleted: false });
+        if(isFirst) window.addNewTracker(ref.id, true);
+    };
+
+    window.deletePlatform = async (id, name) => {
+        if(confirm(`Delete ${name}?`)) await deleteDoc(doc(db, getPlatPath(id)));
+    };
+
+    window.togglePlatform = (pid, forceOpen = false) => {
+        const sub = document.getElementById(`sub-${pid}`);
+        const btn = document.getElementById(`btn-${pid}`);
+        const header = document.getElementById(`ph-${pid}`);
+        
+        // Safety check if element exists (in case it was just deleted)
+        if(!sub || !header) return;
+
+        const isOpen = header.classList.contains('open');
+        if(!forceOpen && isOpen) {
+            header.classList.remove('open'); sub.style.display = 'none'; btn.classList.add('hidden');
+        } else {
+            header.classList.add('open'); sub.style.display = 'block'; btn.classList.remove('hidden');
+            if (trackersListeners[pid]) return; 
+            
+            // CORRECTED PATH
+            const trackersRef = collection(db, `${getPlatPath(pid)}/trackers`);
+            const q = query(trackersRef, where("isDeleted", "==", false), orderBy("createdAt", "asc"));
+            
+            trackersListeners[pid] = onSnapshot(q, (snap) => {
+                sub.innerHTML = '';
+                snap.forEach(tDoc => {
+                    const t = tDoc.data();
+                    const activeClass = (tDoc.id === currentTrackerId) ? 'active' : '';
+                    sub.innerHTML += `<div class="tracker-link group ${activeClass}" onclick="window.selectTracker('${pid}', '${tDoc.id}')">
+                        <span class="truncate">${t.name}</span>
+                        <span class="tab-delete cursor-pointer hover:text-red-500 opacity-0 group-hover:opacity-100" onclick="event.stopPropagation(); window.deleteTracker('${pid}', '${tDoc.id}')">&times;</span>
+                    </div>`;
+                });
+            });
+        }
+    };
+
+    window.addNewTracker = async (pid, isFirst = false) => {
+        const name = isFirst ? 'Followers' : prompt("Category Name (e.g., Likes):");
+        if(!name) return;
+        // CORRECTED PATH
+        await addDoc(collection(db, `${getPlatPath(pid)}/trackers`), { name, createdAt: Date.now(), isDeleted: false });
+    };
+
+    window.deleteTracker = async (pid, tid) => {
+        if(confirm("Delete category?")) await deleteDoc(doc(db, getTrackerPath(pid, tid)));
+    };
+
+    window.selectTracker = (pid, tid) => {
+        currentPlatformId = pid; currentTrackerId = tid;
+        
+        document.getElementById('welcome-view').classList.add('hidden');
+        document.getElementById('tracker-view').classList.remove('hidden');
+        
+        // Update UI active states
+        document.querySelectorAll('.tracker-link').forEach(l => l.classList.remove('active'));
+        // We need to re-render the active state in the sidebar, simplified by just refreshing the toggle
+        window.togglePlatform(pid, true);
+
+        if (trackerSettingsListener) trackerSettingsListener();
+        trackerSettingsListener = onSnapshot(doc(db, getPlatPath(pid)), (d) => {
+            if(d.exists()) {
+                document.getElementById('provider').value = d.data().provider || "";
+                document.getElementById('platform').value = d.data().platform || "";
+            }
+        });
+
+        if (itemsListener) itemsListener();
+        
+        // CORRECTED PATH
+        const itemsRef = collection(db, `${getTrackerPath(pid, tid)}/items`);
+        const q = query(itemsRef, where("isDeleted", "==", false), orderBy("createdAt", "asc"));
+        
+        itemsListener = onSnapshot(q, (snap) => {
+            const tbody = document.getElementById('trackerTable').getElementsByTagName('tbody')[0];
+            tbody.innerHTML = '';
+            
+            // Update Title
+            document.getElementById('tracker-table-title').innerText = "Service Items";
+
+            if(snap.empty) {
+                tbody.innerHTML = '<tr><td colspan="14" class="p-8 text-center text-slate-400">No items found. <a href="#" onclick="window.addServiceItemRow()" class="text-indigo-500 underline">Add one?</a></td></tr>';
+            }
+            
+            snap.forEach(iDoc => {
+                const i = iDoc.data();
+                tbody.innerHTML += `
+                <tr id="${iDoc.id}" class="hover:bg-slate-50 group">
+                    <td class="px-4 py-2"><input class="data-input font-mono text-slate-500" value="${i.id||''}" onchange="window.updateItem('${iDoc.id}', 'id', this.value)"></td>
+                    <td class="px-4 py-2"><input class="data-input" value="${i.cat||''}" onchange="window.updateItem('${iDoc.id}', 'cat', this.value)"></td>
+                    <td class="px-4 py-2"><input class="data-input w-full font-medium text-slate-700" value="${i.service||''}" onchange="window.updateItem('${iDoc.id}', 'service', this.value)"></td>
+                    
+                    <td class="px-4 py-2"><input type="number" class="data-input text-slate-700" value="${i.buyUSD||0}" onchange="window.updateItem('${iDoc.id}', 'buyUSD', this.value)"></td>
+                    <td class="px-4 py-2"><span class="calc-output text-xs font-mono" id="E-${iDoc.id}">0</span></td>
+                    
+                    <td class="px-4 py-2"><input type="number" class="data-input font-bold text-green-700" value="${i.sellDA||0}" onchange="window.updateItem('${iDoc.id}', 'sellDA', this.value)"></td>
+                    <td class="px-4 py-2"><span class="calc-output text-xs font-mono" id="F-${iDoc.id}">0</span></td>
+                    
+                    <td class="px-4 py-2"><input type="number" class="data-input w-16 text-center" value="${i.qty||0}" onchange="window.updateItem('${iDoc.id}', 'qty', this.value)"></td>
+                    
+                    <td class="px-4 py-2 text-right text-xs text-slate-400" id="J-${iDoc.id}">0</td>
+                    <td class="px-4 py-2 text-right text-xs text-slate-400" id="K-${iDoc.id}">0</td>
+                    
+                    <td class="px-4 py-2 text-right font-bold text-sm" id="M-${iDoc.id}">0</td>
+                    <td class="px-4 py-2 text-right font-bold text-xs" id="N-${iDoc.id}">0%</td>
+                    <td class="px-4 py-2 text-center"><button class="text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition" onclick="window.deleteItem('${iDoc.id}')">&times;</button></td>
+                </tr>`;
+            });
+            calculateAll();
+        });
+
+        if(window.innerWidth < 768) {
+            document.getElementById('sidebar').classList.add('-translate-x-full');
+            document.getElementById('sidebar-overlay').classList.add('hidden');
+        }
+    };
+
+    window.addServiceItemRow = async (pid=currentPlatformId, tid=currentTrackerId, isDefault=false) => {
+        const d = isDefault ? { id: '101', cat: 'General', service: '1k Followers', buyUSD: 1, sellDA: 500, qty: 1 } 
+                              : { id: '', cat: '', service: 'New Item', buyUSD: 0, sellDA: 0, qty: 1 };
+        // CORRECTED PATH
+        await addDoc(collection(db, `${getTrackerPath(pid, tid)}/items`), { ...d, createdAt: Date.now(), isDeleted: false });
+    };
+
+    window.updateItem = (id, f, v) => {
+        // CORRECTED PATH
+        updateDoc(doc(db, `${getTrackerPath(currentPlatformId, currentTrackerId)}/items/${id}`), { 
+            [f]: (f==='service'||f==='cat'||f==='id') ? v : Number(v) 
+        });
+    };
+
+    window.deleteItem = async (id) => {
+        if(confirm("Delete item permanently?")) {
+            // CORRECTED PATH
+            await deleteDoc(doc(db, `${getTrackerPath(currentPlatformId, currentTrackerId)}/items/${id}`));
+        }
+    };
+    
+    window.updatePlatformSettings = () => {
+        if(!currentPlatformId) return;
+        updateDoc(doc(db, getPlatPath(currentPlatformId)), {
+            provider: document.getElementById('provider').value,
+            platform: document.getElementById('platform').value
+        });
+    };
+
+    function calculateAll() {
+        const rateInput = document.getElementById('usdToDaRate');
+        if(!rateInput) return; // Safety check
+        
+        const rate = parseFloat(rateInput.value) || 1;
+        const rows = document.querySelectorAll('#trackerTable tbody tr');
+        
+        let tBuyTotal=0, tSellTotal=0, tProfitTotal=0, tQtyTotal=0;
+
+        rows.forEach(row => {
+            if(!row.id) return;
+            const inputs = row.getElementsByTagName('input');
+            // Inputs: 0=ID, 1=Cat, 2=Service, 3=BuyUSD, 4=SellDA, 5=Qty
+            if(inputs.length < 6) return; 
+
+            const buyUSD = parseFloat(inputs[3].value)||0;
+            const sellDA = parseFloat(inputs[4].value)||0;
+            const qty = parseFloat(inputs[5].value)||0;
+
+            const buyDA = buyUSD * rate;
+            const sellUSD = (rate > 0) ? sellDA / rate : 0;
+            const totalBuyUSD = buyUSD * qty;
+            const totalSellUSD = sellUSD * qty; 
+            
+            const profitDA = (sellDA * qty) - (buyDA * qty);
+            
+            // Margin based on Total Sell DA
+            const totalSellDA = sellDA * qty;
+            const profitPerc = totalSellDA ? profitDA / totalSellDA : 0;
+
+            // Update DOM Elements Safely
+            const safeSet = (id, val) => {
+                const el = document.getElementById(id);
+                if(el) el.innerText = val;
+            };
+
+            safeSet(`E-${row.id}`, buyDA.toFixed(2));
+            safeSet(`F-${row.id}`, sellUSD.toFixed(2));
+            safeSet(`J-${row.id}`, totalBuyUSD.toFixed(2));
+            safeSet(`K-${row.id}`, totalSellUSD.toFixed(2));
+            
+            const elM = document.getElementById(`M-${row.id}`);
+            if(elM) {
+                elM.innerText = profitDA.toFixed(2);
+                elM.className = `calc-output text-right font-bold text-sm ${profitDA >= 0 ? 'text-green-600' : 'text-red-600'}`;
+            }
+            
+            safeSet(`N-${row.id}`, (profitPerc * 100).toFixed(1) + '%');
+
+            tBuyTotal += totalBuyUSD; 
+            tSellTotal += totalSellUSD; 
+            tProfitTotal += profitDA;
+            tQtyTotal += qty;
+        });
+
+        document.getElementById('total-Q').innerText = tQtyTotal;
+        document.getElementById('total-J').innerText = tBuyTotal.toFixed(2);
+        document.getElementById('total-K').innerText = tSellTotal.toFixed(2);
+        document.getElementById('total-M').innerText = tProfitTotal.toFixed(2);
+        
+        // Calculate Global Percentage (Total Profit DA / Total Sell DA)
+        const totalSellDA_Global = tSellTotal * rate;
+        const totalPerc = totalSellDA_Global ? (tProfitTotal / totalSellDA_Global * 100).toFixed(1) : "0.0";
+        document.getElementById('total-N').innerText = totalPerc + '%';
+    }
+</script>
+    </script>
 </body>
 </html>
