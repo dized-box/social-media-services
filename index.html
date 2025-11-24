@@ -31,22 +31,23 @@
 
         /* Table Input Styling */
         .table-input {
-            background: transparent;
-            border: 1px solid transparent;
+            background: #fff;
+            border: 1px solid #e2e8f0;
             border-radius: 4px;
-            padding: 4px;
+            padding: 4px 8px;
             width: 100%;
             transition: all 0.2s;
+            font-size: 0.875rem;
+            color: #0f172a;
         }
-        .table-input:hover { border-color: #e7e5e4; background-color: white; }
+        .table-input:hover { border-color: #cbd5e1; }
         .table-input:focus { 
             border-color: #6366f1; 
-            background-color: white; 
             outline: none; 
             box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1); 
         }
         /* Align numbers to right */
-        .table-input.num-input { text-align: right; }
+        .table-input.num-input { text-align: right; font-family: 'Inter', monospace; }
 
         /* Loading Overlay */
         #loading-overlay {
@@ -233,18 +234,17 @@
                     <table class="w-full text-left text-sm" id="serviceTable">
                         <thead class="bg-[#fafaf9] text-[#57534e] font-semibold uppercase text-xs tracking-wider border-b border-[#e7e5e4]">
                             <tr>
-                                <th class="px-6 py-4 w-28 text-center">ID</th>
-                                <th class="px-6 py-4 whitespace-nowrap min-w-[180px]">Platform</th>
-                                <th class="px-6 py-4 whitespace-nowrap min-w-[250px]">Service Name</th>
-                                <th class="px-6 py-4 text-right whitespace-nowrap w-28">Cost ($)</th>
-                                <th class="px-6 py-4 text-right bg-red-50/30 text-red-800 whitespace-nowrap w-28">Cost (DA)</th>
-                                <th class="px-6 py-4 text-right bg-blue-50/30 text-blue-800 whitespace-nowrap w-28">Sell ($)</th>
-                                <th class="px-6 py-4 text-right bg-green-50/30 text-green-800 whitespace-nowrap w-28">Sell (DA)</th>
-                                <th class="px-6 py-4 text-center w-20">Qty</th>
-                                <th class="px-6 py-4 text-right whitespace-nowrap">Profit (DA)</th>
-                                <th class="px-6 py-4 text-right whitespace-nowrap">Margin</th>
-                                <!-- INCREASED ACTION COLUMN WIDTH -->
-                                <th class="px-6 py-4 w-24 text-right">Actions</th>
+                                <th class="px-3 py-3 w-20 text-center">ID</th>
+                                <th class="px-3 py-3 whitespace-nowrap min-w-[180px]">Platform</th>
+                                <th class="px-3 py-3 whitespace-nowrap min-w-[250px]">Service Name</th>
+                                <th class="px-3 py-3 text-right whitespace-nowrap w-24">Cost ($)</th>
+                                <th class="px-3 py-3 text-right bg-red-50/50 text-red-800 whitespace-nowrap w-24">Cost (DA)</th>
+                                <th class="px-3 py-3 text-right bg-blue-50/50 text-blue-800 whitespace-nowrap w-24">Sell ($)</th>
+                                <th class="px-3 py-3 text-right bg-green-50/50 text-green-800 whitespace-nowrap w-24">Sell (DA)</th>
+                                <th class="px-3 py-3 text-center w-16">Qty</th>
+                                <th class="px-3 py-3 text-right whitespace-nowrap">Profit (DA)</th>
+                                <th class="px-3 py-3 text-right whitespace-nowrap">Margin</th>
+                                <th class="px-3 py-3 w-24 text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-[#e7e5e4]" id="tableBody">
@@ -252,16 +252,16 @@
                         </tbody>
                         <tfoot class="bg-[#f5f5f4] font-bold text-[#1c1917] border-t-2 border-[#e7e5e4]">
                             <tr>
-                                <td colspan="3" class="px-6 py-4 text-right text-[#a8a29e] uppercase text-xs tracking-wider">Totals:</td>
+                                <td colspan="3" class="px-3 py-3 text-right text-[#a8a29e] uppercase text-xs tracking-wider">Totals:</td>
                                 
-                                <td class="px-6 py-4 text-right font-mono text-[#57534e]" id="foot-cost-usd">0.00</td>
-                                <td class="px-6 py-4 text-right font-mono text-red-800 bg-red-50/50" id="foot-cost">0</td>
-                                <td class="px-6 py-4 text-right font-mono text-blue-800 bg-blue-50/50" id="foot-sell-usd">0.00</td>
-                                <td class="px-6 py-4 text-right font-mono text-green-800 bg-green-50/50" id="foot-rev">0</td>
-                                <td class="px-6 py-4 text-center font-mono" id="foot-qty">0</td>
-                                <td class="px-6 py-4 text-right font-mono text-indigo-600 text-base" id="foot-profit">0</td>
-                                <td class="px-6 py-4 text-right font-mono text-xs" id="foot-margin">0%</td>
-                                <td class="px-6 py-4"></td>
+                                <td class="px-3 py-3 text-right font-mono text-[#57534e]" id="foot-cost-usd">0.00</td>
+                                <td class="px-3 py-3 text-right font-mono text-red-800 bg-red-50/50" id="foot-cost">0</td>
+                                <td class="px-3 py-3 text-right font-mono text-blue-800 bg-blue-50/50" id="foot-sell-usd">0.00</td>
+                                <td class="px-3 py-3 text-right font-mono text-green-800 bg-green-50/50" id="foot-rev">0</td>
+                                <td class="px-3 py-3 text-center font-mono" id="foot-qty">0</td>
+                                <td class="px-3 py-3 text-right font-mono text-indigo-600 text-base" id="foot-profit">0</td>
+                                <td class="px-3 py-3 text-right font-mono text-xs" id="foot-margin">0%</td>
+                                <td class="px-3 py-3"></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -281,7 +281,7 @@
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, addDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- FIREBASE CONFIGURATION (Extracted from your index.html) ---
+        // --- FIREBASE CONFIGURATION ---
         const firebaseConfig = {
           apiKey: "AIzaSyCdB5SZ9Xi6MVZl-DsmTgWjJPK5EId-4F8",
           authDomain: "dized-box.firebaseapp.com",
@@ -429,7 +429,7 @@
                 newId = serviceData.length > 0 ? Math.max(...serviceData.map(s => s.id)) + 1 : 100;
             }
 
-            const newItem = { id: newId, platform, service, buyUSD: cost, sellDA: sell, qty, link }; // Added link
+            const newItem = { id: newId, platform, service, buyUSD: cost, sellDA: sell, qty, link };
 
             try {
                 await setDoc(doc(db, 'artifacts', appId, 'users', userId, 'services', String(newId)), newItem);
@@ -565,7 +565,7 @@
             footQty.innerText = totalQty.toLocaleString();
             footProfit.innerText = totalProfit.toLocaleString(undefined, {maximumFractionDigits: 0});
             footMargin.innerText = globalMargin.toFixed(1) + '%';
-            footMargin.className = `px-6 py-4 text-right font-mono text-xs font-bold ${globalMargin >= 0 ? 'text-emerald-600' : 'text-red-600'}`;
+            footMargin.className = `px-3 py-3 text-right font-mono text-xs font-bold ${globalMargin >= 0 ? 'text-emerald-600' : 'text-red-600'}`;
 
             updateCharts(visibleData);
         }
@@ -602,22 +602,23 @@
                 const row = document.createElement('tr');
                 row.className = 'hover:bg-[#f5f5f4] transition group border-b border-[#f5f5f4] last:border-0';
                 row.innerHTML = `
-                    <td class="px-6 py-4 text-center font-mono text-[#a8a29e] text-xs">
+                    <!-- COMPACT ROWS: Reduced Padding (py-2 px-3) -->
+                    <td class="px-3 py-2 text-center font-mono text-[#a8a29e] text-xs">
                         <input type="number" value="${item.id}" 
                             onchange="window.updateValue(${item.id}, 'id', this.value)"
                             class="table-input num-input text-center w-24 text-[#a8a29e]">
                     </td>
-                    <td class="px-6 py-4 font-medium text-[#1c1917]">
+                    <td class="px-3 py-2 font-medium text-[#1c1917]">
                         <input type="text" value="${item.platform}" 
                             onchange="window.updateValue(${item.id}, 'platform', this.value)"
                             class="table-input w-full text-[#1c1917] font-medium">
                     </td>
-                    <td class="px-6 py-4 text-[#57534e]">
+                    <td class="px-3 py-2 text-[#57534e]">
                         <input type="text" value="${item.service}" 
                             onchange="window.updateValue(${item.id}, 'service', this.value)"
                             class="table-input w-full text-[#57534e]">
                     </td>
-                    <td class="px-6 py-4 text-right font-mono text-[#a8a29e]">
+                    <td class="px-3 py-2 text-right font-mono text-[#a8a29e]">
                         <div class="flex items-center justify-end gap-1">
                             <span class="text-xs text-gray-400">$</span>
                             <input type="number" value="${item.buyUSD}" step="0.01" 
@@ -625,31 +626,31 @@
                                 class="table-input num-input font-mono w-20">
                         </div>
                     </td>
-                    <td class="px-6 py-4 text-right font-mono font-medium text-red-700 bg-red-50/30">${item.costDA_Unit.toFixed(0)}</td>
+                    <td class="px-3 py-2 text-right font-mono font-bold text-red-700 bg-red-50/30">${item.costDA_Unit.toFixed(0)}</td>
                     
-                    <td class="px-6 py-4 text-right font-mono font-medium text-blue-700 bg-blue-50/30">
+                    <td class="px-3 py-2 text-right font-mono font-bold text-blue-700 bg-blue-50/30">
                         <div class="flex items-center justify-end gap-1">
                             <span class="text-xs opacity-60">$</span>
                             <span>${item.sellUSD_Unit.toFixed(2)}</span>
                         </div>
                     </td>
 
-                    <td class="px-6 py-4 text-right">
+                    <td class="px-3 py-2 text-right">
                          <div class="flex items-center justify-end gap-1 bg-green-50/30 rounded px-2">
                             <input type="number" value="${item.sellDA}" step="10" 
                                 onchange="window.updateValue(${item.id}, 'sellDA', this.value)"
-                                class="table-input num-input font-mono font-medium text-green-700 bg-transparent w-20">
+                                class="table-input num-input font-mono font-bold text-green-700 bg-transparent w-20">
                             <span class="text-xs text-green-700 font-bold">DA</span>
                         </div>
                     </td>
-                    <td class="px-6 py-4 text-center">
+                    <td class="px-3 py-2 text-center">
                         <input type="number" value="${item.qty}" step="1" min="0"
                                 onchange="window.updateValue(${item.id}, 'qty', this.value)"
                                 class="table-input num-input font-mono text-center w-16 bg-[#e5e7eb]/50 focus:bg-white border-b border-gray-300">
                     </td>
-                    <td class="px-6 py-4 text-right font-mono font-bold ${item.profitDA_Total >= 0 ? 'text-[#1c1917]' : 'text-red-600'}">${item.profitDA_Total.toFixed(0)}</td>
-                    <td class="px-6 py-4 text-right font-mono text-xs ${item.margin >= 0 ? 'text-emerald-600' : 'text-red-600'}">${item.margin.toFixed(1)}%</td>
-                    <td class="px-6 py-4 text-right">
+                    <td class="px-3 py-2 text-right font-mono font-bold ${item.profitDA_Total >= 0 ? 'text-[#1c1917]' : 'text-red-600'}">${item.profitDA_Total.toFixed(0)}</td>
+                    <td class="px-3 py-2 text-right font-mono text-xs ${item.margin >= 0 ? 'text-emerald-600' : 'text-red-600'}">${item.margin.toFixed(1)}%</td>
+                    <td class="px-3 py-2 text-right">
                         <div class="flex justify-end gap-2 items-center">
                             ${actionButtons}
                         </div>
