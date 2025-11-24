@@ -223,26 +223,26 @@
                 </div>
                 
                 <div class="overflow-x-auto custom-scroll pb-4">
-                    <table class="w-full text-left text-sm" id="serviceTable">
-                        <thead class="bg-[#fafaf9] text-[#57534e] font-semibold uppercase text-xs tracking-wider border-b border-[#e7e5e4]">
-                            <tr>
-                                <th class="px-6 py-4 w-28 text-center">ID</th>
-                                <!-- UPDATED WIDTH HERE: w-40 -->
-                                <th class="px-6 py-4 whitespace-nowrap w-40">Platform</th>
-                                <!-- UPDATED WIDTH HERE: w-48 -->
-                                <th class="px-6 py-4 whitespace-nowrap w-48">Service Name</th>
-                                <th class="px-6 py-4 text-right whitespace-nowrap w-28">Cost ($)</th>
-                                <th class="px-6 py-4 text-right bg-red-50/30 text-red-800 whitespace-nowrap w-28">Cost (DA)</th>
-                                <!-- NEW COLUMN SELL ($) -->
-                                <th class="px-6 py-4 text-right bg-blue-50/30 text-blue-800 whitespace-nowrap w-28">Sell ($)</th>
-                                <th class="px-6 py-4 text-right bg-green-50/30 text-green-800 whitespace-nowrap w-28">Sell (DA)</th>
-                                <th class="px-6 py-4 text-center w-20">Qty</th>
-                                <th class="px-6 py-4 text-right whitespace-nowrap">Profit (DA)</th>
-                                <th class="px-6 py-4 text-right whitespace-nowrap">Margin</th>
-                                <th class="px-6 py-4 w-12"></th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-[#e7e5e4]" id="tableBody">
+                <table class="w-full text-left text-sm" id="serviceTable">
+                    <thead class="bg-[#fafaf9] text-[#57534e] font-semibold uppercase text-xs tracking-wider border-b border-[#e7e5e4]">
+                        <tr>
+                            <th class="px-6 py-4 w-28 text-center">ID</th>
+                            <!-- FORCE MINIMUM WIDTH: Changed from w-40 to min-w-[180px] -->
+                            <th class="px-6 py-4 whitespace-nowrap min-w-[180px]">Platform</th>
+                            <!-- FORCE MINIMUM WIDTH: Changed from w-48 to min-w-[250px] -->
+                            <th class="px-6 py-4 whitespace-nowrap min-w-[250px]">Service Name</th>
+                            <th class="px-6 py-4 text-right whitespace-nowrap w-28">Cost ($)</th>
+                            <th class="px-6 py-4 text-right bg-red-50/30 text-red-800 whitespace-nowrap w-28">Cost (DA)</th>
+                            <!-- NEW COLUMN SELL ($) -->
+                            <th class="px-6 py-4 text-right bg-blue-50/30 text-blue-800 whitespace-nowrap w-28">Sell ($)</th>
+                            <th class="px-6 py-4 text-right bg-green-50/30 text-green-800 whitespace-nowrap w-28">Sell (DA)</th>
+                            <th class="px-6 py-4 text-center w-20">Qty</th>
+                            <th class="px-6 py-4 text-right whitespace-nowrap">Profit (DA)</th>
+                            <th class="px-6 py-4 text-right whitespace-nowrap">Margin</th>
+                            <th class="px-6 py-4 w-12"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#e7e5e4]" id="tableBody">
                             <!-- Populated by JS -->
                         </tbody>
                         <tfoot class="bg-[#f5f5f4] font-bold text-[#1c1917] border-t-2 border-[#e7e5e4]">
