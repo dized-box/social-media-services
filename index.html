@@ -77,7 +77,7 @@
                 </div>
                 <div class="pt-4 flex flex-col gap-3">
                     <button id="loginBtn" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg transition">Login</button>
-                    <!-- <button id="registerBtn" class="hidden w-full py-3 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl font-bold transition">Create Account</button> -->
+                    <button id="registerBtn" class="w-full py-3 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl font-bold transition">Create Account</button>
                 </div>
             </div>
         </div>
@@ -108,6 +108,13 @@
                         <label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Service Name</label>
                         <input type="text" id="newService" placeholder="e.g., 1k Views" class="w-full p-2 border border-[#e7e5e4] rounded-lg focus:border-[#6366f1] focus:ring-1 focus:ring-[#6366f1] outline-none">
                     </div>
+                    
+                    <!-- NEW LINK INPUT -->
+                    <div>
+                        <label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Provider Link (Secsers)</label>
+                        <input type="url" id="newLink" placeholder="https://secsers.com/services/..." class="w-full p-2 border border-[#e7e5e4] rounded-lg focus:border-[#6366f1] focus:ring-1 focus:ring-[#6366f1] outline-none text-blue-600">
+                    </div>
+
                     <div class="grid grid-cols-3 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Cost ($)</label>
@@ -223,26 +230,24 @@
                 </div>
                 
                 <div class="overflow-x-auto custom-scroll pb-4">
-                <table class="w-full text-left text-sm" id="serviceTable">
-                    <thead class="bg-[#fafaf9] text-[#57534e] font-semibold uppercase text-xs tracking-wider border-b border-[#e7e5e4]">
-                        <tr>
-                            <th class="px-6 py-4 w-28 text-center">ID</th>
-                            <!-- FORCE MINIMUM WIDTH: Changed from w-40 to min-w-[180px] -->
-                            <th class="px-6 py-4 whitespace-nowrap min-w-[180px]">Platform</th>
-                            <!-- FORCE MINIMUM WIDTH: Changed from w-48 to min-w-[250px] -->
-                            <th class="px-6 py-4 whitespace-nowrap min-w-[250px]">Service Name</th>
-                            <th class="px-6 py-4 text-right whitespace-nowrap w-28">Cost ($)</th>
-                            <th class="px-6 py-4 text-right bg-red-50/30 text-red-800 whitespace-nowrap w-28">Cost (DA)</th>
-                            <!-- NEW COLUMN SELL ($) -->
-                            <th class="px-6 py-4 text-right bg-blue-50/30 text-blue-800 whitespace-nowrap w-28">Sell ($)</th>
-                            <th class="px-6 py-4 text-right bg-green-50/30 text-green-800 whitespace-nowrap w-28">Sell (DA)</th>
-                            <th class="px-6 py-4 text-center w-20">Qty</th>
-                            <th class="px-6 py-4 text-right whitespace-nowrap">Profit (DA)</th>
-                            <th class="px-6 py-4 text-right whitespace-nowrap">Margin</th>
-                            <th class="px-6 py-4 w-12"></th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-[#e7e5e4]" id="tableBody">
+                    <table class="w-full text-left text-sm" id="serviceTable">
+                        <thead class="bg-[#fafaf9] text-[#57534e] font-semibold uppercase text-xs tracking-wider border-b border-[#e7e5e4]">
+                            <tr>
+                                <th class="px-6 py-4 w-28 text-center">ID</th>
+                                <th class="px-6 py-4 whitespace-nowrap min-w-[180px]">Platform</th>
+                                <th class="px-6 py-4 whitespace-nowrap min-w-[250px]">Service Name</th>
+                                <th class="px-6 py-4 text-right whitespace-nowrap w-28">Cost ($)</th>
+                                <th class="px-6 py-4 text-right bg-red-50/30 text-red-800 whitespace-nowrap w-28">Cost (DA)</th>
+                                <th class="px-6 py-4 text-right bg-blue-50/30 text-blue-800 whitespace-nowrap w-28">Sell ($)</th>
+                                <th class="px-6 py-4 text-right bg-green-50/30 text-green-800 whitespace-nowrap w-28">Sell (DA)</th>
+                                <th class="px-6 py-4 text-center w-20">Qty</th>
+                                <th class="px-6 py-4 text-right whitespace-nowrap">Profit (DA)</th>
+                                <th class="px-6 py-4 text-right whitespace-nowrap">Margin</th>
+                                <!-- INCREASED ACTION COLUMN WIDTH -->
+                                <th class="px-6 py-4 w-24 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-[#e7e5e4]" id="tableBody">
                             <!-- Populated by JS -->
                         </tbody>
                         <tfoot class="bg-[#f5f5f4] font-bold text-[#1c1917] border-t-2 border-[#e7e5e4]">
@@ -251,7 +256,6 @@
                                 
                                 <td class="px-6 py-4 text-right font-mono text-[#57534e]" id="foot-cost-usd">0.00</td>
                                 <td class="px-6 py-4 text-right font-mono text-red-800 bg-red-50/50" id="foot-cost">0</td>
-                                <!-- NEW FOOTER SELL ($) -->
                                 <td class="px-6 py-4 text-right font-mono text-blue-800 bg-blue-50/50" id="foot-sell-usd">0.00</td>
                                 <td class="px-6 py-4 text-right font-mono text-green-800 bg-green-50/50" id="foot-rev">0</td>
                                 <td class="px-6 py-4 text-center font-mono" id="foot-qty">0</td>
@@ -408,6 +412,7 @@
             const cost = parseFloat(document.getElementById('newCost').value);
             const sell = parseFloat(document.getElementById('newSell').value);
             const qty = parseInt(document.getElementById('newQty').value) || 1;
+            const link = document.getElementById('newLink').value.trim(); // NEW LINK
 
             if (!platform || !service || isNaN(cost) || isNaN(sell)) {
                 alert("Please fill in all fields correctly.");
@@ -424,7 +429,7 @@
                 newId = serviceData.length > 0 ? Math.max(...serviceData.map(s => s.id)) + 1 : 100;
             }
 
-            const newItem = { id: newId, platform, service, buyUSD: cost, sellDA: sell, qty };
+            const newItem = { id: newId, platform, service, buyUSD: cost, sellDA: sell, qty, link }; // Added link
 
             try {
                 await setDoc(doc(db, 'artifacts', appId, 'users', userId, 'services', String(newId)), newItem);
@@ -440,7 +445,6 @@
             
             let updateVal = value;
             
-            // Only parse number for numeric fields
             if(['buyUSD', 'sellDA', 'qty', 'id'].includes(field)) {
                 const numVal = parseFloat(value);
                 if (isNaN(numVal)) return;
@@ -512,6 +516,7 @@
             document.getElementById('newCost').value = '';
             document.getElementById('newSell').value = '';
             document.getElementById('newQty').value = '1';
+            document.getElementById('newLink').value = ''; // Clear link
         }
 
         // --- DASHBOARD CALCULATION ---
@@ -531,8 +536,6 @@
                 const sellDA_Total = sellDA_Unit * qty;
                 const profitDA_Total = sellDA_Total - costDA_Total;
                 const margin = sellDA_Total > 0 ? (profitDA_Total / sellDA_Total) * 100 : 0;
-                
-                // Calculate Sell USD unit based on Sell DA
                 const sellUSD_Unit = currentRate > 0 ? sellDA_Unit / currentRate : 0;
                 
                 return { ...item, costDA_Unit, costDA_Total, sellDA_Unit, sellDA_Total, profitDA_Total, margin, sellUSD_Unit };
@@ -558,10 +561,7 @@
             footCostUSD.innerText = '$' + totalCostUSD.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
             footCost.innerText = totalCost.toLocaleString(undefined, {maximumFractionDigits: 0});
             footRev.innerText = totalRev.toLocaleString(undefined, {maximumFractionDigits: 0});
-            
-            // NEW Footer Calc
             footSellUSD.innerText = '$' + totalSellUSD_Calc.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            
             footQty.innerText = totalQty.toLocaleString();
             footProfit.innerText = totalProfit.toLocaleString(undefined, {maximumFractionDigits: 0});
             footMargin.innerText = globalMargin.toFixed(1) + '%';
@@ -580,6 +580,25 @@
             }
 
             filtered.forEach(item => {
+                // NEW: Generate Action Buttons
+                let actionButtons = '';
+                
+                // If link exists, add BUY button
+                if (item.link && item.link.trim() !== '') {
+                    actionButtons += `
+                        <a href="${item.link}" target="_blank" class="text-blue-600 hover:text-blue-800 bg-blue-50 p-1.5 rounded-md hover:bg-blue-100 transition" title="Buy on Secsers">
+                            <span class="font-bold text-xs">↗</span>
+                        </a>
+                    `;
+                }
+                
+                // Add Delete button
+                actionButtons += `
+                    <button onclick="window.deleteService(${item.id})" class="text-slate-400 hover:text-red-500 p-1.5 rounded-md hover:bg-red-50 transition" title="Delete">
+                        <span class="font-bold text-lg leading-none">&times;</span>
+                    </button>
+                `;
+
                 const row = document.createElement('tr');
                 row.className = 'hover:bg-[#f5f5f4] transition group border-b border-[#f5f5f4] last:border-0';
                 row.innerHTML = `
@@ -608,7 +627,6 @@
                     </td>
                     <td class="px-6 py-4 text-right font-mono font-medium text-red-700 bg-red-50/30">${item.costDA_Unit.toFixed(0)}</td>
                     
-                    <!-- NEW SELL USD CALCULATED -->
                     <td class="px-6 py-4 text-right font-mono font-medium text-blue-700 bg-blue-50/30">
                         <div class="flex items-center justify-end gap-1">
                             <span class="text-xs opacity-60">$</span>
@@ -632,7 +650,9 @@
                     <td class="px-6 py-4 text-right font-mono font-bold ${item.profitDA_Total >= 0 ? 'text-[#1c1917]' : 'text-red-600'}">${item.profitDA_Total.toFixed(0)}</td>
                     <td class="px-6 py-4 text-right font-mono text-xs ${item.margin >= 0 ? 'text-emerald-600' : 'text-red-600'}">${item.margin.toFixed(1)}%</td>
                     <td class="px-6 py-4 text-right">
-                        <button onclick="window.deleteService(${item.id})" class="text-[#d6d3d1] hover:text-red-500 transition opacity-0 group-hover:opacity-100 font-bold text-xl leading-none">&times;</button>
+                        <div class="flex justify-end gap-2 items-center">
+                            ${actionButtons}
+                        </div>
                     </td>
                 `;
                 tableBody.appendChild(row);
@@ -689,5 +709,3 @@
     </script>
 </body>
 </html>
-
-
