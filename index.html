@@ -55,6 +55,15 @@
             z-index: 9999; display: flex; justify-content: center; align-items: center;
             font-weight: 600; color: #6366f1;
         }
+
+        /* Dragging Styles */
+        .draggable-row { cursor: grab; }
+        .draggable-row.dragging { 
+            opacity: 0.5; 
+            background-color: #eff6ff; /* Blue-50 */
+            border: 2px dashed #6366f1;
+        }
+        .drag-handle { cursor: move; }
     </style>
 </head>
 <body class="bg-[#fafaf9] text-[#1c1917] antialiased min-h-screen flex flex-col">
@@ -98,7 +107,7 @@
                     <div class="grid grid-cols-3 gap-4">
                         <div class="col-span-1">
                             <label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">ID</label>
-                            <input type="number" id="newId" placeholder="Auto" class="w-full p-2 border border-[#e7e5e4] rounded-lg focus:border-[#6366f1] focus:ring-1 focus:ring-[#6366f1] outline-none">
+                            <input type="number" id="newId" placeholder="101" class="w-full p-2 border border-[#e7e5e4] rounded-lg focus:border-[#6366f1] focus:ring-1 focus:ring-[#6366f1] outline-none">
                         </div>
                         <div class="col-span-2">
                             <label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Platform</label>
@@ -219,7 +228,7 @@
                 <div class="p-6 border-b border-[#e7e5e4] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                         <h3 class="text-lg font-bold text-[#1c1917]">Service Ledger</h3>
-                        <p class="text-sm text-[#78716c]">Edit details directly in the table.</p>
+                        <p class="text-sm text-[#78716c]">Drag <span class="font-bold">=</span> to reorder items. Edit details directly.</p>
                     </div>
                     <div class="flex gap-3 items-center">
                         <div id="filterContainer" class="flex gap-2">
@@ -236,6 +245,8 @@
                     <table class="w-full text-left text-sm" id="serviceTable">
                         <thead class="bg-[#fafaf9] text-[#57534e] font-semibold uppercase text-xs tracking-wider border-b border-[#e7e5e4]">
                             <tr>
+                                <!-- DRAG HANDLE COL -->
+                                <th class="w-8 px-2 py-3"></th>
                                 <th class="px-3 py-3 w-20 text-center">ID</th>
                                 <th class="px-3 py-3 whitespace-nowrap min-w-[180px]">Platform</th>
                                 <th class="px-3 py-3 whitespace-nowrap min-w-[250px]">Service Name</th>
@@ -254,6 +265,7 @@
                         </tbody>
                         <tfoot class="bg-[#f5f5f4] font-bold text-[#1c1917] border-t-2 border-[#e7e5e4]">
                             <tr>
+                                <td class="px-3 py-3"></td> <!-- Spacer for Handle -->
                                 <td colspan="3" class="px-3 py-3 text-right text-[#a8a29e] uppercase text-xs tracking-wider">Totals:</td>
                                 
                                 <td class="px-3 py-3 text-right font-mono text-[#57534e]" id="foot-cost-usd">0.00</td>
@@ -282,7 +294,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, addDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, addDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, orderBy, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- FIREBASE CONFIGURATION ---
         const firebaseConfig = {
@@ -307,6 +319,9 @@
         let activeFilter = 'all';
         let arbChart = null;
         let distChart = null;
+        // Drag State
+        let dragSrcEl = null;
+        let dragSrcIndex = -1;
 
         // --- DOM REFERENCES ---
         const authContainer = document.getElementById('auth-container');
@@ -329,7 +344,7 @@
         const kpiMargin = document.getElementById('kpi-margin');
         const footCostUSD = document.getElementById('foot-cost-usd');
         const footCost = document.getElementById('foot-cost');
-        const footSellUSD = document.getElementById('foot-sell-usd'); // NEW
+        const footSellUSD = document.getElementById('foot-sell-usd');
         const footRev = document.getElementById('foot-rev');
         const footQty = document.getElementById('foot-qty');
         const footProfit = document.getElementById('foot-profit');
@@ -388,8 +403,17 @@
 
             onSnapshot(servicesRef, (snapshot) => {
                 serviceData = [];
-                snapshot.forEach(doc => serviceData.push(doc.data()));
-                serviceData.sort((a, b) => a.id - b.id);
+                snapshot.forEach(doc => {
+                    serviceData.push({ ...doc.data(), docId: doc.id });
+                });
+                
+                // UPDATED SORTING: Sort by sortOrder, then by createdAt fallback
+                serviceData.sort((a, b) => {
+                    const orderA = a.sortOrder !== undefined ? a.sortOrder : (a.createdAt || 0);
+                    const orderB = b.sortOrder !== undefined ? b.sortOrder : (b.createdAt || 0);
+                    return orderA - orderB;
+                });
+                
                 updateDashboard();
                 updateFilterButtons();
             }, (error) => console.error("Data sync error:", error));
@@ -406,36 +430,110 @@
             });
         }
 
+        // --- DRAG AND DROP LOGIC ---
+        function addDragEvents(row, index) {
+            row.setAttribute('draggable', 'true');
+            row.dataset.index = index;
+
+            row.addEventListener('dragstart', (e) => {
+                dragSrcEl = row;
+                dragSrcIndex = index;
+                row.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', index);
+            });
+
+            row.addEventListener('dragover', (e) => {
+                if (e.preventDefault) e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                return false;
+            });
+
+            row.addEventListener('dragenter', (e) => {
+                row.classList.add('bg-indigo-50');
+            });
+
+            row.addEventListener('dragleave', (e) => {
+                row.classList.remove('bg-indigo-50');
+            });
+
+            row.addEventListener('dragend', () => {
+                row.classList.remove('dragging');
+                const rows = tableBody.querySelectorAll('tr');
+                rows.forEach(r => r.classList.remove('bg-indigo-50'));
+            });
+
+            row.addEventListener('drop', async (e) => {
+                if (e.stopPropagation) e.stopPropagation();
+                const targetIndex = parseInt(row.dataset.index);
+                if (dragSrcIndex !== targetIndex && dragSrcIndex > -1) {
+                    await reorderItems(dragSrcIndex, targetIndex);
+                }
+                return false;
+            });
+        }
+
+        async function reorderItems(fromIndex, toIndex) {
+            // 1. Move item in local array
+            const itemMoved = serviceData.splice(fromIndex, 1)[0];
+            serviceData.splice(toIndex, 0, itemMoved);
+
+            // 2. Update sortOrder for all items
+            // Use Batch Write for atomic update
+            const batch = writeBatch(db);
+            
+            serviceData.forEach((item, index) => {
+                item.sortOrder = index; // Update local model
+                if (item.docId) {
+                    const ref = doc(db, 'artifacts', appId, 'users', userId, 'services', item.docId);
+                    batch.update(ref, { sortOrder: index });
+                }
+            });
+
+            try {
+                await batch.commit();
+                console.log("Order updated");
+            } catch(err) {
+                console.error("Reorder failed", err);
+                alert("Failed to reorder");
+                // Sync usually resets state anyway
+            }
+        }
+
         // --- CRUD ACTIONS ---
         window.saveNewService = async () => {
             if (!userId) return;
-            const rawId = newIdInput.value;
+            // Parse Custom ID (Visual ID)
+            const customId = parseInt(newIdInput.value) || 0; 
             const platform = document.getElementById('newPlatform').value.trim();
             const service = document.getElementById('newService').value.trim();
             const cost = parseFloat(document.getElementById('newCost').value);
             const sell = parseFloat(document.getElementById('newSell').value);
             const qty = parseInt(document.getElementById('newQty').value) || 1;
-            const link = document.getElementById('newLink').value.trim(); // NEW LINK
+            const link = document.getElementById('newLink').value.trim();
 
             if (!platform || !service || isNaN(cost) || isNaN(sell)) {
                 alert("Please fill in all fields correctly.");
                 return;
             }
 
-            let newId;
-            if (rawId) {
-                newId = parseInt(rawId);
-                if (serviceData.some(s => s.id === newId)) {
-                    if(!confirm("ID " + newId + " exists. Overwrite?")) return;
-                }
-            } else {
-                newId = serviceData.length > 0 ? Math.max(...serviceData.map(s => s.id)) + 1 : 100;
-            }
+            // Add at end
+            const sortOrder = serviceData.length;
 
-            const newItem = { id: newId, platform, service, buyUSD: cost, sellDA: sell, qty, link };
+            const newItem = { 
+                customId: customId, 
+                platform, 
+                service, 
+                buyUSD: cost, 
+                sellDA: sell, 
+                qty, 
+                link,
+                sortOrder: sortOrder, // Explicit order
+                createdAt: Date.now()
+            };
 
             try {
-                await setDoc(doc(db, 'artifacts', appId, 'users', userId, 'services', String(newId)), newItem);
+                await addDoc(collection(db, 'artifacts', appId, 'users', userId, 'services'), newItem);
                 closeAddModal();
             } catch (e) {
                 console.error("Error saving:", e);
@@ -443,43 +541,28 @@
             }
         };
 
-        window.updateValue = async (id, field, value) => {
+        window.updateValue = async (docId, field, value) => {
             if (!userId) return;
             
             let updateVal = value;
             
-            if(['buyUSD', 'sellDA', 'qty', 'id'].includes(field)) {
+            if(['buyUSD', 'sellDA', 'qty', 'customId'].includes(field)) {
                 const numVal = parseFloat(value);
                 if (isNaN(numVal)) return;
                 updateVal = numVal;
             }
 
             try {
-                if (field === 'id') {
-                    if (updateVal === id) return;
-                    const oldItem = serviceData.find(s => s.id === id);
-                    if (!oldItem) return;
-                    const newDocRef = doc(db, 'artifacts', appId, 'users', userId, 'services', String(updateVal));
-                    const newDocSnap = await getDoc(newDocRef);
-                    if (newDocSnap.exists()) {
-                        alert("ID " + updateVal + " already exists. Choose another.");
-                        updateDashboard(); return;
-                    }
-                    const newItem = { ...oldItem, id: updateVal };
-                    await setDoc(newDocRef, newItem);
-                    await deleteDoc(doc(db, 'artifacts', appId, 'users', userId, 'services', String(id)));
-                } else {
-                    await updateDoc(doc(db, 'artifacts', appId, 'users', userId, 'services', String(id)), {
-                        [field]: updateVal
-                    });
-                }
+                await updateDoc(doc(db, 'artifacts', appId, 'users', userId, 'services', docId), {
+                    [field]: updateVal
+                });
             } catch (e) { console.error("Update failed:", e); }
         };
 
-        window.deleteService = async (id) => {
+        window.deleteService = async (docId) => {
             if (!userId) return;
             if (confirm('Delete this service permanently?')) {
-                try { await deleteDoc(doc(db, 'artifacts', appId, 'users', userId, 'services', String(id))); } 
+                try { await deleteDoc(doc(db, 'artifacts', appId, 'users', userId, 'services', docId)); } 
                 catch (e) { console.error("Delete failed:", e); }
             }
         };
@@ -508,7 +591,7 @@
 
         function openAddModal() {
             addModal.classList.remove('hidden');
-            const maxId = serviceData.length > 0 ? Math.max(...serviceData.map(s => s.id)) : 0;
+            const maxId = serviceData.length > 0 ? Math.max(...serviceData.map(s => s.customId || 0)) : 100;
             newIdInput.value = maxId + 1;
         }
 
@@ -519,7 +602,7 @@
             document.getElementById('newCost').value = '';
             document.getElementById('newSell').value = '';
             document.getElementById('newQty').value = '1';
-            document.getElementById('newLink').value = ''; // Clear link
+            document.getElementById('newLink').value = ''; 
         }
 
         // --- DASHBOARD CALCULATION ---
@@ -532,6 +615,7 @@
             let totalSellUSD_Calc = 0;
             
             const processedData = serviceData.map(item => {
+                const displayId = item.customId !== undefined ? item.customId : 0;
                 const qty = item.qty || 0;
                 const costDA_Unit = item.buyUSD * currentRate;
                 const costDA_Total = costDA_Unit * qty;
@@ -540,8 +624,9 @@
                 const profitDA_Total = sellDA_Total - costDA_Total;
                 const margin = sellDA_Total > 0 ? (profitDA_Total / sellDA_Total) * 100 : 0;
                 const sellUSD_Unit = currentRate > 0 ? sellDA_Unit / currentRate : 0;
+                const docId = item.docId || ''; 
                 
-                return { ...item, costDA_Unit, costDA_Total, sellDA_Unit, sellDA_Total, profitDA_Total, margin, sellUSD_Unit };
+                return { ...item, displayId, costDA_Unit, costDA_Total, sellDA_Unit, sellDA_Total, profitDA_Total, margin, sellUSD_Unit, docId };
             });
 
             const visibleData = renderTable(processedData);
@@ -578,15 +663,14 @@
             const filtered = activeFilter === 'all' ? data : data.filter(d => d.platform === activeFilter);
 
             if (filtered.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="11" class="px-6 py-8 text-center text-[#a8a29e]">No services found. Add one to get started.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="12" class="px-6 py-8 text-center text-[#a8a29e]">No services found. Add one to get started.</td></tr>';
                 return [];
             }
 
-            filtered.forEach(item => {
-                // NEW: Generate Action Buttons
+            filtered.forEach((item, index) => { // NOTE: index used for drag handle
+                const docId = item.docId; 
+
                 let actionButtons = '';
-                
-                // If link exists, add BUY button
                 if (item.link && item.link.trim() !== '') {
                     actionButtons += `
                         <a href="${item.link}" target="_blank" class="text-blue-600 hover:text-blue-800 bg-blue-50 p-1.5 rounded-md hover:bg-blue-100 transition" title="Buy on Secsers">
@@ -594,38 +678,38 @@
                         </a>
                     `;
                 }
-                
-                // Add Delete button
                 actionButtons += `
-                    <button onclick="window.deleteService(${item.id})" class="text-slate-400 hover:text-red-500 p-1.5 rounded-md hover:bg-red-50 transition" title="Delete">
+                    <button onclick="window.deleteService('${docId}')" class="text-slate-400 hover:text-red-500 p-1.5 rounded-md hover:bg-red-50 transition" title="Delete">
                         <span class="font-bold text-lg leading-none">&times;</span>
                     </button>
                 `;
 
                 const row = document.createElement('tr');
-                row.className = 'hover:bg-[#f5f5f4] transition group border-b border-[#f5f5f4] last:border-0';
+                row.className = 'hover:bg-[#f5f5f4] transition group border-b border-[#f5f5f4] last:border-0 draggable-row';
                 row.innerHTML = `
-                    <!-- COMPACT ROWS: Reduced Padding (py-2 px-3) -->
+                    <td class="px-2 py-2 text-center drag-handle cursor-move text-slate-400 hover:text-slate-600">
+                        <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path></svg>
+                    </td>
                     <td class="px-3 py-2 text-center font-mono text-[#a8a29e] text-xs">
-                        <input type="number" value="${item.id}" 
-                            onchange="window.updateValue(${item.id}, 'id', this.value)"
+                        <input type="number" value="${item.displayId}" 
+                            onchange="window.updateValue('${docId}', 'customId', this.value)"
                             class="table-input num-input text-center w-24 text-[#a8a29e]">
                     </td>
                     <td class="px-3 py-2 font-medium text-[#1c1917]">
                         <input type="text" value="${item.platform}" 
-                            onchange="window.updateValue(${item.id}, 'platform', this.value)"
+                            onchange="window.updateValue('${docId}', 'platform', this.value)"
                             class="table-input w-full text-[#1c1917] font-medium">
                     </td>
                     <td class="px-3 py-2 text-[#57534e]">
                         <input type="text" value="${item.service}" 
-                            onchange="window.updateValue(${item.id}, 'service', this.value)"
+                            onchange="window.updateValue('${docId}', 'service', this.value)"
                             class="table-input w-full text-[#57534e]">
                     </td>
                     <td class="px-3 py-2 text-right font-mono text-[#a8a29e]">
                         <div class="flex items-center justify-end gap-1">
                             <span class="text-xs text-gray-400">$</span>
                             <input type="number" value="${item.buyUSD}" step="0.01" 
-                                onchange="window.updateValue(${item.id}, 'buyUSD', this.value)"
+                                onchange="window.updateValue('${docId}', 'buyUSD', this.value)"
                                 class="table-input num-input font-mono w-20">
                         </div>
                     </td>
@@ -641,14 +725,14 @@
                     <td class="px-3 py-2 text-right">
                          <div class="flex items-center justify-end gap-1 bg-green-50/30 rounded px-2">
                             <input type="number" value="${item.sellDA}" step="10" 
-                                onchange="window.updateValue(${item.id}, 'sellDA', this.value)"
+                                onchange="window.updateValue('${docId}', 'sellDA', this.value)"
                                 class="table-input num-input font-mono font-bold text-green-700 bg-transparent w-20">
                             <span class="text-xs text-green-700 font-bold">DA</span>
                         </div>
                     </td>
                     <td class="px-3 py-2 text-center">
                         <input type="number" value="${item.qty}" step="1" min="0"
-                                onchange="window.updateValue(${item.id}, 'qty', this.value)"
+                                onchange="window.updateValue('${docId}', 'qty', this.value)"
                                 class="table-input num-input font-mono text-center w-16 bg-[#e5e7eb]/50 focus:bg-white border-b border-gray-300">
                     </td>
                     <td class="px-3 py-2 text-right font-mono font-bold ${item.profitDA_Total >= 0 ? 'text-[#1c1917]' : 'text-red-600'}">${item.profitDA_Total.toFixed(0)}</td>
@@ -659,6 +743,9 @@
                         </div>
                     </td>
                 `;
+                
+                // ADD DRAG HANDLERS
+                addDragEvents(row, index);
                 tableBody.appendChild(row);
             });
             return filtered;
