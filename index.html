@@ -57,13 +57,14 @@
         }
 
         /* Dragging Styles */
-        .draggable-row { cursor: grab; }
         .draggable-row.dragging { 
             opacity: 0.5; 
             background-color: #eff6ff; /* Blue-50 */
             border: 2px dashed #6366f1;
         }
-        .drag-handle { cursor: move; }
+        /* Only change cursor on the handle */
+        .drag-handle { cursor: grab; touch-action: none; }
+        .drag-handle:active { cursor: grabbing; }
     </style>
 </head>
 <body class="bg-[#fafaf9] text-[#1c1917] antialiased min-h-screen flex flex-col">
@@ -114,9 +115,26 @@
                             <input type="text" id="newPlatform" placeholder="e.g., YouTube" class="w-full p-2 border border-[#e7e5e4] rounded-lg focus:border-[#6366f1] focus:ring-1 focus:ring-[#6366f1] outline-none">
                         </div>
                     </div>
+                    
+                    <!-- NEW CATEGORY INPUT -->
+                    <div>
+                        <label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Category (Followers, Likes...)</label>
+                        <div class="relative">
+                            <input type="text" id="newCategory" list="categorySuggestions" placeholder="Select or type..." class="w-full p-2 border border-[#e7e5e4] rounded-lg focus:border-[#6366f1] focus:ring-1 focus:ring-[#6366f1] outline-none">
+                            <datalist id="categorySuggestions">
+                                <option value="Followers">
+                                <option value="Likes">
+                                <option value="Views">
+                                <option value="Comments">
+                                <option value="Shares">
+                                <option value="Subscribers">
+                            </datalist>
+                        </div>
+                    </div>
+
                     <div>
                         <label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Service Name</label>
-                        <input type="text" id="newService" placeholder="e.g., 1k Views" class="w-full p-2 border border-[#e7e5e4] rounded-lg focus:border-[#6366f1] focus:ring-1 focus:ring-[#6366f1] outline-none">
+                        <input type="text" id="newService" placeholder="e.g., 1k High Quality" class="w-full p-2 border border-[#e7e5e4] rounded-lg focus:border-[#6366f1] focus:ring-1 focus:ring-[#6366f1] outline-none">
                     </div>
                     
                     <!-- NEW LINK INPUT -->
@@ -228,7 +246,7 @@
                 <div class="p-6 border-b border-[#e7e5e4] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                         <h3 class="text-lg font-bold text-[#1c1917]">Service Ledger</h3>
-                        <p class="text-sm text-[#78716c]">Drag <span class="font-bold">=</span> to reorder items. Edit details directly.</p>
+                        <p class="text-sm text-[#78716c]">Drag <span class="font-bold bg-gray-100 px-1 rounded">=</span> to reorder items. Edit details directly.</p>
                     </div>
                     <div class="flex gap-3 items-center">
                         <div id="filterContainer" class="flex gap-2">
@@ -248,8 +266,10 @@
                                 <!-- DRAG HANDLE COL -->
                                 <th class="w-8 px-2 py-3"></th>
                                 <th class="px-3 py-3 w-20 text-center">ID</th>
-                                <th class="px-3 py-3 whitespace-nowrap min-w-[180px]">Platform</th>
-                                <th class="px-3 py-3 whitespace-nowrap min-w-[250px]">Service Name</th>
+                                <th class="px-3 py-3 whitespace-nowrap min-w-[140px]">Platform</th>
+                                <!-- NEW CATEGORY COLUMN -->
+                                <th class="px-3 py-3 whitespace-nowrap min-w-[140px]">Category</th>
+                                <th class="px-3 py-3 whitespace-nowrap min-w-[220px]">Service Name</th>
                                 <th class="px-3 py-3 text-right whitespace-nowrap w-24">Cost ($)</th>
                                 <th class="px-3 py-3 text-right bg-red-50/50 text-red-800 whitespace-nowrap w-24">Cost (DA)</th>
                                 <th class="px-3 py-3 text-right bg-blue-50/50 text-blue-800 whitespace-nowrap w-24">Sell ($)</th>
@@ -257,7 +277,7 @@
                                 <th class="px-3 py-3 text-center w-16">Qty</th>
                                 <th class="px-3 py-3 text-right whitespace-nowrap">Profit (DA)</th>
                                 <th class="px-3 py-3 text-right whitespace-nowrap">Margin</th>
-                                <th class="px-3 py-3 w-24 text-right">Actions</th>
+                                <th class="px-3 py-3 w-32 text-right">Actions</th> <!-- Increased Width -->
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-[#e7e5e4]" id="tableBody">
@@ -266,7 +286,7 @@
                         <tfoot class="bg-[#f5f5f4] font-bold text-[#1c1917] border-t-2 border-[#e7e5e4]">
                             <tr>
                                 <td class="px-3 py-3"></td> <!-- Spacer for Handle -->
-                                <td colspan="3" class="px-3 py-3 text-right text-[#a8a29e] uppercase text-xs tracking-wider">Totals:</td>
+                                <td colspan="4" class="px-3 py-3 text-right text-[#a8a29e] uppercase text-xs tracking-wider">Totals:</td>
                                 
                                 <td class="px-3 py-3 text-right font-mono text-[#57534e]" id="foot-cost-usd">0.00</td>
                                 <td class="px-3 py-3 text-right font-mono text-red-800 bg-red-50/50" id="foot-cost">0</td>
@@ -337,6 +357,7 @@
         // Modal
         const addModal = document.getElementById('addModal');
         const newIdInput = document.getElementById('newId');
+        const newCategoryInput = document.getElementById('newCategory');
         
         // Footer & KPIs
         const kpiRevenue = document.getElementById('kpi-revenue');
@@ -407,7 +428,7 @@
                     serviceData.push({ ...doc.data(), docId: doc.id });
                 });
                 
-                // UPDATED SORTING: Sort by sortOrder, then by createdAt fallback
+                // Sort by sortOrder, then by createdAt fallback
                 serviceData.sort((a, b) => {
                     const orderA = a.sortOrder !== undefined ? a.sortOrder : (a.createdAt || 0);
                     const orderB = b.sortOrder !== undefined ? b.sortOrder : (b.createdAt || 0);
@@ -430,12 +451,24 @@
             });
         }
 
-        // --- DRAG AND DROP LOGIC ---
+        // --- DRAG AND DROP LOGIC (RESTRICTED TO HANDLE) ---
         function addDragEvents(row, index) {
-            row.setAttribute('draggable', 'true');
+            // IMPORTANT: DO NOT set draggable="true" here initially.
+            // We only set it when the handle is moused over/down.
+            row.setAttribute('draggable', 'false');
             row.dataset.index = index;
 
+            const handle = row.querySelector('.drag-handle');
+            
+            // RESTRICT DRAGGING: Only enable dragging when interacting with the handle
+            handle.addEventListener('mouseenter', () => row.setAttribute('draggable', 'true'));
+            handle.addEventListener('mouseleave', () => row.setAttribute('draggable', 'false'));
+            
+            // Mobile touch support is trickier, but for mouse this is robust:
+            handle.addEventListener('mousedown', () => row.setAttribute('draggable', 'true'));
+            
             row.addEventListener('dragstart', (e) => {
+                // Double check target (redundant but safe)
                 dragSrcEl = row;
                 dragSrcIndex = index;
                 row.classList.add('dragging');
@@ -459,6 +492,7 @@
 
             row.addEventListener('dragend', () => {
                 row.classList.remove('dragging');
+                row.setAttribute('draggable', 'false'); // Reset after drag
                 const rows = tableBody.querySelectorAll('tr');
                 rows.forEach(r => r.classList.remove('bg-indigo-50'));
             });
@@ -474,16 +508,13 @@
         }
 
         async function reorderItems(fromIndex, toIndex) {
-            // 1. Move item in local array
             const itemMoved = serviceData.splice(fromIndex, 1)[0];
             serviceData.splice(toIndex, 0, itemMoved);
 
-            // 2. Update sortOrder for all items
-            // Use Batch Write for atomic update
             const batch = writeBatch(db);
             
             serviceData.forEach((item, index) => {
-                item.sortOrder = index; // Update local model
+                item.sortOrder = index;
                 if (item.docId) {
                     const ref = doc(db, 'artifacts', appId, 'users', userId, 'services', item.docId);
                     batch.update(ref, { sortOrder: index });
@@ -492,20 +523,18 @@
 
             try {
                 await batch.commit();
-                console.log("Order updated");
             } catch(err) {
                 console.error("Reorder failed", err);
                 alert("Failed to reorder");
-                // Sync usually resets state anyway
             }
         }
 
         // --- CRUD ACTIONS ---
         window.saveNewService = async () => {
             if (!userId) return;
-            // Parse Custom ID (Visual ID)
             const customId = parseInt(newIdInput.value) || 0; 
             const platform = document.getElementById('newPlatform').value.trim();
+            const category = document.getElementById('newCategory').value.trim(); 
             const service = document.getElementById('newService').value.trim();
             const cost = parseFloat(document.getElementById('newCost').value);
             const sell = parseFloat(document.getElementById('newSell').value);
@@ -517,18 +546,18 @@
                 return;
             }
 
-            // Add at end
             const sortOrder = serviceData.length;
 
             const newItem = { 
                 customId: customId, 
                 platform, 
+                category,
                 service, 
                 buyUSD: cost, 
                 sellDA: sell, 
                 qty, 
                 link,
-                sortOrder: sortOrder, // Explicit order
+                sortOrder: sortOrder, 
                 createdAt: Date.now()
             };
 
@@ -538,6 +567,32 @@
             } catch (e) {
                 console.error("Error saving:", e);
                 alert("Failed to save.");
+            }
+        };
+
+        // NEW: DUPLICATE FUNCTION
+        window.duplicateService = async (docId) => {
+            if (!userId) return;
+            const original = serviceData.find(s => s.docId === docId);
+            if (!original) return;
+
+            // Calculate new Custom ID
+            const maxId = serviceData.length > 0 ? Math.max(...serviceData.map(s => s.customId || 0)) : 100;
+            const newCustomId = maxId + 1;
+
+            const newItem = {
+                ...original,
+                customId: newCustomId,
+                service: original.service + " (Copy)",
+                createdAt: Date.now(),
+                sortOrder: serviceData.length // Put at end
+            };
+            delete newItem.docId; // Ensure we don't copy the document ID
+
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'users', userId, 'services'), newItem);
+            } catch (e) {
+                console.error("Duplicate failed", e);
             }
         };
 
@@ -598,6 +653,7 @@
         function closeAddModal() {
             addModal.classList.add('hidden');
             document.getElementById('newPlatform').value = '';
+            document.getElementById('newCategory').value = ''; 
             document.getElementById('newService').value = '';
             document.getElementById('newCost').value = '';
             document.getElementById('newSell').value = '';
@@ -663,11 +719,11 @@
             const filtered = activeFilter === 'all' ? data : data.filter(d => d.platform === activeFilter);
 
             if (filtered.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="12" class="px-6 py-8 text-center text-[#a8a29e]">No services found. Add one to get started.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="13" class="px-6 py-8 text-center text-[#a8a29e]">No services found. Add one to get started.</td></tr>';
                 return [];
             }
 
-            filtered.forEach((item, index) => { // NOTE: index used for drag handle
+            filtered.forEach((item, index) => {
                 const docId = item.docId; 
 
                 let actionButtons = '';
@@ -678,6 +734,12 @@
                         </a>
                     `;
                 }
+                // NEW: Duplicate Button
+                actionButtons += `
+                    <button onclick="window.duplicateService('${docId}')" class="text-indigo-400 hover:text-indigo-600 p-1.5 rounded-md hover:bg-indigo-50 transition" title="Duplicate">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                    </button>
+                `;
                 actionButtons += `
                     <button onclick="window.deleteService('${docId}')" class="text-slate-400 hover:text-red-500 p-1.5 rounded-md hover:bg-red-50 transition" title="Delete">
                         <span class="font-bold text-lg leading-none">&times;</span>
@@ -687,7 +749,7 @@
                 const row = document.createElement('tr');
                 row.className = 'hover:bg-[#f5f5f4] transition group border-b border-[#f5f5f4] last:border-0 draggable-row';
                 row.innerHTML = `
-                    <td class="px-2 py-2 text-center drag-handle cursor-move text-slate-400 hover:text-slate-600">
+                    <td class="px-2 py-2 text-center drag-handle text-slate-400 hover:text-slate-600">
                         <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path></svg>
                     </td>
                     <td class="px-3 py-2 text-center font-mono text-[#a8a29e] text-xs">
@@ -699,6 +761,11 @@
                         <input type="text" value="${item.platform}" 
                             onchange="window.updateValue('${docId}', 'platform', this.value)"
                             class="table-input w-full text-[#1c1917] font-medium">
+                    </td>
+                    <td class="px-3 py-2 text-[#57534e]">
+                        <input type="text" value="${item.category || ''}" 
+                            onchange="window.updateValue('${docId}', 'category', this.value)"
+                            class="table-input w-full text-[#57534e]">
                     </td>
                     <td class="px-3 py-2 text-[#57534e]">
                         <input type="text" value="${item.service}" 
@@ -744,7 +811,6 @@
                     </td>
                 `;
                 
-                // ADD DRAG HANDLERS
                 addDragEvents(row, index);
                 tableBody.appendChild(row);
             });
