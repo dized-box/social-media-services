@@ -85,34 +85,53 @@
                     <button id="closeModalBtn" class="text-[#a8a29e] hover:text-red-500 text-2xl leading-none">&times;</button>
                 </div>
                 <div class="p-6 space-y-4 overflow-y-auto custom-scroll">
+                    <!-- ID & Basics -->
                     <div class="grid grid-cols-4 gap-4">
                         <div class="col-span-1"><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">ID</label><input type="number" id="newId" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
+                        
+                        <!-- SMM Platform -->
                         <div class="col-span-3 smm-field"><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Platform</label><input type="text" id="newPlatform" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
+                        
+                        <!-- Canva Name -->
                         <div class="col-span-3 canva-field hidden"><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Customer Name</label><input type="text" id="newName" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
+                        
+                        <!-- Game Name (Moved up for Games) -->
+                        <div class="col-span-3 game-field hidden"><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Game Name</label><input type="text" id="newGameName" placeholder="Free Fire..." class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
                     </div>
+
+                    <!-- SMM Specific -->
                     <div class="grid grid-cols-2 gap-4 smm-field">
                         <div><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Category</label><input type="text" id="newCategory" list="catList" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"><datalist id="catList"><option value="Followers"><option value="Likes"></datalist></div>
                         <div><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Type (Tag)</label><input type="text" id="newType" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
                     </div>
-                    <!-- Game Fields -->
-                    <div class="grid grid-cols-2 gap-4 game-field hidden">
-                        <div><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Provider</label><input type="text" id="newProvider" placeholder="Shop2Game..." class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
-                        <div><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Game Name</label><input type="text" id="newGameName" placeholder="Free Fire..." class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
-                    </div>
-                    <div class="game-field hidden"><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Amount (Coins/Gems)</label><input type="text" id="newAmount" placeholder="100 Diamonds" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
-
-                    <div class="canva-field hidden"><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Customer Email</label><input type="email" id="newEmail" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
                     <div class="smm-field"><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Service Name</label><input type="text" id="newService" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
+
+                    <!-- GAMES Specific (Reordered) -->
+                    <div class="grid grid-cols-2 gap-4 game-field hidden">
+                        <div><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Console</label><input type="text" id="newGameConsole" placeholder="Mobile, PC..." list="consoleList" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"><datalist id="consoleList"><option value="Mobile"><option value="PC"><option value="PlayStation"><option value="Xbox"></datalist></div>
+                        <div><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Provider</label><input type="text" id="newProvider" placeholder="Shop2Game..." class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 game-field hidden">
+                        <div><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Method</label><input type="text" id="newGameMethod" list="methodList" placeholder="Direct Top-up..." class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"><datalist id="methodList"><option value="Direct Top-up"><option value="Redeem Code"><option value="Login ID"><option value="Manual"></datalist></div>
+                        <div><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Amount</label><input type="text" id="newAmount" placeholder="100 Diamonds" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
+                    </div>
+
+                    <!-- Canva Specific -->
+                    <div class="canva-field hidden"><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Customer Email</label><input type="email" id="newEmail" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
                     <div class="grid grid-cols-2 gap-4 canva-field hidden">
                         <div><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Start Date</label><input type="date" id="newStartDate" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
                         <div><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">End Date</label><input type="date" id="newEndDate" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
                     </div>
+
+                    <!-- Financials -->
                     <div class="grid grid-cols-3 gap-4">
                         <div class="smm-field game-field"><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Cost ($)</label><input type="number" id="newCost" step="0.01" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
                         <div class="canva-field hidden"><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Cost (DA)</label><input type="number" id="newCostDA" step="10" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
                         <div><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Sell (DA)</label><input type="number" id="newSell" step="10" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
                         <div class="smm-field"><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Qty</label><input type="number" id="newQty" value="1" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
                     </div>
+                    
+                    <!-- Link -->
                     <div class="smm-field game-field"><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Link</label><input type="url" id="newLink" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none text-blue-600"></div>
                 </div>
                 <div class="px-6 py-4 bg-[#fafaf9] flex justify-end gap-3 border-t border-[#e7e5e4]">
@@ -191,9 +210,10 @@
                 <div id="view-games" class="hidden space-y-6">
                     <div class="flex flex-col md:flex-row justify-between gap-4 bg-white p-4 rounded-xl border border-[#e7e5e4] shadow-sm">
                         <div class="flex flex-wrap gap-2 items-center">
-                            <select id="gameProviderFilter" class="bg-[#f5f5f4] text-sm font-medium rounded-lg p-2 outline-none"><option value="all">All Providers</option></select>
-                            <div class="h-4 w-px bg-[#e7e5e4]"></div>
                             <select id="gameNameFilter" class="bg-[#f5f5f4] text-sm font-medium rounded-lg p-2 outline-none"><option value="all">All Games</option></select>
+                            <div class="h-4 w-px bg-[#e7e5e4]"></div><select id="gameConsoleFilter" class="bg-[#f5f5f4] text-sm font-medium rounded-lg p-2 outline-none"><option value="all">All Consoles</option></select>
+                            <div class="h-4 w-px bg-[#e7e5e4]"></div><select id="gameProviderFilter" class="bg-[#f5f5f4] text-sm font-medium rounded-lg p-2 outline-none"><option value="all">All Providers</option></select>
+                            <div class="h-4 w-px bg-[#e7e5e4]"></div><select id="gameCategoryFilter" class="bg-[#f5f5f4] text-sm font-medium rounded-lg p-2 outline-none"><option value="all">All Methods</option></select>
                         </div>
                         <button onclick="window.openAddModal()" class="flex items-center gap-2 px-4 py-2 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm"><span>+ Add Game Topup</span></button>
                     </div>
@@ -204,9 +224,13 @@
                                     <tr>
                                         <th class="w-8 px-2 py-3"></th> <!-- Drag Handle -->
                                         <th class="px-3 py-3 w-24 text-center">ID</th>
+                                        <!-- UPDATED COLUMN ORDER -->
+                                        <th class="px-3 py-3 min-w-[150px]">Game Name</th>
+                                        <th class="px-3 py-3 min-w-[100px]">Console</th>
                                         <th class="px-3 py-3 min-w-[150px]">Provider</th>
-                                        <th class="px-3 py-3 min-w-[200px]">Game Name</th>
-                                        <th class="px-3 py-3 min-w-[150px]">Amount</th>
+                                        <th class="px-3 py-3 min-w-[120px]">Category</th>
+                                        <th class="px-3 py-3 min-w-[120px]">Amount</th>
+                                        
                                         <th class="px-3 py-3 text-right w-32">Cost $</th>
                                         <th class="px-3 py-3 text-right w-24 bg-red-50">Cost DA</th>
                                         <th class="px-3 py-3 text-right w-24 bg-blue-50">Sell $</th>
@@ -259,7 +283,7 @@
         let canvaData = [];
         let gamesData = [];
         let smmFilters = { platform: 'all', category: 'all', type: 'all' };
-        let gamesFilters = { provider: 'all', game: 'all' }; // NEW
+        let gamesFilters = { game: 'all', console: 'all', provider: 'all', category: 'all' };
         let smmChart = null; let smmDistChart = null;
         let dragSrcEl = null; let dragSrcIndex = -1;
 
@@ -303,8 +327,18 @@
             document.getElementById('typeFilter').addEventListener('change', (e) => { smmFilters.type = e.target.value; updateDashboard(); });
             
             // GAMES FILTERS
-            document.getElementById('gameProviderFilter').addEventListener('change', (e) => { gamesFilters.provider = e.target.value; updateGamesGameFilter(); updateGamesDashboard(); });
-            document.getElementById('gameNameFilter').addEventListener('change', (e) => { gamesFilters.game = e.target.value; updateGamesDashboard(); });
+            document.getElementById('gameNameFilter').addEventListener('change', (e) => { 
+                gamesFilters.game = e.target.value; gamesFilters.console='all'; gamesFilters.provider='all'; gamesFilters.category='all'; updateGamesConsoleFilter(); updateGamesDashboard(); 
+            });
+            document.getElementById('gameConsoleFilter').addEventListener('change', (e) => { 
+                gamesFilters.console = e.target.value; gamesFilters.provider='all'; gamesFilters.category='all'; updateGamesProviderFilter(); updateGamesDashboard(); 
+            });
+            document.getElementById('gameProviderFilter').addEventListener('change', (e) => { 
+                gamesFilters.provider = e.target.value; gamesFilters.category='all'; updateGamesCategoryFilter(); updateGamesDashboard(); 
+            });
+            document.getElementById('gameCategoryFilter').addEventListener('change', (e) => { 
+                gamesFilters.category = e.target.value; updateGamesDashboard(); 
+            });
             
             document.getElementById('closeModalBtn').onclick = () => document.getElementById('addModal').classList.add('hidden');
             document.getElementById('cancelModalBtn').onclick = () => document.getElementById('addModal').classList.add('hidden');
@@ -315,35 +349,34 @@
             document.getElementById('sidebar-overlay').onclick = () => toggleSidebar(false);
         }
 
+        // --- HELPER TO GET CURRENT DATA LISTS ---
+        function getVisibleData() {
+            if(currentView === 'smm') {
+                return smmData.filter(i => (smmFilters.platform==='all'||i.platform===smmFilters.platform) && (smmFilters.category==='all'||(i.category||"Gen")===smmFilters.category) && (smmFilters.type==='all'||(i.type||"")===smmFilters.type));
+            } else if(currentView === 'games') {
+                return gamesData.filter(i => (gamesFilters.game==='all'||(i.game||"Unk")===gamesFilters.game) && (gamesFilters.console==='all'||(i.console||"PC")===gamesFilters.console) && (gamesFilters.provider==='all'||i.provider===gamesFilters.provider) && (gamesFilters.category==='all'||(i.category||"General")===gamesFilters.category));
+            } else {
+                return canvaData;
+            }
+        }
+        function getGlobalData() {
+            if(currentView === 'smm') return smmData;
+            if(currentView === 'games') return gamesData;
+            return canvaData;
+        }
+
         // --- GLOBAL WINDOW EXPORTS ---
         window.openAddModal = () => {
             document.getElementById('addModal').classList.remove('hidden');
-            let list = [];
-            if (currentView === 'smm') list = smmData;
-            else if (currentView === 'canva') list = canvaData;
-            else list = gamesData;
-
+            let list = getGlobalData();
             const maxId = list.length > 0 ? Math.max(...list.map(i => i.customId || 0)) : 100;
             document.getElementById('newId').value = maxId + 1;
-            
-            const smmFields = document.querySelectorAll('.smm-field'); 
-            const canvaFields = document.querySelectorAll('.canva-field');
-            const gameFields = document.querySelectorAll('.game-field');
+            const smmFields = document.querySelectorAll('.smm-field'); const canvaFields = document.querySelectorAll('.canva-field'); const gameFields = document.querySelectorAll('.game-field');
+            smmFields.forEach(el => el.classList.add('hidden')); canvaFields.forEach(el => el.classList.add('hidden')); gameFields.forEach(el => el.classList.add('hidden'));
 
-            smmFields.forEach(el => el.classList.add('hidden'));
-            canvaFields.forEach(el => el.classList.add('hidden'));
-            gameFields.forEach(el => el.classList.add('hidden'));
-
-            if(currentView === 'smm') {
-                document.getElementById('modalTitle').textContent = "Add Social Media Service";
-                smmFields.forEach(el => el.classList.remove('hidden'));
-            } else if (currentView === 'canva') {
-                document.getElementById('modalTitle').textContent = "Add Canva Subscription";
-                canvaFields.forEach(el => el.classList.remove('hidden'));
-            } else {
-                document.getElementById('modalTitle').textContent = "Add Game Top-up";
-                gameFields.forEach(el => el.classList.remove('hidden'));
-            }
+            if(currentView === 'smm') { document.getElementById('modalTitle').textContent = "Add Social Media Service"; smmFields.forEach(el => el.classList.remove('hidden')); }
+            else if (currentView === 'canva') { document.getElementById('modalTitle').textContent = "Add Canva Subscription"; canvaFields.forEach(el => el.classList.remove('hidden')); }
+            else { document.getElementById('modalTitle').textContent = "Add Game Top-up"; gameFields.forEach(el => el.classList.remove('hidden')); }
         };
 
         window.switchView = (view) => {
@@ -370,10 +403,7 @@
 
         window.saveNewService = async () => {
             if(!userId) return;
-            const common = {
-                customId: parseInt(document.getElementById('newId').value) || 0,
-                createdAt: Date.now()
-            };
+            const common = { customId: parseInt(document.getElementById('newId').value) || 0, createdAt: Date.now() };
             try {
                 if(currentView === 'smm') {
                     await addDoc(collection(db, 'artifacts', appId, 'users', userId, 'services'), { ...common,
@@ -388,11 +418,13 @@
                         name: document.getElementById('newName').value, email: document.getElementById('newEmail').value,
                         startDate: document.getElementById('newStartDate').value, endDate: document.getElementById('newEndDate').value,
                         buyDA: parseFloat(document.getElementById('newCostDA').value) || 0,
-                        sellDA: parseFloat(document.getElementById('newSell').value) || 0
+                        sellDA: parseFloat(document.getElementById('newSell').value) || 0,
+                        sortOrder: canvaData.length
                     });
                 } else {
                     await addDoc(collection(db, 'artifacts', appId, 'users', userId, 'games_services'), { ...common,
-                        provider: document.getElementById('newProvider').value, game: document.getElementById('newGameName').value,
+                        game: document.getElementById('newGameName').value, console: document.getElementById('newGameConsole').value,
+                        provider: document.getElementById('newProvider').value, category: document.getElementById('newGameMethod').value,
                         amount: document.getElementById('newAmount').value,
                         buyUSD: parseFloat(document.getElementById('newCost').value) || 0,
                         sellDA: parseFloat(document.getElementById('newSell').value) || 0,
@@ -419,16 +451,12 @@
             });
             onSnapshot(collection(db, 'artifacts', appId, 'users', userId, 'canva_services'), (s) => {
                 canvaData = []; s.forEach(d => canvaData.push({...d.data(), docId: d.id}));
-                canvaData.sort((a, b) => new Date(b.endDate || 0) - new Date(a.endDate || 0));
+                canvaData.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)); // Sort by custom order
                 updateCanvaDashboard();
             });
             onSnapshot(collection(db, 'artifacts', appId, 'users', userId, 'games_services'), (s) => {
                 gamesData = []; s.forEach(d => gamesData.push({...d.data(), docId: d.id}));
-                gamesData.sort((a, b) => {
-                    const orderA = a.sortOrder !== undefined ? a.sortOrder : (a.createdAt || 0);
-                    const orderB = b.sortOrder !== undefined ? b.sortOrder : (b.createdAt || 0);
-                    return orderA - orderB;
-                });
+                gamesData.sort((a, b) => (a.sortOrder ?? a.createdAt ?? 0) - (b.sortOrder ?? b.createdAt ?? 0));
                 updateGamesFilters(); updateGamesDashboard();
             });
         }
@@ -458,26 +486,60 @@
             if(types.includes(smmFilters.type)) tf.value = smmFilters.type;
         }
 
-        // --- GAMES FILTERS ---
         function updateGamesFilters() {
-            const provs = [...new Set(gamesData.map(i => i.provider || "Unk"))].sort();
+            const games = [...new Set(gamesData.map(i => i.game || "Unk"))].sort();
+            const gf = document.getElementById('gameNameFilter');
+            gf.innerHTML = '<option value="all">All Games</option>' + games.map(g => `<option value="${g}">${g}</option>`).join('');
+            if(games.includes(gamesFilters.game)) gf.value = gamesFilters.game;
+            updateGamesConsoleFilter();
+        }
+        function updateGamesConsoleFilter() {
+            const game = document.getElementById('gameNameFilter').value;
+            let d = gamesData;
+            if(game !== 'all') d = d.filter(i => (i.game||"Unk") === game);
+            const cons = [...new Set(d.map(i => i.console || "PC"))].sort();
+            
+            const gcf = document.getElementById('gameConsoleFilter');
+            gcf.innerHTML = '<option value="all">All Consoles</option>' + cons.map(c => `<option value="${c}">${c}</option>`).join('');
+            if(cons.includes(gamesFilters.console)) gcf.value = gamesFilters.console;
+            else { gcf.value = 'all'; gamesFilters.console = 'all'; }
+            updateGamesProviderFilter();
+        }
+        function updateGamesProviderFilter() {
+            const game = document.getElementById('gameNameFilter').value;
+            const consoleVal = document.getElementById('gameConsoleFilter').value;
+            let d = gamesData;
+            if(game !== 'all') d = d.filter(i => (i.game||"Unk") === game);
+            if(consoleVal !== 'all') d = d.filter(i => (i.console||"PC") === consoleVal);
+            
+            const provs = [...new Set(d.map(i => i.provider || "Unk"))].sort();
             const pf = document.getElementById('gameProviderFilter');
             pf.innerHTML = '<option value="all">All Providers</option>' + provs.map(p => `<option value="${p}">${p}</option>`).join('');
             if(provs.includes(gamesFilters.provider)) pf.value = gamesFilters.provider;
-            updateGamesGameFilter();
+            else { pf.value = 'all'; gamesFilters.provider = 'all'; }
+            updateGamesCategoryFilter();
         }
-        function updateGamesGameFilter() {
+        function updateGamesCategoryFilter() {
+            const game = document.getElementById('gameNameFilter').value;
+            const consoleVal = document.getElementById('gameConsoleFilter').value;
             const prov = document.getElementById('gameProviderFilter').value;
-            let games = prov === 'all' ? [...new Set(gamesData.map(i => i.game || "Unk"))] : [...new Set(gamesData.filter(i => i.provider === prov).map(i => i.game || "Unk"))];
-            const gf = document.getElementById('gameNameFilter');
-            gf.innerHTML = '<option value="all">All Games</option>' + games.sort().map(g => `<option value="${g}">${g}</option>`).join('');
-            if(games.includes(gamesFilters.game)) gf.value = gamesFilters.game;
+            
+            let d = gamesData;
+            if(game !== 'all') d = d.filter(i => (i.game||"Unk") === game);
+            if(consoleVal !== 'all') d = d.filter(i => (i.console||"PC") === consoleVal);
+            if(prov !== 'all') d = d.filter(i => i.provider === prov);
+            
+            const cats = [...new Set(d.map(i => i.category || "General"))].sort();
+            const gcf = document.getElementById('gameCategoryFilter');
+            gcf.innerHTML = '<option value="all">All Methods</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
+            if(cats.includes(gamesFilters.category)) gcf.value = gamesFilters.category;
+            else { gcf.value = 'all'; gamesFilters.category = 'all'; }
         }
 
-        // --- UPDATE DASHBOARDS ---
+        // --- RENDER & LOGIC ---
         function updateDashboard() {
             if(currentView !== 'smm') return;
-            const visible = smmData.filter(i => (smmFilters.platform==='all'||i.platform===smmFilters.platform) && (smmFilters.category==='all'||(i.category||"Gen")===smmFilters.category) && (smmFilters.type==='all'||(i.type||"")===smmFilters.type));
+            const visible = getVisibleData();
             let tCostUSD=0, tCostDA=0, tRev=0, tProfit=0;
             const tbody = document.getElementById('smmTableBody'); tbody.innerHTML = '';
             if(visible.length === 0) tbody.innerHTML = '<tr><td colspan="14" class="text-center py-8 text-slate-400">No items.</td></tr>';
@@ -502,7 +564,7 @@
                     <td class="px-3 py-2 text-right font-bold ${profit>=0?'text-indigo-600':'text-red-500'}">${profit.toFixed(0)}</td>
                     <td class="px-3 py-2 text-right text-xs">${(item.sellDA>0?(profit/(item.sellDA*qty)*100):0).toFixed(0)}%</td>
                     <td class="px-3 py-2 text-right whitespace-nowrap">${btns}</td>`;
-                if(smmFilters.platform==='all' && smmFilters.category==='all') addDragEvents(tr, idx); else tr.querySelector('.drag-handle').classList.add('opacity-0','pointer-events-none');
+                addDragEvents(tr, idx);
                 tbody.appendChild(tr);
             });
             updateKPIs(tCostUSD, tCostDA, tRev, tProfit); updateCharts(visible);
@@ -510,10 +572,10 @@
 
         function updateGamesDashboard() {
             if(currentView !== 'games') return;
-            const visible = gamesData.filter(i => (gamesFilters.provider==='all'||i.provider===gamesFilters.provider) && (gamesFilters.game==='all'||(i.game||"Unk")===gamesFilters.game));
+            const visible = getVisibleData();
             let tCostUSD=0, tCostDA=0, tRev=0, tProfit=0;
             const tbody = document.getElementById('gamesTableBody'); tbody.innerHTML = '';
-            if(visible.length === 0) tbody.innerHTML = '<tr><td colspan="11" class="text-center py-8 text-slate-400">No games found.</td></tr>';
+            if(visible.length === 0) tbody.innerHTML = '<tr><td colspan="12" class="text-center py-8 text-slate-400">No games found.</td></tr>';
             visible.forEach((item, idx) => {
                 const costDA = item.buyUSD * currentRate; const profit = item.sellDA - costDA;
                 tCostUSD += item.buyUSD; tCostDA += costDA; tRev += item.sellDA; tProfit += profit;
@@ -523,8 +585,10 @@
                 tr.innerHTML = `
                     <td class="px-2 py-2 text-center drag-handle text-slate-300 hover:text-slate-600"><span class="text-xl">≡</span></td>
                     <td class="px-3 py-2"><input class="table-input num-input text-xs text-slate-400 w-24" value="${item.customId||0}" onchange="updGame('${item.docId}','customId',this.value)"></td>
-                    <td class="px-3 py-2"><input class="table-input font-medium" value="${item.provider}" onchange="updGame('${item.docId}','provider',this.value)"></td>
                     <td class="px-3 py-2"><input class="table-input" value="${item.game}" onchange="updGame('${item.docId}','game',this.value)"></td>
+                    <td class="px-3 py-2"><input class="table-input font-medium" value="${item.console||''}" onchange="updGame('${item.docId}','console',this.value)"></td>
+                    <td class="px-3 py-2"><input class="table-input" value="${item.provider}" onchange="updGame('${item.docId}','provider',this.value)"></td>
+                    <td class="px-3 py-2"><input class="table-input text-slate-500" value="${item.category||''}" onchange="updGame('${item.docId}','category',this.value)"></td>
                     <td class="px-3 py-2"><input class="table-input text-slate-500" value="${item.amount}" onchange="updGame('${item.docId}','amount',this.value)"></td>
                     <td class="px-3 py-2"><input class="table-input num-input w-32" value="${item.buyUSD}" onchange="updGame('${item.docId}','buyUSD',this.value)"></td>
                     <td class="px-3 py-2 text-right font-mono text-red-600 bg-red-50/50 rounded">${costDA.toFixed(0)}</td>
@@ -533,7 +597,7 @@
                     <td class="px-3 py-2 text-right font-bold ${profit>=0?'text-indigo-600':'text-red-500'}">${profit.toFixed(0)}</td>
                     <td class="px-3 py-2 text-right text-xs">${(item.sellDA>0?(profit/item.sellDA*100):0).toFixed(0)}%</td>
                     <td class="px-3 py-2 text-right whitespace-nowrap">${btns}</td>`;
-                if(gamesFilters.provider==='all' && gamesFilters.game==='all') addDragEvents(tr, idx); else tr.querySelector('.drag-handle').classList.add('opacity-0','pointer-events-none');
+                addDragEvents(tr, idx);
                 tbody.appendChild(tr);
             });
             updateKPIs(tCostUSD, tCostDA, tRev, tProfit);
@@ -620,7 +684,7 @@
                 e.stopPropagation();
                 let allow = false;
                 if(currentView === 'smm' && smmFilters.platform==='all' && smmFilters.category==='all') allow = true;
-                if(currentView === 'games' && gamesFilters.provider==='all' && gamesFilters.game==='all') allow = true;
+                if(currentView === 'games' && gamesFilters.provider==='all' && gamesFilters.game==='all' && gamesFilters.category==='all' && gamesFilters.console==='all') allow = true;
                 
                 if(!allow) { alert("Please clear filters to reorder items."); return false; }
                 
@@ -632,17 +696,53 @@
         }
 
         async function reorderItems(fromIndex, toIndex) {
-            let list, collectionName;
-            if (currentView === 'smm') { list = smmData; collectionName = 'services'; }
-            else if (currentView === 'games') { list = gamesData; collectionName = 'games_services'; }
-            else return;
+            const visibleList = getVisibleData(); // The array currently shown (potentially filtered)
+            const globalList = getGlobalData();   // The full array from DB
+            let collectionName;
+            if (currentView === 'smm') collectionName = 'services';
+            else if (currentView === 'games') collectionName = 'games_services';
+            else collectionName = 'canva_services';
 
-            const itemMoved = list.splice(fromIndex, 1)[0];
-            list.splice(toIndex, 0, itemMoved);
+            // Identify items involved
+            const itemMoved = visibleList[fromIndex];
+            const itemTarget = visibleList[toIndex];
+
+            // If filtered, we need to find their positions in the global list to perform the move correctly
+            // Basic strategy: Remove itemMoved from its global position and insert it near itemTarget's global position.
+            const globalFromIdx = globalList.findIndex(i => i.docId === itemMoved.docId);
+            let globalToIdx = globalList.findIndex(i => i.docId === itemTarget.docId);
+
+            if (globalFromIdx === -1 || globalToIdx === -1) return;
+
+            // Perform the move in the global list
+            // Note: If moving downwards, the removal shifts indices, so we need care.
+            // But since we have unique IDs, we can just remove object and insert at target index.
+            // Correct Logic: 
+            // 1. Remove from old pos
+            const [removedItem] = globalList.splice(globalFromIdx, 1);
+            // 2. Re-calculate target index because removal might have shifted it
+            globalToIdx = globalList.findIndex(i => i.docId === itemTarget.docId);
+            // 3. Insert. If dragging downwards (visually), we usually want to insert *after*? 
+            // Drag-drop logic usually implies "insert at this index".
+            // If from < to (in visible list), we generally want to place after.
+            // But simple insertion at current index works for "insert before".
             
-            // Batch update
+            // Refined Logic for Visual Consistency:
+            // If we drag row 0 to row 1 (down), we want it to be at index 1.
+            // If we drag row 5 to row 2 (up), we want it at index 2.
+            
+            // Adjust insertion point based on direction in VISIBLE list to feel natural
+            if (fromIndex < toIndex) {
+                // Dragging down: Insert AFTER the target in the global list
+                globalList.splice(globalToIdx + 1, 0, removedItem);
+            } else {
+                // Dragging up: Insert BEFORE the target
+                globalList.splice(globalToIdx, 0, removedItem);
+            }
+            
+            // Batch update all sortOrders
             const batch = writeBatch(db);
-            list.forEach((item, index) => {
+            globalList.forEach((item, index) => {
                  item.sortOrder = index;
                  if (item.docId) {
                      const ref = doc(db, 'artifacts', appId, 'users', userId, collectionName, item.docId);
