@@ -6,45 +6,67 @@
     <title>Service Pricing Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
         
-        .chart-container { position: relative; width: 100%; max-width: 100%; height: 300px; margin: 0 auto; }
-        @media (min-width: 768px) { .chart-container { height: 350px; } }
+        .chart-container { position: relative; width: 100%; height: 280px; }
 
         .custom-scroll::-webkit-scrollbar { height: 8px; width: 8px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .custom-scroll::-webkit-scrollbar-track { background: transparent; }
 
+        /* Unified Table Input Styling - COMPACT */
         .table-input {
-            background: #fff; border: 1px solid #e2e8f0; border-radius: 4px; padding: 4px 8px; width: 100%; transition: all 0.2s; font-size: 0.875rem; color: #0f172a;
+            background: transparent; 
+            border: 1px solid transparent; 
+            border-radius: 3px; 
+            padding: 2px 4px; 
+            width: 100%; 
+            transition: all 0.15s ease-in-out; 
+            font-size: 0.85rem; 
+            color: #334155;
+            font-weight: 500;
         }
-        .table-input:hover { border-color: #cbd5e1; }
-        .table-input:focus { border-color: #6366f1; outline: none; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1); }
+        .table-input:hover { background-color: #f8fafc; border-color: #e2e8f0; }
+        .table-input:focus { 
+            background-color: #ffffff; 
+            border-color: #6366f1; 
+            outline: none; 
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1); 
+            color: #0f172a;
+        }
         .table-input.num-input { text-align: right; font-family: 'Inter', monospace; }
 
         #sidebar { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .draggable-row.dragging { opacity: 0.5; background-color: #eff6ff; border: 2px dashed #6366f1; }
-        .drag-handle { cursor: grab; touch-action: none; }
+        .draggable-row.dragging { opacity: 0.6; background-color: #eff6ff; border: 2px dashed #6366f1; transform: scale(0.99); }
+        .drag-handle { cursor: grab; touch-action: none; color: #cbd5e1; transition: color 0.2s; }
+        .drag-handle:hover { color: #64748b; }
         .drag-handle:active { cursor: grabbing; }
+
+        /* Compact Header */
+        th { font-size: 0.7rem !important; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; font-weight: 700; }
     </style>
 </head>
-<body class="bg-[#fafaf9] text-[#1c1917] antialiased min-h-screen flex flex-col overflow-hidden">
+<body class="bg-[#f1f5f9] text-[#0f172a] antialiased min-h-screen flex flex-col overflow-hidden">
 
     <!-- AUTH SCREEN -->
-    <div id="auth-container" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-indigo-600 to-blue-500">
-        <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden mx-4 p-8">
+    <div id="auth-container" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-slate-900 to-indigo-900">
+        <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden mx-4 p-10">
             <div class="text-center mb-8">
-                <h1 class="text-2xl font-bold text-slate-900">Dashboard Login</h1>
-                <p class="text-slate-500 text-sm mt-1">Manage your SMM & Canva services</p>
+                <div class="mx-auto w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mb-4 text-3xl">🔐</div>
+                <h1 class="text-2xl font-bold text-slate-900">Store Manager</h1>
+                <p class="text-slate-500 text-sm mt-1">Secure Business Dashboard</p>
             </div>
             <div id="auth-error" class="hidden bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4 text-center"></div>
-            <div class="space-y-4">
-                <div><label class="text-xs font-bold text-slate-500 uppercase">Email</label><input type="email" id="auth-email" class="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"></div>
-                <div><label class="text-xs font-bold text-slate-500 uppercase">Password</label><input type="password" id="auth-password" class="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"></div>
-                <div class="pt-4 flex flex-col gap-3">
-                    <button id="loginBtn" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg transition">Login</button>
+            <div class="space-y-5">
+                <div><label class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Email</label><input type="email" id="auth-email" class="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition"></div>
+                <div><label class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Password</label><input type="password" id="auth-password" class="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition"></div>
+                <div class="pt-2 flex flex-col gap-3">
+                    <button id="loginBtn" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg transition transform active:scale-95">Sign In</button>
                     <button id="registerBtn" class="w-full py-3 bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl font-bold transition">Create Account</button>
                 </div>
             </div>
@@ -52,237 +74,316 @@
     </div>
 
     <!-- SIDEBAR & OVERLAY -->
-    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden backdrop-blur-sm transition-opacity"></div>
-    <div id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-white border-r border-[#e7e5e4] z-50 transform -translate-x-full shadow-2xl flex flex-col">
-        <div class="p-6 border-b border-[#e7e5e4] flex justify-between items-center">
-            <h2 class="text-lg font-bold text-[#1c1917]">Navigation</h2>
+    <div id="sidebar-overlay" class="fixed inset-0 bg-slate-900/50 z-40 hidden backdrop-blur-sm transition-opacity"></div>
+    <div id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-white border-r border-slate-200 z-50 transform -translate-x-full shadow-2xl flex flex-col">
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2"><span>📊</span> Dashboard</h2>
             <button id="closeSidebarBtn" class="text-slate-400 hover:text-red-500 text-2xl">&times;</button>
         </div>
-        <nav class="flex-1 p-4 space-y-2">
-            <button onclick="switchView('smm')" id="nav-smm" class="w-full text-left px-4 py-3 rounded-lg font-medium transition flex items-center gap-3 bg-indigo-50 text-indigo-700">
-                <span class="text-xl">📱</span> Social Media
+        <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
+            <div class="px-3 pt-4 pb-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Catalog</div>
+            <button onclick="switchView('smm')" id="nav-smm" class="w-full text-left px-3 py-2.5 rounded-lg font-medium transition flex items-center gap-3 bg-indigo-50 text-indigo-700">
+                <span class="text-lg w-6 text-center">📱</span> Social Media
             </button>
-            <button onclick="switchView('games')" id="nav-games" class="w-full text-left px-4 py-3 rounded-lg font-medium text-slate-600 hover:bg-[#f5f5f4] transition flex items-center gap-3">
-                <span class="text-xl">🎮</span> Games Top-up
+            <button onclick="switchView('games')" id="nav-games" class="w-full text-left px-3 py-2.5 rounded-lg font-medium text-slate-600 hover:bg-slate-50 transition flex items-center gap-3">
+                <span class="text-lg w-6 text-center">🎮</span> Games Top-up
             </button>
-            <!-- NEW ACCOUNTS NAV ITEM -->
-            <button onclick="switchView('accounts')" id="nav-accounts" class="w-full text-left px-4 py-3 rounded-lg font-medium text-slate-600 hover:bg-[#f5f5f4] transition flex items-center gap-3">
-                <span class="text-xl">🔐</span> Accounts Shop
+            <button onclick="switchView('accounts')" id="nav-accounts" class="w-full text-left px-3 py-2.5 rounded-lg font-medium text-slate-600 hover:bg-slate-50 transition flex items-center gap-3">
+                <span class="text-lg w-6 text-center">🔐</span> Accounts Shop
             </button>
-            <button onclick="switchView('canva')" id="nav-canva" class="w-full text-left px-4 py-3 rounded-lg font-medium text-slate-600 hover:bg-[#f5f5f4] transition flex items-center gap-3">
-                <span class="text-xl">🎨</span> Canva Pro
+            <button onclick="switchView('canva')" id="nav-canva" class="w-full text-left px-3 py-2.5 rounded-lg font-medium text-slate-600 hover:bg-slate-50 transition flex items-center gap-3">
+                <span class="text-lg w-6 text-center">🎨</span> Canva Pro
+            </button>
+            
+            <div class="px-3 pt-6 pb-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Business</div>
+            <button onclick="switchView('sales')" id="nav-sales" class="w-full text-left px-3 py-2.5 rounded-lg font-medium text-slate-600 hover:bg-slate-50 transition flex items-center gap-3">
+                <span class="text-lg w-6 text-center">📈</span> Sales & Ledger
             </button>
         </nav>
-        <div class="p-4 border-t border-[#e7e5e4]">
-            <button id="logoutBtn" class="w-full px-4 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition">Sign Out</button>
+        <div class="p-4 border-t border-slate-100 bg-slate-50">
+            <button id="logoutBtn" class="w-full px-4 py-2 text-sm font-bold text-red-600 border border-red-200 bg-white rounded-lg hover:bg-red-50 transition">Sign Out</button>
         </div>
     </div>
 
     <!-- MAIN APP CONTAINER -->
     <div id="app-container" class="hidden flex flex-col h-screen w-full overflow-hidden">
 
-        <!-- ADD ITEM MODAL -->
-        <div id="addModal" class="fixed inset-0 z-[100] hidden bg-black/20 backdrop-blur-sm flex items-center justify-center p-4">
-            <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full overflow-hidden border border-[#e7e5e4] flex flex-col max-h-[90vh]">
-                <div class="px-6 py-4 border-b border-[#e7e5e4] flex justify-between items-center bg-[#fafaf9]">
-                    <h3 class="font-bold text-lg text-[#1c1917]" id="modalTitle">Add New Service</h3>
-                    <button id="closeModalBtn" class="text-[#a8a29e] hover:text-red-500 text-2xl leading-none">&times;</button>
+        <!-- ADD SERVICE MODAL -->
+        <div id="addModal" class="fixed inset-0 z-[100] hidden bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 flex flex-col max-h-[90vh]">
+                <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                    <h3 class="font-bold text-lg text-slate-800" id="modalTitle">Add Item</h3>
+                    <button id="closeModalBtn" class="text-slate-400 hover:text-red-500 text-2xl leading-none">&times;</button>
                 </div>
-                <div class="p-6 space-y-4 overflow-y-auto custom-scroll">
-                    <!-- ID & Basics -->
-                    <div class="grid grid-cols-4 gap-4">
-                        <div class="col-span-1"><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">ID</label><input type="number" id="newId" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
+                <div class="p-6 space-y-5 overflow-y-auto custom-scroll">
+                    <!-- Dynamic Fields Container -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="col-span-1"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">ID</label><input type="number" id="newId" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
                         
-                        <!-- SMM & Accounts Platform -->
-                        <div class="col-span-3 smm-field accounts-field"><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Platform</label><input type="text" id="newPlatform" placeholder="Netflix, Instagram..." class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
-                        
-                        <!-- Canva Name -->
-                        <div class="col-span-3 canva-field hidden"><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Customer Name</label><input type="text" id="newName" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
-                        
-                        <!-- Game Name -->
-                        <div class="col-span-3 game-field hidden"><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Game Name</label><input type="text" id="newGameName" placeholder="Free Fire..." class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
+                        <!-- Section Specific Inputs -->
+                        <div class="col-span-1 smm-field accounts-field"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Platform</label><input type="text" id="newPlatform" placeholder="e.g. Netflix" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
+                        <div class="col-span-1 game-field hidden"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Game Name</label><input type="text" id="newGameName" placeholder="e.g. Free Fire" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
+                        <div class="col-span-1 canva-field hidden"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Customer Name</label><input type="text" id="newName" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
                     </div>
 
-                    <!-- SMM & Accounts: Category/Type -->
+                    <!-- Category / Type Row -->
                     <div class="grid grid-cols-2 gap-4 smm-field accounts-field">
-                        <div><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Category</label><input type="text" id="newCategory" list="catList" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"><datalist id="catList"><option value="Streaming"><option value="Gaming"><option value="Followers"><option value="Likes"></datalist></div>
-                        <div><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Type (Tag)</label><input type="text" id="newType" placeholder="Private, Shared..." class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
+                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Category</label><input type="text" id="newCategory" list="catList" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"><datalist id="catList"><option value="Followers"><option value="Likes"><option value="Streaming"><option value="Gaming"></datalist></div>
+                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Type (Tag)</label><input type="text" id="newType" placeholder="HQ, Private..." class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
                     </div>
                     
-                    <div class="smm-field accounts-field"><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Service/Item Name</label><input type="text" id="newService" placeholder="1 Month 4K, 1k Followers..." class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
-
-                    <!-- GAMES Specific -->
+                    <!-- Games Specific -->
                     <div class="grid grid-cols-2 gap-4 game-field hidden">
-                        <div><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Console</label><input type="text" id="newGameConsole" placeholder="Mobile, PC..." list="consoleList" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"><datalist id="consoleList"><option value="Mobile"><option value="PC"><option value="PlayStation"><option value="Xbox"></datalist></div>
-                        <div><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Provider</label><input type="text" id="newProvider" placeholder="Shop2Game..." class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
+                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Console</label><input type="text" id="newGameConsole" placeholder="Mobile, PC..." list="consoleList" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"><datalist id="consoleList"><option value="Mobile"><option value="PC"><option value="Xbox"></datalist></div>
+                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Provider</label><input type="text" id="newProvider" placeholder="Supplier Name" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
                     </div>
                     <div class="grid grid-cols-2 gap-4 game-field hidden">
-                        <div><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Method</label><input type="text" id="newGameMethod" list="methodList" placeholder="Direct Top-up..." class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"><datalist id="methodList"><option value="Direct Top-up"><option value="Redeem Code"><option value="Login ID"><option value="Manual"></datalist></div>
-                        <div><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Amount</label><input type="text" id="newAmount" placeholder="100 Diamonds" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
+                         <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Method</label><input type="text" id="newGameMethod" list="methodList" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"><datalist id="methodList"><option value="ID"><option value="Login"><option value="Code"></datalist></div>
+                         <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Amount</label><input type="text" id="newAmount" placeholder="100 Gems" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
                     </div>
 
                     <!-- Canva Specific -->
-                    <div class="canva-field hidden"><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Customer Email</label><input type="email" id="newEmail" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
+                    <div class="canva-field hidden"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Customer Email</label><input type="email" id="newEmail" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
                     <div class="grid grid-cols-2 gap-4 canva-field hidden">
-                        <div><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Start Date</label><input type="date" id="newStartDate" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
-                        <div><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">End Date</label><input type="date" id="newEndDate" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
+                         <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Start Date</label><input type="date" id="newStartDate" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
+                         <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">End Date</label><input type="date" id="newEndDate" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
                     </div>
 
+                    <!-- Item Name -->
+                    <div class="smm-field accounts-field"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Item Name</label><input type="text" id="newService" placeholder="1k Followers..." class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
+
                     <!-- Financials -->
-                    <div class="grid grid-cols-3 gap-4">
-                        <div class="smm-field game-field accounts-field"><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Cost ($)</label><input type="number" id="newCost" step="0.01" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
-                        <div class="canva-field hidden"><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Cost (DA)</label><input type="number" id="newCostDA" step="10" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
-                        <div><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Sell (DA)</label><input type="number" id="newSell" step="10" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
-                        <div class="smm-field accounts-field"><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Qty</label><input type="number" id="newQty" value="1" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none"></div>
+                    <div class="grid grid-cols-3 gap-4 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                        <div class="smm-field game-field accounts-field"><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Cost ($)</label><input type="number" id="newCost" step="0.01" class="w-full p-2 border border-slate-200 rounded-md outline-none"></div>
+                        <div class="canva-field hidden"><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Cost (DA)</label><input type="number" id="newCostDA" step="10" class="w-full p-2 border border-slate-200 rounded-md outline-none"></div>
+                        <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Sell (DA)</label><input type="number" id="newSell" step="10" class="w-full p-2 border border-slate-200 rounded-md outline-none"></div>
+                        <div class="smm-field accounts-field"><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Qty</label><input type="number" id="newQty" value="1" class="w-full p-2 border border-slate-200 rounded-md outline-none"></div>
                     </div>
-                    
-                    <!-- Link -->
-                    <div class="smm-field game-field accounts-field"><label class="block text-xs font-bold text-[#a8a29e] uppercase mb-1">Link</label><input type="url" id="newLink" class="w-full p-2 border border-[#e7e5e4] rounded-lg outline-none text-blue-600"></div>
+
+                    <div class="smm-field game-field accounts-field"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Purchase Link</label><input type="url" id="newLink" placeholder="https://..." class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500 text-blue-600"></div>
                 </div>
-                <div class="px-6 py-4 bg-[#fafaf9] flex justify-end gap-3 border-t border-[#e7e5e4]">
-                    <button id="cancelModalBtn" class="px-4 py-2 text-sm font-medium text-[#57534e] hover:bg-[#e7e5e4] rounded-lg">Cancel</button>
-                    <button id="saveServiceBtn" class="px-4 py-2 text-sm font-bold text-white bg-[#6366f1] hover:bg-[#4f46e5] rounded-lg shadow-sm">Save Service</button>
+                <div class="px-6 py-4 bg-slate-50 flex justify-end gap-3 border-t border-slate-100">
+                    <button id="cancelModalBtn" class="px-5 py-2 text-sm font-bold text-slate-500 hover:bg-slate-200 rounded-lg transition">Cancel</button>
+                    <button id="saveServiceBtn" class="px-5 py-2 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-md transition transform active:scale-95">Save Item</button>
                 </div>
             </div>
         </div>
 
-        <!-- HEADER -->
-        <header class="bg-white border-b border-[#e7e5e4] flex-shrink-0 z-30 shadow-sm relative">
-            <div class="max-w-[98%] mx-auto px-4 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div class="flex items-center gap-4">
-                    <button id="sidebarToggle" class="text-slate-500 hover:text-indigo-600 p-1"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
+        <!-- RECORD SALE MODAL -->
+        <div id="saleModal" class="fixed inset-0 z-[100] hidden bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 flex flex-col">
+                <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                    <h3 class="font-bold text-lg text-slate-800">Record Transaction</h3>
+                    <button onclick="document.getElementById('saleModal').classList.add('hidden')" class="text-slate-400 hover:text-red-500 text-2xl leading-none">&times;</button>
+                </div>
+                <div class="p-6 space-y-4">
                     <div>
-                        <h1 class="text-2xl font-bold tracking-tight text-[#1c1917]" id="pageTitle">Social Media Services</h1>
-                        <div class="flex items-center gap-2 mt-1">
-                            <span class="text-xs text-[#57534e] font-medium bg-[#f5f5f4] px-2 py-0.5 rounded" id="userEmailDisplay">...</span>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Select Item</label>
+                        <select id="saleServiceSelect" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none bg-slate-50 focus:bg-white transition text-sm">
+                            <option value="">-- Choose from Catalog --</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Sell Price (DA)</label><input type="number" id="saleSellPrice" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none font-bold text-green-600"></div>
+                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Cost (DA)</label><input type="number" id="saleCostPrice" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none bg-slate-50 text-slate-500"></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Quantity</label><input type="number" id="saleQty" value="1" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none text-center font-bold"></div>
+                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Date</label><input type="date" id="saleDate" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none"></div>
+                    </div>
+                    <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Notes / Customer</label><input type="text" id="saleNotes" placeholder="Optional notes..." class="w-full p-2.5 border border-slate-200 rounded-lg outline-none"></div>
+                </div>
+                <div class="px-6 py-4 bg-slate-50 flex justify-end gap-3 border-t border-slate-100">
+                    <button onclick="document.getElementById('saleModal').classList.add('hidden')" class="px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-200 rounded-lg transition">Cancel</button>
+                    <button id="confirmSaleBtn" class="px-4 py-2 text-sm font-bold text-white bg-green-600 hover:bg-green-700 rounded-lg shadow-md transition transform active:scale-95">Confirm Sale</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- APP HEADER -->
+        <header class="bg-white border-b border-slate-200 flex-shrink-0 z-30 shadow-sm relative">
+            <div class="max-w-[98%] mx-auto px-4 py-3 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <button id="sidebarToggle" class="text-slate-400 hover:text-indigo-600 p-1"><svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
+                    <div>
+                        <h1 class="text-xl font-bold tracking-tight text-slate-800" id="pageTitle">Social Media Services</h1>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-slate-400 font-medium" id="userEmailDisplay">...</span>
                         </div>
                     </div>
                 </div>
-                <div class="bg-[#f5f5f4] rounded-lg p-2 flex items-center gap-4 border border-[#e7e5e4]">
-                    <div class="text-[10px] font-bold text-[#57534e] uppercase tracking-wider">USD to DA</div>
+                <!-- Rate Control -->
+                <div class="bg-slate-50 rounded-lg p-2 flex items-center gap-4 border border-slate-200 shadow-sm">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">USD to DA</div>
                     <div class="flex items-center gap-2">
-                        <input type="range" id="rateSlider" min="200" max="300" value="255" class="w-24 h-2 bg-[#d6d3d1] rounded-lg cursor-pointer accent-[#6366f1]">
-                        <div class="bg-white px-2 py-1 rounded border border-[#e7e5e4] font-mono font-bold text-[#6366f1] text-sm" id="rateDisplay">255.0</div>
+                        <input type="range" id="rateSlider" min="200" max="300" value="255" class="w-24 h-2 bg-slate-200 rounded-lg cursor-pointer accent-indigo-600">
+                        <div class="bg-white px-2 py-1 rounded border border-slate-200 font-mono font-bold text-indigo-600 text-sm shadow-sm" id="rateDisplay">255.0</div>
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- CONTENT -->
-        <main class="flex-1 overflow-y-auto custom-scroll w-full bg-[#f8fafc]">
+        <!-- CONTENT AREA -->
+        <main class="flex-1 overflow-y-auto custom-scroll w-full bg-[#f1f5f9]">
             <div class="max-w-[98%] mx-auto px-4 py-6 space-y-6">
-                <!-- KPIS -->
-                <section class="grid grid-cols-2 lg:grid-cols-5 gap-3">
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-[#e7e5e4]"><div class="text-[10px] font-bold text-[#a8a29e] uppercase">Total Cost ($)</div><div class="text-xl font-bold text-slate-700" id="kpi-cost-usd">$0.00</div></div>
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-[#e7e5e4]"><div class="text-[10px] font-bold text-[#a8a29e] uppercase">Total Cost (DA)</div><div class="text-xl font-bold text-red-600" id="kpi-cost-da">0</div></div>
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-[#e7e5e4]"><div class="text-[10px] font-bold text-[#a8a29e] uppercase">Revenue (DA)</div><div class="text-xl font-bold text-[#1c1917]" id="kpi-revenue">0</div></div>
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-[#e7e5e4]"><div class="text-[10px] font-bold text-[#a8a29e] uppercase">Profit (DA)</div><div class="text-xl font-bold text-[#6366f1]" id="kpi-profit">0</div></div>
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-[#e7e5e4]"><div class="text-[10px] font-bold text-[#a8a29e] uppercase">Margin</div><div class="text-xl font-bold text-emerald-600" id="kpi-margin">0%</div></div>
+
+                <!-- MAIN KPIS -->
+                <section id="main-kpis" class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 stat-card"><div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Cost ($)</div><div class="text-2xl font-bold text-slate-700 mt-1" id="kpi-cost-usd">$0.00</div></div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 stat-card"><div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Cost (DA)</div><div class="text-2xl font-bold text-red-500 mt-1" id="kpi-cost-da">0</div></div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 stat-card"><div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Stock Value (Sell)</div><div class="text-2xl font-bold text-slate-800 mt-1" id="kpi-revenue">0</div></div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 stat-card"><div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Proj. Profit</div><div class="text-2xl font-bold text-indigo-600 mt-1" id="kpi-profit">0</div></div>
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 stat-card"><div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Avg. Margin</div><div class="text-2xl font-bold text-emerald-500 mt-1" id="kpi-margin">0%</div></div>
                 </section>
 
-                <!-- SECTION: SMM -->
+                <!-- SMM VIEW -->
                 <div id="view-smm" class="space-y-6">
-                    <div class="flex flex-col md:flex-row justify-between gap-4 bg-white p-4 rounded-xl border border-[#e7e5e4] shadow-sm">
+                    <div class="flex flex-col md:flex-row justify-between gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                         <div class="flex flex-wrap gap-2 items-center">
-                            <select id="platformFilter" class="bg-[#f5f5f4] text-sm font-medium rounded-lg p-2 outline-none"><option value="all">All Platforms</option></select>
-                            <select id="categoryFilter" class="bg-[#f5f5f4] text-sm font-medium rounded-lg p-2 outline-none"><option value="all">All Categories</option></select>
-                            <select id="typeFilter" class="bg-[#f5f5f4] text-sm font-medium rounded-lg p-2 outline-none"><option value="all">All Types</option></select>
+                            <select id="platformFilter" class="bg-slate-50 text-sm font-semibold text-slate-600 rounded-lg px-3 py-2 outline-none border border-slate-200 focus:border-indigo-500"><option value="all">All Platforms</option></select>
+                            <select id="categoryFilter" class="bg-slate-50 text-sm font-semibold text-slate-600 rounded-lg px-3 py-2 outline-none border border-slate-200 focus:border-indigo-500"><option value="all">All Categories</option></select>
+                            <select id="typeFilter" class="bg-slate-50 text-sm font-semibold text-slate-600 rounded-lg px-3 py-2 outline-none border border-slate-200 focus:border-indigo-500"><option value="all">All Types</option></select>
                         </div>
-                        <button onclick="window.openAddModal()" class="flex items-center gap-2 px-4 py-2 text-sm font-bold text-white bg-[#1c1917] hover:bg-[#57534e] rounded-lg shadow-sm whitespace-nowrap"><span>+ Add Service</span></button>
+                        <button onclick="window.openAddModal()" class="flex items-center gap-2 px-5 py-2 text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-lg shadow-md transition transform active:scale-95"><span>+ Add Service</span></button>
                     </div>
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="lg:col-span-2 bg-white p-4 rounded-xl border border-[#e7e5e4] h-80"><canvas id="smmChart"></canvas></div>
-                        <div class="bg-white p-4 rounded-xl border border-[#e7e5e4] h-80"><canvas id="smmDistChart"></canvas></div>
+                        <div class="lg:col-span-2 bg-white p-5 rounded-xl border border-slate-200 shadow-sm h-80"><canvas id="smmChart"></canvas></div>
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm h-80"><canvas id="smmDistChart"></canvas></div>
                     </div>
-                    <div class="bg-white rounded-xl shadow-sm border border-[#e7e5e4] overflow-hidden">
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                         <div class="overflow-x-auto custom-scroll">
                             <table class="w-full text-left text-sm" id="smmTable">
-                                <thead class="bg-[#fafaf9] text-[#57534e] font-semibold uppercase text-xs tracking-wider border-b border-[#e7e5e4]">
+                                <thead class="bg-slate-50 text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
                                     <tr>
                                         <th class="w-8 px-2 py-3"></th>
-                                        <th class="px-3 py-3 w-24 text-center">ID</th>
-                                        <th class="px-3 py-3 min-w-[120px]">Platform</th><th class="px-3 py-3 min-w-[160px]">Category</th><th class="px-3 py-3 min-w-[140px]">Type</th><th class="px-3 py-3 min-w-[200px]">Service</th>
-                                        <th class="px-3 py-3 text-right w-32">Cost $</th><th class="px-3 py-3 text-right w-20 bg-red-50">Cost DA</th><th class="px-3 py-3 text-right w-20 bg-blue-50">Sell $</th><th class="px-3 py-3 text-right w-32 bg-green-50">Sell DA</th><th class="px-3 py-3 text-center w-12">Qty</th><th class="px-3 py-3 text-right">Profit</th><th class="px-3 py-3 text-right">Margin</th><th class="px-3 py-3 text-right w-24">Act</th>
+                                        <th class="px-2 py-1 w-12 text-center">ID</th>
+                                        <th class="px-2 py-1 min-w-[120px]">Platform</th><th class="px-2 py-1 min-w-[120px]">Category</th><th class="px-2 py-1 min-w-[100px]">Type</th><th class="px-2 py-1 min-w-[150px]">Service</th>
+                                        <th class="px-2 py-1 text-right w-24">Cost $</th><th class="px-2 py-1 text-right w-20 bg-red-50/50 text-red-700">Cost DA</th><th class="px-2 py-1 text-right w-20 bg-blue-50/50 text-blue-700">Sell $</th><th class="px-2 py-1 text-right w-24 bg-green-50/50 text-green-700">Sell DA</th>
+                                        <th class="px-2 py-1 text-center w-12">Qty</th><th class="px-2 py-1 text-right font-bold text-slate-700">Profit</th><th class="px-2 py-1 text-right">Margin</th><th class="px-2 py-1 text-right w-20">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-[#e7e5e4]" id="smmTableBody"></tbody>
+                                <tbody class="divide-y divide-slate-100" id="smmTableBody"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- SECTION: GAMES -->
+                <!-- GAMES VIEW -->
                 <div id="view-games" class="hidden space-y-6">
-                    <div class="flex flex-col md:flex-row justify-between gap-4 bg-white p-4 rounded-xl border border-[#e7e5e4] shadow-sm">
+                    <div class="flex flex-col md:flex-row justify-between gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                         <div class="flex flex-wrap gap-2 items-center">
-                            <select id="gameNameFilter" class="bg-[#f5f5f4] text-sm font-medium rounded-lg p-2 outline-none"><option value="all">All Games</option></select>
-                            <div class="h-4 w-px bg-[#e7e5e4]"></div><select id="gameConsoleFilter" class="bg-[#f5f5f4] text-sm font-medium rounded-lg p-2 outline-none"><option value="all">All Consoles</option></select>
-                            <div class="h-4 w-px bg-[#e7e5e4]"></div><select id="gameProviderFilter" class="bg-[#f5f5f4] text-sm font-medium rounded-lg p-2 outline-none"><option value="all">All Providers</option></select>
-                            <div class="h-4 w-px bg-[#e7e5e4]"></div><select id="gameCategoryFilter" class="bg-[#f5f5f4] text-sm font-medium rounded-lg p-2 outline-none"><option value="all">All Methods</option></select>
+                            <select id="gameNameFilter" class="bg-slate-50 text-sm font-semibold text-slate-600 rounded-lg px-3 py-2 outline-none border border-slate-200"><option value="all">All Games</option></select>
+                            <select id="gameConsoleFilter" class="bg-slate-50 text-sm font-semibold text-slate-600 rounded-lg px-3 py-2 outline-none border border-slate-200"><option value="all">All Consoles</option></select>
+                            <select id="gameProviderFilter" class="bg-slate-50 text-sm font-semibold text-slate-600 rounded-lg px-3 py-2 outline-none border border-slate-200"><option value="all">All Providers</option></select>
+                            <select id="gameCategoryFilter" class="bg-slate-50 text-sm font-semibold text-slate-600 rounded-lg px-3 py-2 outline-none border border-slate-200"><option value="all">All Methods</option></select>
                         </div>
-                        <button onclick="window.openAddModal()" class="flex items-center gap-2 px-4 py-2 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm"><span>+ Add Game Topup</span></button>
+                        <button onclick="window.openAddModal()" class="flex items-center gap-2 px-5 py-2 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-md transition transform active:scale-95"><span>+ Add Game</span></button>
                     </div>
-                    <div class="bg-white rounded-xl shadow-sm border border-[#e7e5e4] overflow-hidden">
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                         <div class="overflow-x-auto custom-scroll">
                             <table class="w-full text-left text-sm" id="gamesTable">
-                                <thead class="bg-[#fafaf9] text-[#57534e] font-semibold uppercase text-xs tracking-wider border-b border-[#e7e5e4]">
+                                <thead class="bg-slate-50 text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
                                     <tr>
                                         <th class="w-8 px-2 py-3"></th>
-                                        <th class="px-3 py-3 w-24 text-center">ID</th>
-                                        <th class="px-3 py-3 min-w-[150px]">Game Name</th><th class="px-3 py-3 min-w-[100px]">Console</th><th class="px-3 py-3 min-w-[150px]">Provider</th><th class="px-3 py-3 min-w-[120px]">Category</th><th class="px-3 py-3 min-w-[120px]">Amount</th>
-                                        <th class="px-3 py-3 text-right w-32">Cost $</th><th class="px-3 py-3 text-right w-24 bg-red-50">Cost DA</th><th class="px-3 py-3 text-right w-24 bg-blue-50">Sell $</th><th class="px-3 py-3 text-right w-32 bg-green-50">Sell DA</th>
-                                        <th class="px-3 py-3 text-right">Profit</th><th class="px-3 py-3 text-right">Margin</th><th class="px-3 py-3 text-right w-24">Act</th>
+                                        <th class="px-2 py-1 w-12 text-center">ID</th>
+                                        <th class="px-2 py-1 min-w-[150px]">Game Name</th><th class="px-2 py-1 min-w-[80px]">Console</th><th class="px-2 py-1 min-w-[120px]">Provider</th><th class="px-2 py-1 min-w-[120px]">Category</th><th class="px-2 py-1 min-w-[120px]">Amount</th>
+                                        <th class="px-2 py-1 text-right w-24">Cost $</th><th class="px-2 py-1 text-right w-20 bg-red-50/50 text-red-700">Cost DA</th><th class="px-2 py-1 text-right w-20 bg-blue-50/50 text-blue-700">Sell $</th><th class="px-2 py-1 text-right w-24 bg-green-50/50 text-green-700">Sell DA</th>
+                                        <th class="px-2 py-1 text-right font-bold text-slate-700">Profit</th><th class="px-2 py-1 text-right">Margin</th><th class="px-2 py-1 text-right w-20">Act</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-[#e7e5e4]" id="gamesTableBody"></tbody>
+                                <tbody class="divide-y divide-slate-100" id="gamesTableBody"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- SECTION: ACCOUNTS -->
+                <!-- ACCOUNTS VIEW -->
                 <div id="view-accounts" class="hidden space-y-6">
-                    <div class="flex flex-col md:flex-row justify-between gap-4 bg-white p-4 rounded-xl border border-[#e7e5e4] shadow-sm">
+                    <div class="flex flex-col md:flex-row justify-between gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                         <div class="flex flex-wrap gap-2 items-center">
-                            <select id="accPlatformFilter" class="bg-[#f5f5f4] text-sm font-medium rounded-lg p-2 outline-none"><option value="all">All Platforms</option></select>
-                            <select id="accCategoryFilter" class="bg-[#f5f5f4] text-sm font-medium rounded-lg p-2 outline-none"><option value="all">All Categories</option></select>
-                            <select id="accTypeFilter" class="bg-[#f5f5f4] text-sm font-medium rounded-lg p-2 outline-none"><option value="all">All Types</option></select>
+                            <select id="accPlatformFilter" class="bg-slate-50 text-sm font-semibold text-slate-600 rounded-lg px-3 py-2 outline-none border border-slate-200"><option value="all">All Platforms</option></select>
+                            <select id="accCategoryFilter" class="bg-slate-50 text-sm font-semibold text-slate-600 rounded-lg px-3 py-2 outline-none border border-slate-200"><option value="all">All Categories</option></select>
+                            <select id="accTypeFilter" class="bg-slate-50 text-sm font-semibold text-slate-600 rounded-lg px-3 py-2 outline-none border border-slate-200"><option value="all">All Types</option></select>
                         </div>
-                        <button onclick="window.openAddModal()" class="flex items-center gap-2 px-4 py-2 text-sm font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-lg shadow-sm"><span>+ Add Account</span></button>
+                        <button onclick="window.openAddModal()" class="flex items-center gap-2 px-5 py-2 text-sm font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-lg shadow-md transition transform active:scale-95"><span>+ Add Account</span></button>
                     </div>
-                    <div class="bg-white rounded-xl shadow-sm border border-[#e7e5e4] overflow-hidden">
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                         <div class="overflow-x-auto custom-scroll">
                             <table class="w-full text-left text-sm" id="accountsTable">
-                                <thead class="bg-[#fafaf9] text-[#57534e] font-semibold uppercase text-xs tracking-wider border-b border-[#e7e5e4]">
+                                <thead class="bg-slate-50 text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
                                     <tr>
                                         <th class="w-8 px-2 py-3"></th>
-                                        <th class="px-3 py-3 w-24 text-center">ID</th>
-                                        <th class="px-3 py-3 min-w-[120px]">Platform</th><th class="px-3 py-3 min-w-[160px]">Category</th><th class="px-3 py-3 min-w-[140px]">Type</th><th class="px-3 py-3 min-w-[200px]">Item Name</th>
-                                        <th class="px-3 py-3 text-right w-32">Cost $</th><th class="px-3 py-3 text-right w-20 bg-red-50">Cost DA</th><th class="px-3 py-3 text-right w-20 bg-blue-50">Sell $</th><th class="px-3 py-3 text-right w-32 bg-green-50">Sell DA</th><th class="px-3 py-3 text-center w-12">Qty</th><th class="px-3 py-3 text-right">Profit</th><th class="px-3 py-3 text-right">Margin</th><th class="px-3 py-3 text-right w-24">Act</th>
+                                        <th class="px-2 py-1 w-12 text-center">ID</th>
+                                        <th class="px-2 py-1 min-w-[120px]">Platform</th><th class="px-2 py-1 min-w-[120px]">Category</th><th class="px-2 py-1 min-w-[100px]">Type</th><th class="px-2 py-1 min-w-[150px]">Item Name</th>
+                                        <th class="px-2 py-1 text-right w-24">Cost $</th><th class="px-2 py-1 text-right w-20 bg-red-50/50 text-red-700">Cost DA</th><th class="px-2 py-1 text-right w-20 bg-blue-50/50 text-blue-700">Sell $</th><th class="px-2 py-1 text-right w-24 bg-green-50/50 text-green-700">Sell DA</th><th class="px-2 py-1 text-center w-12">Qty</th><th class="px-2 py-1 text-right font-bold text-slate-700">Profit</th><th class="px-2 py-1 text-right">Margin</th><th class="px-2 py-1 text-right w-20">Act</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-[#e7e5e4]" id="accountsTableBody"></tbody>
+                                <tbody class="divide-y divide-slate-100" id="accountsTableBody"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- SECTION: CANVA -->
+                <!-- CANVA VIEW -->
                 <div id="view-canva" class="hidden space-y-6">
-                    <div class="flex justify-end bg-white p-4 rounded-xl border border-[#e7e5e4] shadow-sm"><button onclick="window.openAddModal()" class="flex items-center gap-2 px-4 py-2 text-sm font-bold text-white bg-[#6366f1] hover:bg-[#4f46e5] rounded-lg shadow-sm"><span>+ Add Subscription</span></button></div>
-                    <div class="bg-white rounded-xl shadow-sm border border-[#e7e5e4] overflow-hidden">
+                    <div class="flex justify-end bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <button onclick="window.openAddModal()" class="flex items-center gap-2 px-5 py-2 text-sm font-bold text-white bg-[#6366f1] hover:bg-[#4f46e5] rounded-lg shadow-md transition transform active:scale-95"><span>+ Add Subscription</span></button>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                         <div class="overflow-x-auto custom-scroll">
                             <table class="w-full text-left text-sm" id="canvaTable">
-                                <thead class="bg-[#fafaf9] text-[#57534e] font-semibold uppercase text-xs tracking-wider border-b border-[#e7e5e4]">
+                                <thead class="bg-slate-50 text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
                                     <tr>
-                                        <th class="px-3 py-3 w-24 text-center">ID</th><th class="px-3 py-3 min-w-[150px]">Customer Name</th><th class="px-3 py-3 min-w-[200px]">Email</th><th class="px-3 py-3 w-32">Start Date</th><th class="px-3 py-3 w-32">End Date</th><th class="px-3 py-3 text-right w-32">Cost $</th><th class="px-3 py-3 text-right w-24 bg-red-50">Cost DA</th><th class="px-3 py-3 text-right w-24 bg-blue-50">Sell $</th><th class="px-3 py-3 text-right w-32 bg-green-50">Sell DA</th><th class="px-3 py-3 text-right">Profit</th><th class="px-3 py-3 text-right">Margin</th><th class="px-3 py-3 text-right w-16">Act</th>
+                                        <th class="px-2 py-1 w-12 text-center">ID</th><th class="px-2 py-1 min-w-[150px]">Customer</th><th class="px-2 py-1 min-w-[180px]">Email</th><th class="px-2 py-1 w-24">Start</th><th class="px-2 py-1 w-24">End</th>
+                                        <th class="px-2 py-1 text-right w-24">Cost $</th><th class="px-2 py-1 text-right w-20 bg-red-50/50 text-red-700">Cost DA</th><th class="px-2 py-1 text-right w-20 bg-blue-50/50 text-blue-700">Sell $</th><th class="px-2 py-1 text-right w-24 bg-green-50/50 text-green-700">Sell DA</th>
+                                        <th class="px-2 py-1 text-right font-bold text-slate-700">Profit</th><th class="px-2 py-1 text-right">Margin</th><th class="px-2 py-1 text-right w-16">Act</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-[#e7e5e4]" id="canvaTableBody"></tbody>
+                                <tbody class="divide-y divide-slate-100" id="canvaTableBody"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
+
+                <!-- SALES VIEW -->
+                <div id="view-sales" class="hidden space-y-6">
+                    <div class="flex flex-col md:flex-row justify-between gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="flex flex-wrap gap-3 items-center">
+                            <div class="relative">
+                                <input type="text" id="salesSearch" placeholder="Search..." class="pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 text-sm rounded-lg outline-none w-48 focus:bg-white focus:border-indigo-500 transition">
+                                <span class="absolute left-2.5 top-2.5 text-slate-400 text-xs">🔍</span>
+                            </div>
+                            <select id="salesDateFilter" class="bg-slate-50 text-sm font-semibold text-slate-600 rounded-lg px-3 py-2 outline-none border border-slate-200"><option value="all">All Time</option><option value="today">Today</option><option value="month">This Month</option></select>
+                            <div class="flex gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
+                                <button onclick="window.downloadPDF()" class="px-3 py-1 text-xs font-bold text-slate-600 hover:bg-white hover:shadow-sm rounded transition">PDF</button>
+                                <button onclick="window.exportCSV()" class="px-3 py-1 text-xs font-bold text-slate-600 hover:bg-white hover:shadow-sm rounded transition">CSV</button>
+                            </div>
+                        </div>
+                        <button onclick="window.openSaleModal()" class="flex items-center gap-2 px-5 py-2 text-sm font-bold text-white bg-green-600 hover:bg-green-700 rounded-lg shadow-md transition transform active:scale-95"><span>+ Record Sale</span></button>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="overflow-x-auto custom-scroll">
+                            <table class="w-full text-left text-sm" id="salesTable">
+                                <thead class="bg-slate-50 text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                                    <tr>
+                                        <th class="px-2 py-1 w-24">Date</th>
+                                        <th class="px-2 py-1 min-w-[150px]">Service / Item</th>
+                                        <th class="px-2 py-1 w-24">Category</th>
+                                        <th class="px-2 py-1 min-w-[150px] text-slate-400">Notes</th>
+                                        <th class="px-2 py-1 w-12 text-center">Qty</th>
+                                        <th class="px-2 py-1 text-right text-red-500">Cost</th>
+                                        <th class="px-2 py-1 text-right text-blue-600">Rev</th>
+                                        <th class="px-2 py-1 text-right font-bold text-green-700">Profit</th>
+                                        <th class="px-2 py-1 text-right w-12"></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100" id="salesTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </main>
     </div>
@@ -297,22 +398,38 @@
         const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
 
         // --- STATE ---
-        let userId = null;
+        let userId = null; 
         let currentRate = 255;
         let currentView = 'smm';
-        let smmData = [], canvaData = [], gamesData = [], accountsData = [];
+        let smmData=[], canvaData=[], gamesData=[], accountsData=[], salesData=[];
+        
         let smmFilters = { platform: 'all', category: 'all', type: 'all' };
         let gamesFilters = { game: 'all', console: 'all', provider: 'all', category: 'all' };
         let accountsFilters = { platform: 'all', category: 'all', type: 'all' };
+        let salesFilters = { date: 'all', search: '' };
+        
         let smmChart = null; let smmDistChart = null;
         let dragSrcEl = null; let dragSrcIndex = -1;
 
-        // --- DOM ---
-        const nav = { smm: document.getElementById('nav-smm'), canva: document.getElementById('nav-canva'), games: document.getElementById('nav-games'), accounts: document.getElementById('nav-accounts') };
-        const views = { smm: document.getElementById('view-smm'), canva: document.getElementById('view-canva'), games: document.getElementById('view-games'), accounts: document.getElementById('view-accounts') };
+        // --- DOM REFERENCES ---
+        const nav = { 
+            smm: document.getElementById('nav-smm'), 
+            canva: document.getElementById('nav-canva'), 
+            games: document.getElementById('nav-games'), 
+            accounts: document.getElementById('nav-accounts'), 
+            sales: document.getElementById('nav-sales') 
+        };
+        const views = { 
+            smm: document.getElementById('view-smm'), 
+            canva: document.getElementById('view-canva'), 
+            games: document.getElementById('view-games'), 
+            accounts: document.getElementById('view-accounts'), 
+            sales: document.getElementById('view-sales') 
+        };
         const pageTitle = document.getElementById('pageTitle');
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebar-overlay');
+        const saleServiceSelect = document.getElementById('saleServiceSelect');
 
         // --- AUTH ---
         window.handleLogin = async function() {
@@ -325,9 +442,20 @@
         }
         window.handleLogout = function() { signOut(auth); }
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) { userId = user.uid; document.getElementById('userEmailDisplay').textContent = user.email; document.getElementById('auth-container').classList.add('hidden'); document.getElementById('app-container').classList.remove('hidden'); setupRealtimeListeners(); } 
-            else { userId = null; document.getElementById('auth-container').classList.remove('hidden'); document.getElementById('app-container').classList.add('hidden'); smmData = []; canvaData = []; gamesData = []; accountsData = []; }
+        onAuthStateChanged(auth, async (user) => {
+            if (user) { 
+                if (user.isAnonymous || !user.email) { await signOut(auth); return; } // Force email login
+                userId = user.uid; 
+                document.getElementById('auth-container').classList.add('hidden'); 
+                document.getElementById('app-container').classList.remove('hidden');
+                setupRealtimeListeners();
+            } 
+            else { 
+                userId = null; 
+                document.getElementById('auth-container').classList.remove('hidden'); 
+                document.getElementById('app-container').classList.add('hidden'); 
+                smmData=[]; canvaData=[]; gamesData=[]; accountsData=[]; salesData=[]; 
+            }
         });
 
         // --- INIT & LISTENERS ---
@@ -359,28 +487,50 @@
             document.getElementById('accCategoryFilter').addEventListener('change', (e) => { accountsFilters.category = e.target.value; updateAccountsTypeFilter(); updateAccountsDashboard(); });
             document.getElementById('accTypeFilter').addEventListener('change', (e) => { accountsFilters.type = e.target.value; updateAccountsDashboard(); });
             
+            // Sales Filters
+            document.getElementById('salesDateFilter').addEventListener('change', (e) => { salesFilters.date = e.target.value; updateSalesDashboard(); });
+            document.getElementById('salesSearch').addEventListener('input', (e) => { salesFilters.search = e.target.value.toLowerCase(); updateSalesDashboard(); });
+
+            // Modal Controls
             document.getElementById('closeModalBtn').onclick = () => document.getElementById('addModal').classList.add('hidden');
             document.getElementById('cancelModalBtn').onclick = () => document.getElementById('addModal').classList.add('hidden');
             document.getElementById('saveServiceBtn').onclick = window.saveNewService;
             
+            // Sale Modal Interaction
+            if (saleServiceSelect) {
+                saleServiceSelect.addEventListener('change', (e) => {
+                    if(!e.target.value) return;
+                    const [source, id] = e.target.value.split(':');
+                    let item;
+                    if(source==='smm') item = smmData.find(i=>i.docId===id);
+                    else if(source==='games') item = gamesData.find(i=>i.docId===id);
+                    else if(source==='accounts') item = accountsData.find(i=>i.docId===id);
+                    
+                    if(item) {
+                        const costDA = item.buyDA || (item.buyUSD * currentRate);
+                        document.getElementById('saleSellPrice').value = item.sellDA;
+                        document.getElementById('saleCostPrice').value = costDA.toFixed(0);
+                    }
+                });
+            }
+            document.getElementById('confirmSaleBtn').onclick = window.saveSaleRecord;
+
             document.getElementById('sidebarToggle').onclick = () => toggleSidebar(true);
             document.getElementById('closeSidebarBtn').onclick = () => toggleSidebar(false);
             document.getElementById('sidebar-overlay').onclick = () => toggleSidebar(false);
         }
 
-        // --- GLOBAL WINDOW EXPORTS ---
+        // --- GLOBAL EXPORTS ---
         window.openAddModal = () => {
             document.getElementById('addModal').classList.remove('hidden');
             let list = getGlobalData();
             const maxId = list.length > 0 ? Math.max(...list.map(i => i.customId || 0)) : 100;
             document.getElementById('newId').value = maxId + 1;
-            
             const smmFields = document.querySelectorAll('.smm-field'); 
             const canvaFields = document.querySelectorAll('.canva-field');
             const gameFields = document.querySelectorAll('.game-field');
-            const accountsFields = document.querySelectorAll('.accounts-field'); // Reused class
+            const accountsFields = document.querySelectorAll('.accounts-field');
 
-            // Hide all first
             document.querySelectorAll('.smm-field, .canva-field, .game-field').forEach(el => el.classList.add('hidden'));
 
             if(currentView === 'smm') {
@@ -394,35 +544,144 @@
                 gameFields.forEach(el => el.classList.remove('hidden'));
             } else if (currentView === 'accounts') {
                 document.getElementById('modalTitle').textContent = "Add Account Product";
-                // Reuse SMM/Accounts common fields (Platform, Category, Type, Service, Financials, Link)
                 accountsFields.forEach(el => el.classList.remove('hidden'));
             }
         };
 
+        window.openSaleModal = () => {
+            document.getElementById('saleModal').classList.remove('hidden');
+            document.getElementById('saleDate').valueAsDate = new Date();
+            const saleServiceSelect = document.getElementById('saleServiceSelect');
+            // Populate select
+            saleServiceSelect.innerHTML = '<option value="">-- Choose from Catalog --</option>';
+            
+            // Group Options
+            const addGroup = (label, data, source) => {
+                if(data.length === 0) return;
+                const group = document.createElement('optgroup');
+                group.label = label;
+                data.forEach(item => {
+                    const name = item.service || item.game || item.platform; // Dynamic name logic
+                    const opt = document.createElement('option');
+                    opt.value = `${source}:${item.docId}`;
+                    opt.textContent = name + (item.category ? ` - ${item.category}` : '');
+                    group.appendChild(opt);
+                });
+                saleServiceSelect.appendChild(group);
+            };
+
+            addGroup("Social Media", smmData, "smm");
+            addGroup("Games", gamesData, "games");
+            addGroup("Accounts", accountsData, "accounts");
+        };
+
+        window.saveSaleRecord = async () => {
+            const selectVal = document.getElementById('saleServiceSelect').value;
+            if(!selectVal) { alert("Please select a service"); return; }
+            
+            const [source, id] = selectVal.split(':');
+            let itemName = "", category = "";
+            
+            // Find item to get name ref
+            if(source==='smm') { const i = smmData.find(x=>x.docId===id); itemName = i.service; category = i.platform; }
+            else if(source==='games') { const i = gamesData.find(x=>x.docId===id); itemName = i.game + " " + i.amount; category = "Games"; }
+            else { const i = accountsData.find(x=>x.docId===id); itemName = i.service; category = i.platform; }
+
+            const sell = parseFloat(document.getElementById('saleSellPrice').value)||0;
+            const cost = parseFloat(document.getElementById('saleCostPrice').value)||0;
+            const qty = parseInt(document.getElementById('saleQty').value)||1;
+            const date = document.getElementById('saleDate').value;
+            const notes = document.getElementById('saleNotes').value.trim();
+
+            try {
+                // Workers save sales to Admin's record
+                await addDoc(collection(db, 'artifacts', appId, 'users', userId, 'sales_records'), {
+                    service: itemName, category, sell, cost, qty, date, notes,
+                    profit: (sell - cost) * qty, timestamp: Date.now()
+                });
+                document.getElementById('saleModal').classList.add('hidden');
+                document.getElementById('saleNotes').value = '';
+            } catch(e) { console.error(e); alert("Failed to record sale"); }
+        };
+        
+        window.deleteSale = async (id) => {
+            if(confirm("Delete this sale record?")) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'users', userId, 'sales_records', id));
+            }
+        };
+
+        window.downloadPDF = () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.text("Sales Report", 14, 20);
+            doc.setFontSize(10);
+            doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 30);
+
+            // Filtered data for PDF matches view
+            const visibleSales = getVisibleSales();
+            
+            const tableData = visibleSales.map(row => [
+                row.date,
+                row.service,
+                row.category,
+                row.qty,
+                row.sell.toFixed(0),
+                row.profit.toFixed(0)
+            ]);
+
+            doc.autoTable({
+                head: [['Date', 'Service', 'Category', 'Qty', 'Rev (DA)', 'Profit (DA)']],
+                body: tableData,
+                startY: 40,
+            });
+
+            doc.save('sales_report.pdf');
+        };
+        
+        window.exportCSV = () => {
+            const visibleSales = getVisibleSales();
+            let csvContent = "data:text/csv;charset=utf-8,Date,Service,Category,Notes,Quantity,Cost (DA),Sell (DA),Profit (DA)\n";
+            visibleSales.forEach(row => { const note = row.notes ? row.notes.replace(/,/g, " ") : ""; csvContent += `${row.date},${row.service},${row.category},${note},${row.qty},${row.cost},${row.sell},${row.profit}\n`; });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a"); link.setAttribute("href", encodedUri); link.setAttribute("download", "sales_export.csv");
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        };
+
         window.switchView = (view) => {
             currentView = view; toggleSidebar(false);
-            views.smm.classList.add('hidden'); views.canva.classList.add('hidden'); views.games.classList.add('hidden'); views.accounts.classList.add('hidden');
-            nav.smm.classList.remove('bg-indigo-50', 'text-indigo-700'); nav.smm.classList.add('text-slate-600');
-            nav.canva.classList.remove('bg-indigo-50', 'text-indigo-700'); nav.canva.classList.add('text-slate-600');
-            nav.games.classList.remove('bg-indigo-50', 'text-indigo-700'); nav.games.classList.add('text-slate-600');
-            nav.accounts.classList.remove('bg-indigo-50', 'text-indigo-700'); nav.accounts.classList.add('text-slate-600');
+            
+            // Hide all views first
+            Object.values(views).forEach(v => v.classList.add('hidden'));
+            
+            // Reset nav styles
+            Object.values(nav).forEach(n => {
+                n.classList.remove('bg-indigo-50', 'text-indigo-700');
+                n.classList.add('text-slate-600');
+            });
+
+            // Activate specific view and nav
+            if(views[view]) {
+                views[view].classList.remove('hidden');
+                document.getElementById(`nav-${view}`).classList.add('bg-indigo-50', 'text-indigo-700');
+                document.getElementById(`nav-${view}`).classList.remove('text-slate-600');
+            }
 
             if(view === 'smm') {
-                pageTitle.textContent = "Social Media Services"; views.smm.classList.remove('hidden');
-                nav.smm.classList.add('bg-indigo-50', 'text-indigo-700'); nav.smm.classList.remove('text-slate-600');
+                pageTitle.textContent = "Social Media Services";
                 updateDashboard();
             } else if(view === 'canva') {
-                pageTitle.textContent = "Canva Pro Invitations"; views.canva.classList.remove('hidden');
-                nav.canva.classList.add('bg-indigo-50', 'text-indigo-700'); nav.canva.classList.remove('text-slate-600');
+                pageTitle.textContent = "Canva Pro Invitations";
                 updateCanvaDashboard();
             } else if (view === 'games') {
-                pageTitle.textContent = "Games Top-up"; views.games.classList.remove('hidden');
-                nav.games.classList.add('bg-indigo-50', 'text-indigo-700'); nav.games.classList.remove('text-slate-600');
+                pageTitle.textContent = "Games Top-up";
                 updateGamesDashboard();
             } else if (view === 'accounts') {
-                pageTitle.textContent = "Accounts Shop"; views.accounts.classList.remove('hidden');
-                nav.accounts.classList.add('bg-indigo-50', 'text-indigo-700'); nav.accounts.classList.remove('text-slate-600');
+                pageTitle.textContent = "Accounts Shop";
                 updateAccountsDashboard();
+            } else if (view === 'sales') {
+                pageTitle.textContent = "Sales & Ledger";
+                updateSalesDashboard();
             }
         };
 
@@ -447,7 +706,7 @@
                         sellDA: parseFloat(document.getElementById('newSell').value) || 0,
                         sortOrder: canvaData.length
                     });
-                } else {
+                } else if (currentView === 'games') {
                     await addDoc(collection(db, 'artifacts', appId, 'users', userId, 'games_services'), { ...common,
                         game: document.getElementById('newGameName').value, console: document.getElementById('newGameConsole').value,
                         provider: document.getElementById('newProvider').value, category: document.getElementById('newGameMethod').value,
@@ -463,18 +722,23 @@
 
         // --- DATA & UI UPDATES ---
         function setupRealtimeListeners() {
+            if(!userId) return;
+
+            // Settings
             const settingsDoc = doc(db, 'artifacts', appId, 'users', userId, 'settings', 'global');
             onSnapshot(settingsDoc, (s) => { if(s.exists()) { currentRate = s.data().rate || 255; document.getElementById('rateSlider').value = currentRate; document.getElementById('rateDisplay').textContent = currentRate.toFixed(1); updateDashboard(); updateCanvaDashboard(); updateGamesDashboard(); updateAccountsDashboard(); } else setDoc(settingsDoc, { rate: 255 }, { merge: true }); });
             
             const sortFn = (a, b) => (a.sortOrder ?? a.createdAt ?? 0) - (b.sortOrder ?? b.createdAt ?? 0);
             
-            onSnapshot(collection(db, 'artifacts', appId, 'users', userId, 'services'), (s) => { smmData = []; s.forEach(d => smmData.push({...d.data(), docId: d.id})); smmData.sort(sortFn); updateSMMFilters(); updateDashboard(); });
-            onSnapshot(collection(db, 'artifacts', appId, 'users', userId, 'canva_services'), (s) => { canvaData = []; s.forEach(d => canvaData.push({...d.data(), docId: d.id})); canvaData.sort((a, b) => new Date(b.endDate || 0) - new Date(a.endDate || 0)); updateCanvaDashboard(); });
-            onSnapshot(collection(db, 'artifacts', appId, 'users', userId, 'games_services'), (s) => { gamesData = []; s.forEach(d => gamesData.push({...d.data(), docId: d.id})); gamesData.sort(sortFn); updateGamesFilters(); updateGamesDashboard(); });
-            onSnapshot(collection(db, 'artifacts', appId, 'users', userId, 'accounts_services'), (s) => { accountsData = []; s.forEach(d => accountsData.push({...d.data(), docId: d.id})); accountsData.sort(sortFn); updateAccountsFilters(); updateAccountsDashboard(); });
+            // Listeners for Shared Data
+            onSnapshot(collection(db, 'artifacts', appId, 'users', userId, `services`), (s) => { smmData = []; s.forEach(d => smmData.push({...d.data(), docId: d.id})); smmData.sort(sortFn); updateSMMFilters(); updateDashboard(); });
+            onSnapshot(collection(db, 'artifacts', appId, 'users', userId, `canva_services`), (s) => { canvaData = []; s.forEach(d => canvaData.push({...d.data(), docId: d.id})); canvaData.sort((a, b) => new Date(b.endDate || 0) - new Date(a.endDate || 0)); updateCanvaDashboard(); });
+            onSnapshot(collection(db, 'artifacts', appId, 'users', userId, `games_services`), (s) => { gamesData = []; s.forEach(d => gamesData.push({...d.data(), docId: d.id})); gamesData.sort(sortFn); updateGamesFilters(); updateGamesDashboard(); });
+            onSnapshot(collection(db, 'artifacts', appId, 'users', userId, `accounts_services`), (s) => { accountsData = []; s.forEach(d => accountsData.push({...d.data(), docId: d.id})); accountsData.sort(sortFn); updateAccountsFilters(); updateAccountsDashboard(); });
+            onSnapshot(collection(db, 'artifacts', appId, 'users', userId, `sales_records`), (s) => { salesData = []; s.forEach(d => salesData.push({...d.data(), docId: d.id})); salesData.sort((a, b) => b.timestamp - a.timestamp); updateSalesDashboard(); });
         }
 
-        // --- FILTERS ---
+        // --- SMM LOGIC ---
         function updateSMMFilters() {
             const plats = [...new Set(smmData.map(i => i.platform || "Uncat"))].sort();
             const pf = document.getElementById('platformFilter');
@@ -569,6 +833,57 @@
             const visible = accountsData.filter(i => (accountsFilters.platform==='all'||i.platform===accountsFilters.platform) && (accountsFilters.category==='all'||(i.category||"Gen")===accountsFilters.category) && (accountsFilters.type==='all'||(i.type||"")===accountsFilters.type));
             renderStandardTable(visible, 'accountsTableBody');
         }
+        
+        function updateSalesDashboard() {
+            if(currentView !== 'sales') return;
+            const visible = getVisibleSales();
+            const tbody = document.getElementById('salesTableBody'); tbody.innerHTML = '';
+            
+            if(visible.length === 0) tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-slate-400">No transactions.</td></tr>';
+            
+            let tCostDA = 0;
+            let tRev = 0;
+            let tProfit = 0;
+
+            visible.forEach(item => {
+                const q = item.qty || 1;
+                tCostDA += (item.cost * q);
+                tRev += (item.sell * q);
+                tProfit += ((item.sell - item.cost) * q);
+
+                const tr = document.createElement('tr'); tr.className = "hover:bg-slate-50 border-b border-slate-100";
+                tr.innerHTML = `
+                    <td class="px-2 py-1 text-slate-600 font-mono text-xs">${item.date}</td>
+                    <td class="px-2 py-1 font-medium text-slate-800 text-xs">${item.service}</td>
+                    <td class="px-2 py-1 text-slate-500 text-xs">${item.category || '-'}</td>
+                    <td class="px-2 py-1 text-slate-400 italic text-xs max-w-[150px] truncate" title="${item.notes||''}">${item.notes || '-'}</td>
+                    <td class="px-2 py-1 text-center text-slate-700 text-xs">${item.qty}</td>
+                    <td class="px-2 py-1 text-right text-red-500 font-mono text-xs">${item.cost.toFixed(0)}</td>
+                    <td class="px-2 py-1 text-right text-slate-700 font-bold font-mono text-xs">${item.sell.toFixed(0)}</td>
+                    <td class="px-2 py-1 text-right font-bold text-green-600 font-mono text-xs">${item.profit.toFixed(0)}</td>
+                    <td class="px-2 py-1 text-right"><button onclick="window.deleteSale('${item.docId}')" class="text-slate-300 hover:text-red-500 text-xs">&times;</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            const tCostUSD = currentRate > 0 ? tCostDA / currentRate : 0;
+            updateKPIs(tCostUSD, tCostDA, tRev, tProfit);
+        }
+
+        function getVisibleSales() {
+            const now = new Date();
+            const filter = salesFilters.date;
+            
+            return salesData.filter(item => {
+                const itemDate = new Date(item.date);
+                if (filter === 'today') {
+                    return itemDate.toDateString() === now.toDateString();
+                } else if (filter === 'month') {
+                    return itemDate.getMonth() === now.getMonth() && itemDate.getFullYear() === now.getFullYear();
+                }
+                return true;
+            });
+        }
 
         function renderStandardTable(data, bodyId) {
             let tCostUSD=0, tCostDA=0, tRev=0, tProfit=0;
@@ -583,24 +898,24 @@
                 const delFn = currentView === 'smm' ? 'delSMM' : 'delAccount';
                 const dupFn = currentView === 'smm' ? 'dupSMM' : 'dupAccount';
 
-                let btns = `<button onclick="window.${dupFn}('${item.docId}')" class="text-indigo-500 hover:bg-indigo-50 p-1 mr-1">❐</button><button onclick="window.${delFn}('${item.docId}')" class="text-red-500 hover:bg-red-50 p-1">&times;</button>`;
-                if(item.link) btns = `<a href="${item.link}" target="_blank" class="text-blue-500 hover:bg-blue-50 p-1 mr-1">↗</a>` + btns;
+                let btns = `<button onclick="window.${dupFn}('${item.docId}')" class="text-indigo-400 hover:text-indigo-600 p-1 mr-1 transition" title="Duplicate">❐</button><button onclick="window.${delFn}('${item.docId}')" class="text-slate-400 hover:text-red-500 p-1 transition" title="Delete">&times;</button>`;
+                if(item.link) btns = `<a href="${item.link}" target="_blank" class="text-blue-500 hover:text-blue-700 p-1 mr-1 transition" title="Link">↗</a>` + btns;
 
                 tr.innerHTML = `
-                    <td class="px-2 py-2 text-center drag-handle text-slate-300 hover:text-slate-600"><span class="text-xl">≡</span></td>
-                    <td class="px-3 py-2"><input class="table-input num-input text-xs text-slate-400 w-24" value="${item.customId||0}" onchange="${fnBase}('${item.docId}','customId',this.value)"></td>
-                    <td class="px-3 py-2"><input class="table-input font-medium" value="${item.platform}" onchange="${fnBase}('${item.docId}','platform',this.value)"></td>
-                    <td class="px-3 py-2"><input class="table-input text-slate-500" value="${item.category||''}" onchange="${fnBase}('${item.docId}','category',this.value)"></td>
-                    <td class="px-3 py-2"><input class="table-input text-xs text-slate-400" value="${item.type||''}" onchange="${fnBase}('${item.docId}','type',this.value)"></td>
-                    <td class="px-3 py-2"><input class="table-input" value="${item.service}" onchange="${fnBase}('${item.docId}','service',this.value)"></td>
-                    <td class="px-3 py-2"><input class="table-input num-input w-32" value="${item.buyUSD}" onchange="${fnBase}('${item.docId}','buyUSD',this.value)"></td>
-                    <td class="px-3 py-2 text-right font-mono text-red-600 bg-red-50/50 rounded">${costDA.toFixed(0)}</td>
-                    <td class="px-3 py-2 text-right font-mono text-blue-600 bg-blue-50/50 rounded">${(currentRate>0?item.sellDA/currentRate:0).toFixed(2)}</td>
-                    <td class="px-3 py-2"><input class="table-input num-input font-bold text-green-700 w-32" value="${item.sellDA}" onchange="${fnBase}('${item.docId}','sellDA',this.value)"></td>
-                    <td class="px-3 py-2"><input class="table-input num-input" value="${qty}" onchange="${fnBase}('${item.docId}','qty',this.value)"></td>
-                    <td class="px-3 py-2 text-right font-bold ${profit>=0?'text-indigo-600':'text-red-500'}">${profit.toFixed(0)}</td>
-                    <td class="px-3 py-2 text-right text-xs">${(item.sellDA>0?(profit/(item.sellDA*qty)*100):0).toFixed(0)}%</td>
-                    <td class="px-3 py-2 text-right whitespace-nowrap">${btns}</td>`;
+                    <td class="px-2 py-1 text-center drag-handle text-slate-300 hover:text-slate-600"><span class="text-lg">≡</span></td>
+                    <td class="px-2 py-1"><input class="table-input num-input text-xs text-slate-400 w-12" value="${item.customId||0}" onchange="${fnBase}('${item.docId}','customId',this.value)"></td>
+                    <td class="px-2 py-1"><input class="table-input font-medium w-24" value="${item.platform}" onchange="${fnBase}('${item.docId}','platform',this.value)"></td>
+                    <td class="px-2 py-1"><input class="table-input text-slate-500 text-xs w-24" value="${item.category||''}" onchange="${fnBase}('${item.docId}','category',this.value)"></td>
+                    <td class="px-2 py-1"><input class="table-input text-xs text-slate-400 w-20" value="${item.type||''}" onchange="${fnBase}('${item.docId}','type',this.value)"></td>
+                    <td class="px-2 py-1"><input class="table-input w-full" value="${item.service}" onchange="${fnBase}('${item.docId}','service',this.value)"></td>
+                    <td class="px-2 py-1 financial-col"><input class="table-input num-input w-20" value="${item.buyUSD}" onchange="${fnBase}('${item.docId}','buyUSD',this.value)"></td>
+                    <td class="px-2 py-1 text-right font-mono text-red-600 bg-red-50/50 rounded font-medium text-xs w-20">${costDA.toFixed(0)}</td>
+                    <td class="px-2 py-1 text-right font-mono text-blue-600 bg-blue-50/50 rounded font-medium text-xs w-20">${(currentRate>0?item.sellDA/currentRate:0).toFixed(2)}</td>
+                    <td class="px-2 py-1"><input class="table-input num-input font-bold text-green-700 w-20" value="${item.sellDA}" onchange="${fnBase}('${item.docId}','sellDA',this.value)"></td>
+                    <td class="px-2 py-1"><input class="table-input num-input w-12" value="${qty}" onchange="${fnBase}('${item.docId}','qty',this.value)"></td>
+                    <td class="px-2 py-1 text-right font-bold text-slate-700 text-xs">${profit.toFixed(0)}</td>
+                    <td class="px-2 py-1 text-right text-xs text-slate-500">${(item.sellDA>0?(profit/(item.sellDA*qty)*100):0).toFixed(0)}%</td>
+                    <td class="px-2 py-1 text-right whitespace-nowrap">${btns}</td>`;
                 
                 let allow = false;
                 if(currentView==='smm' && smmFilters.platform==='all' && smmFilters.category==='all') allow=true;
@@ -610,7 +925,7 @@
                 tbody.appendChild(tr);
             });
             updateKPIs(tCostUSD, tCostDA, tRev, tProfit); 
-            if(currentView==='smm') updateCharts(data); // Only chart SMM for now or update charts to be dynamic
+            if(currentView==='smm') updateCharts(data);
         }
 
         function updateGamesDashboard() {
@@ -618,28 +933,28 @@
             const visible = getVisibleData();
             let tCostUSD=0, tCostDA=0, tRev=0, tProfit=0;
             const tbody = document.getElementById('gamesTableBody'); tbody.innerHTML = '';
-            if(visible.length === 0) tbody.innerHTML = '<tr><td colspan="12" class="text-center py-8 text-slate-400">No games found.</td></tr>';
+            if(visible.length === 0) tbody.innerHTML = '<tr><td colspan="14" class="text-center py-8 text-slate-400">No games found.</td></tr>';
             visible.forEach((item, idx) => {
                 const costDA = item.buyUSD * currentRate; const profit = item.sellDA - costDA;
                 tCostUSD += item.buyUSD; tCostDA += costDA; tRev += item.sellDA; tProfit += profit;
-                let btns = `<button onclick="window.delGame('${item.docId}')" class="text-red-500 hover:bg-red-50 p-1 rounded">&times;</button>`;
-                if(item.link) btns = `<a href="${item.link}" target="_blank" class="text-blue-500 hover:bg-blue-50 p-1 mr-1">↗</a>` + btns;
+                let btns = `<button onclick="window.delGame('${item.docId}')" class="text-red-500 hover:bg-red-50 p-1 rounded transition">&times;</button>`;
+                if(item.link) btns = `<a href="${item.link}" target="_blank" class="text-blue-500 hover:bg-blue-50 p-1 mr-1 transition">↗</a>` + btns;
                 const tr = document.createElement('tr'); tr.className = "hover:bg-slate-50 border-b border-slate-100 last:border-0 draggable-row group";
                 tr.innerHTML = `
-                    <td class="px-2 py-2 text-center drag-handle text-slate-300 hover:text-slate-600"><span class="text-xl">≡</span></td>
-                    <td class="px-3 py-2"><input class="table-input num-input text-xs text-slate-400 w-24" value="${item.customId||0}" onchange="updGame('${item.docId}','customId',this.value)"></td>
-                    <td class="px-3 py-2"><input class="table-input" value="${item.game}" onchange="updGame('${item.docId}','game',this.value)"></td>
-                    <td class="px-3 py-2"><input class="table-input font-medium" value="${item.console||''}" onchange="updGame('${item.docId}','console',this.value)"></td>
-                    <td class="px-3 py-2"><input class="table-input" value="${item.provider}" onchange="updGame('${item.docId}','provider',this.value)"></td>
-                    <td class="px-3 py-2"><input class="table-input text-slate-500" value="${item.category||''}" onchange="updGame('${item.docId}','category',this.value)"></td>
-                    <td class="px-3 py-2"><input class="table-input text-slate-500" value="${item.amount}" onchange="updGame('${item.docId}','amount',this.value)"></td>
-                    <td class="px-3 py-2"><input class="table-input num-input w-32" value="${item.buyUSD}" onchange="updGame('${item.docId}','buyUSD',this.value)"></td>
-                    <td class="px-3 py-2 text-right font-mono text-red-600 bg-red-50/50 rounded">${costDA.toFixed(0)}</td>
-                    <td class="px-3 py-2 text-right font-mono text-blue-600 bg-blue-50/50 rounded">${(currentRate>0?item.sellDA/currentRate:0).toFixed(2)}</td>
-                    <td class="px-3 py-2"><input class="table-input num-input font-bold text-green-700 w-32" value="${item.sellDA}" onchange="updGame('${item.docId}','sellDA',this.value)"></td>
-                    <td class="px-3 py-2 text-right font-bold ${profit>=0?'text-indigo-600':'text-red-500'}">${profit.toFixed(0)}</td>
-                    <td class="px-3 py-2 text-right text-xs">${(item.sellDA>0?(profit/item.sellDA*100):0).toFixed(0)}%</td>
-                    <td class="px-3 py-2 text-right whitespace-nowrap">${btns}</td>`;
+                    <td class="px-2 py-1 text-center drag-handle text-slate-300 hover:text-slate-600"><span class="text-xl">≡</span></td>
+                    <td class="px-2 py-1"><input class="table-input num-input text-xs text-slate-400 w-12" value="${item.customId||0}" onchange="updGame('${item.docId}','customId',this.value)"></td>
+                    <td class="px-2 py-1"><input class="table-input w-32 font-medium" value="${item.game}" onchange="updGame('${item.docId}','game',this.value)"></td>
+                    <td class="px-2 py-1"><input class="table-input text-xs text-slate-600 w-20" value="${item.console||''}" onchange="updGame('${item.docId}','console',this.value)"></td>
+                    <td class="px-2 py-1"><input class="table-input text-xs text-slate-600 w-24" value="${item.provider}" onchange="updGame('${item.docId}','provider',this.value)"></td>
+                    <td class="px-2 py-1"><input class="table-input text-slate-500 text-xs w-24" value="${item.category||''}" onchange="updGame('${item.docId}','category',this.value)"></td>
+                    <td class="px-2 py-1"><input class="table-input text-slate-500 text-xs w-24" value="${item.amount}" onchange="updGame('${item.docId}','amount',this.value)"></td>
+                    <td class="px-2 py-1 financial-col"><input class="table-input num-input w-20" value="${item.buyUSD}" onchange="updGame('${item.docId}','buyUSD',this.value)"></td>
+                    <td class="px-2 py-1 text-right font-mono text-red-600 bg-red-50/50 rounded font-medium text-xs w-20">${costDA.toFixed(0)}</td>
+                    <td class="px-2 py-1 text-right font-mono text-blue-600 bg-blue-50/50 rounded font-medium text-xs w-20">${(currentRate>0?item.sellDA/currentRate:0).toFixed(2)}</td>
+                    <td class="px-2 py-1"><input class="table-input num-input font-bold text-green-700 w-20" value="${item.sellDA}" onchange="updGame('${item.docId}','sellDA',this.value)"></td>
+                    <td class="px-2 py-1 text-right font-bold text-slate-700 text-xs">${profit.toFixed(0)}</td>
+                    <td class="px-2 py-1 text-right text-xs text-slate-500">${(item.sellDA>0?(profit/item.sellDA*100):0).toFixed(0)}%</td>
+                    <td class="px-2 py-1 text-right whitespace-nowrap">${btns}</td>`;
                 if(gamesFilters.provider==='all' && gamesFilters.game==='all' && gamesFilters.category==='all') addDragEvents(tr, idx); else tr.querySelector('.drag-handle').classList.add('opacity-0','pointer-events-none');
                 tbody.appendChild(tr);
             });
@@ -652,25 +967,27 @@
             let tCostUSD=0, tCostDA=0, tRev=0, tProfit=0;
             const tbody = document.getElementById('canvaTableBody'); tbody.innerHTML = '';
             if(canvaData.length === 0) tbody.innerHTML = '<tr><td colspan="12" class="text-center py-8 text-slate-400">No subscriptions.</td></tr>';
+
             canvaData.forEach(item => {
                 const costDA = item.buyDA !== undefined ? item.buyDA : (item.buyUSD * currentRate);
                 const costUSD = currentRate > 0 ? (costDA / currentRate) : 0;
                 const profit = item.sellDA - costDA;
                 tCostUSD += costUSD; tCostDA += costDA; tRev += item.sellDA; tProfit += profit;
+                
                 const tr = document.createElement('tr'); tr.className = "hover:bg-slate-50 border-b border-slate-100 last:border-0";
                 tr.innerHTML = `
-                    <td class="px-3 py-2 text-center text-xs text-slate-400 font-mono"><input class="table-input num-input text-xs text-slate-400 w-24" value="${item.customId||'Auto'}" onchange="updCanva('${item.docId}','customId',this.value)"></td>
-                    <td class="px-3 py-2"><input class="table-input font-medium" value="${item.name}" onchange="updCanva('${item.docId}','name',this.value)"></td>
-                    <td class="px-3 py-2"><input class="table-input text-slate-500" value="${item.email}" onchange="updCanva('${item.docId}','email',this.value)"></td>
-                    <td class="px-3 py-2"><input type="date" class="table-input text-xs" value="${item.startDate}" onchange="updCanva('${item.docId}','startDate',this.value)"></td>
-                    <td class="px-3 py-2"><input type="date" class="table-input text-xs" value="${item.endDate}" onchange="updCanva('${item.docId}','endDate',this.value)"></td>
-                    <td class="px-3 py-2 text-right font-mono text-slate-500 w-32">${costUSD.toFixed(2)}</td>
-                    <td class="px-3 py-2"><input class="table-input num-input font-bold text-red-600 bg-red-50/50 w-24" value="${costDA}" onchange="updCanva('${item.docId}','buyDA',this.value)"></td>
-                    <td class="px-3 py-2 text-right font-mono text-blue-600 bg-blue-50/50 rounded">${(currentRate>0?item.sellDA/currentRate:0).toFixed(2)}</td>
-                    <td class="px-3 py-2"><input class="table-input num-input font-bold text-green-700 w-32" value="${item.sellDA}" onchange="updCanva('${item.docId}','sellDA',this.value)"></td>
-                    <td class="px-3 py-2 text-right font-bold ${profit>=0?'text-indigo-600':'text-red-500'}">${profit.toFixed(0)}</td>
-                    <td class="px-3 py-2 text-right text-xs">${(item.sellDA>0?(profit/item.sellDA*100):0).toFixed(0)}%</td>
-                    <td class="px-3 py-2 text-right"><button onclick="window.delCanva('${item.docId}')" class="text-red-500 hover:bg-red-50 p-1 rounded">&times;</button></td>
+                    <td class="px-2 py-1 text-center text-xs text-slate-400 font-mono"><input class="table-input num-input text-xs text-slate-400 w-12" value="${item.customId||'Auto'}" onchange="updCanva('${item.docId}','customId',this.value)"></td>
+                    <td class="px-2 py-1"><input class="table-input font-medium w-32" value="${item.name}" onchange="updCanva('${item.docId}','name',this.value)"></td>
+                    <td class="px-2 py-1"><input class="table-input text-slate-500 text-xs w-40" value="${item.email}" onchange="updCanva('${item.docId}','email',this.value)"></td>
+                    <td class="px-2 py-1"><input type="date" class="table-input text-xs w-24" value="${item.startDate}" onchange="updCanva('${item.docId}','startDate',this.value)"></td>
+                    <td class="px-2 py-1"><input type="date" class="table-input text-xs w-24" value="${item.endDate}" onchange="updCanva('${item.docId}','endDate',this.value)"></td>
+                    <td class="px-2 py-1 text-right font-mono text-slate-500 w-20 text-xs">${costUSD.toFixed(2)}</td>
+                    <td class="px-2 py-1"><input class="table-input num-input font-bold text-red-600 bg-red-50/50 w-20 text-xs" value="${costDA}" onchange="updCanva('${item.docId}','buyDA',this.value)"></td>
+                    <td class="px-2 py-1 text-right font-mono text-blue-600 bg-blue-50/50 rounded font-medium text-xs w-20">${(currentRate>0?item.sellDA/currentRate:0).toFixed(2)}</td>
+                    <td class="px-2 py-1"><input class="table-input num-input font-bold text-green-700 w-20 text-xs" value="${item.sellDA}" onchange="updCanva('${item.docId}','sellDA',this.value)"></td>
+                    <td class="px-2 py-1 text-right font-bold text-slate-700 text-xs">${profit.toFixed(0)}</td>
+                    <td class="px-2 py-1 text-right text-xs text-slate-500">${(item.sellDA>0?(profit/item.sellDA*100):0).toFixed(0)}%</td>
+                    <td class="px-2 py-1 text-right"><button onclick="window.delCanva('${item.docId}')" class="text-red-500 hover:bg-red-50 p-1 rounded transition">&times;</button></td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -723,6 +1040,7 @@
         window.delCanva = async (id) => { if(confirm("Delete?")) await deleteDoc(doc(db,'artifacts',appId,'users',userId,'canva_services',id)); };
         window.updGame = async (id, f, v) => { let val=v; if(['buyUSD','sellDA','customId'].includes(f)) val=parseFloat(v)||0; await updateDoc(doc(db,'artifacts',appId,'users',userId,'games_services',id), {[f]:val}); };
         window.delGame = async (id) => { if(confirm("Delete?")) await deleteDoc(doc(db,'artifacts',appId,'users',userId,'games_services',id)); };
+        window.deleteSale = async (id) => { if(confirm("Delete this sale record?")) { await deleteDoc(doc(db, 'artifacts', appId, 'users', userId, 'sales_records', id)); } };
 
         // --- CHARTS & DRAG ---
         function initCharts() {
@@ -768,17 +1086,15 @@
             const visibleList = getVisibleData(); // The array currently shown (potentially filtered)
             const globalList = getGlobalData();   // The full array from DB
             let collectionName;
-            if (currentView === 'smm') collectionName = 'services';
-            else if (currentView === 'games') collectionName = 'games_services';
-            else if (currentView === 'accounts') collectionName = 'accounts_services';
-            else collectionName = 'canva_services';
+            if (currentView === 'smm') collectionName = `services`;
+            else if (currentView === 'games') collectionName = `games_services`;
+            else if (currentView === 'accounts') collectionName = `accounts_services`;
+            else collectionName = `canva_services`;
 
             // Identify items involved
             const itemMoved = visibleList[fromIndex];
             const itemTarget = visibleList[toIndex];
 
-            // If filtered, we need to find their positions in the global list to perform the move correctly
-            // Basic strategy: Remove itemMoved from its global position and insert it near itemTarget's global position.
             const globalFromIdx = globalList.findIndex(i => i.docId === itemMoved.docId);
             let globalToIdx = globalList.findIndex(i => i.docId === itemTarget.docId);
 
