@@ -86,7 +86,10 @@
                 <span class="text-lg w-6 text-center">📱</span> Social Media
             </button>
             <button onclick="switchView('games')" id="nav-games" class="w-full text-left px-3 py-2.5 rounded-lg font-medium text-slate-600 hover:bg-slate-50 transition flex items-center gap-3">
-                <span class="text-lg w-6 text-center">🎮</span> Games Top-up
+                <span class="text-lg w-6 text-center">💎</span> Games Top-up
+            </button>
+            <button onclick="switchView('keys')" id="nav-keys" class="w-full text-left px-3 py-2.5 rounded-lg font-medium text-slate-600 hover:bg-slate-50 transition flex items-center gap-3">
+                <span class="text-lg w-6 text-center">🕹️</span> Game Keys
             </button>
             <button onclick="switchView('accounts')" id="nav-accounts" class="w-full text-left px-3 py-2.5 rounded-lg font-medium text-slate-600 hover:bg-slate-50 transition flex items-center gap-3">
                 <span class="text-lg w-6 text-center">🔐</span> Accounts Shop
@@ -122,9 +125,12 @@
                         
                         <!-- Section Specific Inputs -->
                         <div class="col-span-1 smm-field accounts-field"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Platform</label><input type="text" id="newPlatform" placeholder="e.g. Netflix" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
-                        <div class="col-span-1 game-field hidden"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Game Name</label><input type="text" id="newGameName" placeholder="e.g. Free Fire" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
+                        <div class="col-span-1 game-field keys-field hidden"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Game Name</label><input type="text" id="newGameName" placeholder="e.g. Free Fire" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
                         <div class="col-span-1 canva-field hidden"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Customer Name</label><input type="text" id="newName" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
                     </div>
+                    
+                    <!-- KEY EDITION (Immediate next to name for Keys) -->
+                    <div class="keys-field hidden"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Edition</label><input type="text" id="newKeysEdition" placeholder="Standard, Ultimate..." class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
 
                     <!-- Category / Type Row -->
                     <div class="grid grid-cols-2 gap-4 smm-field accounts-field">
@@ -132,11 +138,18 @@
                         <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Type (Tag)</label><input type="text" id="newType" placeholder="HQ, Private..." class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
                     </div>
                     
-                    <!-- Games Specific -->
+                    <!-- Games Top-up Specific -->
                     <div class="grid grid-cols-2 gap-4 game-field hidden">
                         <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Console</label><input type="text" id="newGameConsole" placeholder="Mobile, PC..." list="consoleList" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"><datalist id="consoleList"><option value="Mobile"><option value="PC"><option value="Xbox"></datalist></div>
                         <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Provider</label><input type="text" id="newProvider" placeholder="Supplier Name" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
                     </div>
+                    
+                    <!-- KEYS Specific (Platform/Region) -->
+                    <div class="grid grid-cols-2 gap-4 keys-field hidden">
+                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Platform</label><input type="text" id="newKeysPlatform" placeholder="Steam, Origin..." list="keyPlatList" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"><datalist id="keyPlatList"><option value="Steam"><option value="Battle.net"><option value="Xbox"><option value="PlayStation"></datalist></div>
+                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Region</label><input type="text" id="newKeysRegion" placeholder="Global, EU..." class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
+                    </div>
+
                     <div class="grid grid-cols-2 gap-4 game-field hidden">
                          <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Method</label><input type="text" id="newGameMethod" list="methodList" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"><datalist id="methodList"><option value="ID"><option value="Login"><option value="Code"></datalist></div>
                          <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Amount</label><input type="text" id="newAmount" placeholder="100 Gems" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
@@ -154,13 +167,13 @@
 
                     <!-- Financials -->
                     <div class="grid grid-cols-3 gap-4 bg-slate-50 p-3 rounded-lg border border-slate-100">
-                        <div class="smm-field game-field accounts-field"><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Cost ($)</label><input type="number" id="newCost" step="0.01" class="w-full p-2 border border-slate-200 rounded-md outline-none"></div>
+                        <div class="smm-field game-field accounts-field keys-field"><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Cost ($)</label><input type="number" id="newCost" step="0.01" class="w-full p-2 border border-slate-200 rounded-md outline-none"></div>
                         <div class="canva-field hidden"><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Cost (DA)</label><input type="number" id="newCostDA" step="10" class="w-full p-2 border border-slate-200 rounded-md outline-none"></div>
                         <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Sell (DA)</label><input type="number" id="newSell" step="10" class="w-full p-2 border border-slate-200 rounded-md outline-none"></div>
-                        <div class="smm-field accounts-field"><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Qty</label><input type="number" id="newQty" value="1" class="w-full p-2 border border-slate-200 rounded-md outline-none"></div>
+                        <div class="smm-field accounts-field keys-field"><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Qty</label><input type="number" id="newQty" value="1" class="w-full p-2 border border-slate-200 rounded-md outline-none"></div>
                     </div>
 
-                    <div class="smm-field game-field accounts-field"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Purchase Link</label><input type="url" id="newLink" placeholder="https://..." class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500 text-blue-600"></div>
+                    <div class="smm-field game-field accounts-field keys-field"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Purchase Link</label><input type="url" id="newLink" placeholder="https://..." class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500 text-blue-600"></div>
                 </div>
                 <div class="px-6 py-4 bg-slate-50 flex justify-end gap-3 border-t border-slate-100">
                     <button id="cancelModalBtn" class="px-5 py-2 text-sm font-bold text-slate-500 hover:bg-slate-200 rounded-lg transition">Cancel</button>
@@ -244,7 +257,10 @@
                             <select id="categoryFilter" class="bg-slate-50 text-sm font-semibold text-slate-600 rounded-lg px-3 py-2 outline-none border border-slate-200 focus:border-indigo-500"><option value="all">All Categories</option></select>
                             <select id="typeFilter" class="bg-slate-50 text-sm font-semibold text-slate-600 rounded-lg px-3 py-2 outline-none border border-slate-200 focus:border-indigo-500"><option value="all">All Types</option></select>
                         </div>
-                        <button onclick="window.openAddModal()" class="flex items-center gap-2 px-5 py-2 text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-lg shadow-md transition transform active:scale-95"><span>+ Add Service</span></button>
+                        <div class="flex gap-2">
+                             <button onclick="window.downloadPDF()" class="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg shadow-sm"><span>📄 PDF</span></button>
+                             <button onclick="window.openAddModal()" class="flex items-center gap-2 px-5 py-2 text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-lg shadow-md transition transform active:scale-95"><span>+ Add Service</span></button>
+                        </div>
                     </div>
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div class="lg:col-span-2 bg-white p-5 rounded-xl border border-slate-200 shadow-sm h-80"><canvas id="smmChart"></canvas></div>
@@ -257,8 +273,8 @@
                                     <tr>
                                         <th class="w-8 px-2 py-3"></th>
                                         <th class="px-2 py-1 w-12 text-center">ID</th>
-                                        <th class="px-2 py-1 min-w-[120px]">Platform</th><th class="px-2 py-1 min-w-[120px]">Category</th><th class="px-2 py-1 min-w-[100px]">Type</th><th class="px-2 py-1 min-w-[150px]">Service</th>
-                                        <th class="px-2 py-1 text-right w-24">Cost $</th><th class="px-2 py-1 text-right w-20 bg-red-50/50 text-red-700">Cost DA</th><th class="px-2 py-1 text-right w-20 bg-blue-50/50 text-blue-700">Sell $</th><th class="px-2 py-1 text-right w-24 bg-green-50/50 text-green-700">Sell DA</th>
+                                        <th class="px-2 py-1 min-w-[140px]">Platform</th><th class="px-2 py-1 min-w-[140px]">Category</th><th class="px-2 py-1 min-w-[100px]">Type</th><th class="px-2 py-1 min-w-[150px]">Service</th>
+                                        <th class="px-2 py-1 text-right w-24">Cost $</th><th class="px-2 py-1 text-right w-24 bg-red-50/50 text-red-700">Cost DA</th><th class="px-2 py-1 text-right w-20 bg-blue-50/50 text-blue-700">Sell $</th><th class="px-2 py-1 text-right w-24 bg-green-50/50 text-green-700">Sell DA</th>
                                         <th class="px-2 py-1 text-center w-12">Qty</th><th class="px-2 py-1 text-right font-bold text-slate-700">Profit</th><th class="px-2 py-1 text-right">Margin</th><th class="px-2 py-1 text-right w-20">Actions</th>
                                     </tr>
                                 </thead>
@@ -277,7 +293,10 @@
                             <select id="gameProviderFilter" class="bg-slate-50 text-sm font-semibold text-slate-600 rounded-lg px-3 py-2 outline-none border border-slate-200"><option value="all">All Providers</option></select>
                             <select id="gameCategoryFilter" class="bg-slate-50 text-sm font-semibold text-slate-600 rounded-lg px-3 py-2 outline-none border border-slate-200"><option value="all">All Methods</option></select>
                         </div>
-                        <button onclick="window.openAddModal()" class="flex items-center gap-2 px-5 py-2 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-md transition transform active:scale-95"><span>+ Add Game</span></button>
+                        <div class="flex gap-2">
+                            <button onclick="window.downloadPDF()" class="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg shadow-sm"><span>📄 PDF</span></button>
+                            <button onclick="window.openAddModal()" class="flex items-center gap-2 px-5 py-2 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-md transition transform active:scale-95"><span>+ Add Game</span></button>
+                        </div>
                     </div>
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                         <div class="overflow-x-auto custom-scroll">
@@ -286,14 +305,38 @@
                                     <tr>
                                         <th class="w-8 px-2 py-3"></th>
                                         <th class="px-2 py-1 w-12 text-center">ID</th>
-                                        <th class="px-2 py-1 min-w-[150px]">Game Name</th><th class="px-2 py-1 min-w-[80px]">Console</th><th class="px-2 py-1 min-w-[120px]">Provider</th><th class="px-2 py-1 min-w-[120px]">Category</th><th class="px-2 py-1 min-w-[120px]">Amount</th>
-                                        <th class="px-2 py-1 text-right w-24">Cost $</th><th class="px-2 py-1 text-right w-20 bg-red-50/50 text-red-700">Cost DA</th><th class="px-2 py-1 text-right w-20 bg-blue-50/50 text-blue-700">Sell $</th><th class="px-2 py-1 text-right w-24 bg-green-50/50 text-green-700">Sell DA</th>
-                                        <th class="px-2 py-1 text-right font-bold text-slate-700">Profit</th><th class="px-2 py-1 text-right">Margin</th><th class="px-2 py-1 text-right w-20">Act</th>
+                                        <th class="px-2 py-1 min-w-[160px]">Game Name</th><th class="px-2 py-1 min-w-[100px]">Console</th><th class="px-2 py-1 min-w-[140px]">Provider</th><th class="px-2 py-1 min-w-[140px]">Category</th><th class="px-2 py-1 min-w-[140px]">Amount</th>
+                                        <th class="px-2 py-1 text-right w-24">Cost $</th><th class="px-2 py-1 text-right w-24 bg-red-50/50 text-red-700">Cost DA</th><th class="px-2 py-1 text-right w-24 bg-blue-50/50 text-blue-700">Sell $</th><th class="px-2 py-1 text-right w-24 bg-green-50/50 text-green-700">Sell DA</th>
+                                        <th class="px-2 py-1 text-right font-bold text-slate-700">Profit</th><th class="px-2 py-1 text-right">Margin</th><th class="px-2 py-1 text-right w-24">Act</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100" id="gamesTableBody"></tbody>
                             </table>
                         </div>
+                    </div>
+                </div>
+
+                <!-- GAME KEYS VIEW -->
+                <div id="view-keys" class="hidden space-y-6">
+                    <div class="flex justify-end bg-white p-4 rounded-xl border border-slate-200 shadow-sm gap-2">
+                        <button onclick="window.downloadPDF()" class="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg shadow-sm"><span>📄 PDF</span></button>
+                        <button onclick="window.openAddModal()" class="flex items-center gap-2 px-5 py-2 text-sm font-bold text-white bg-purple-600 hover:bg-purple-700 rounded-lg shadow-md transition transform active:scale-95"><span>+ Add Key</span></button>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                         <div class="overflow-x-auto custom-scroll">
+                            <table class="w-full text-left text-sm" id="keysTable">
+                                <thead class="bg-slate-50 text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                                    <tr>
+                                        <th class="w-8 px-2 py-3"></th>
+                                        <th class="px-2 py-1 w-12 text-center">ID</th>
+                                        <th class="px-2 py-1 min-w-[180px]">Game Title</th><th class="px-2 py-1 min-w-[100px]">Edition</th><th class="px-2 py-1 min-w-[100px]">Platform</th><th class="px-2 py-1 min-w-[100px]">Region</th>
+                                        <th class="px-2 py-1 text-right w-24">Cost $</th><th class="px-2 py-1 text-right w-24 bg-red-50/50 text-red-700">Cost DA</th><th class="px-2 py-1 text-right w-24 bg-blue-50/50 text-blue-700">Sell $</th><th class="px-2 py-1 text-right w-24 bg-green-50/50 text-green-700">Sell DA</th>
+                                        <th class="px-2 py-1 text-right font-bold text-slate-700">Profit</th><th class="px-2 py-1 text-right">Margin</th><th class="px-2 py-1 text-right w-20">Act</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100" id="keysTableBody"></tbody>
+                            </table>
+                         </div>
                     </div>
                 </div>
 
@@ -305,7 +348,10 @@
                             <select id="accCategoryFilter" class="bg-slate-50 text-sm font-semibold text-slate-600 rounded-lg px-3 py-2 outline-none border border-slate-200"><option value="all">All Categories</option></select>
                             <select id="accTypeFilter" class="bg-slate-50 text-sm font-semibold text-slate-600 rounded-lg px-3 py-2 outline-none border border-slate-200"><option value="all">All Types</option></select>
                         </div>
-                        <button onclick="window.openAddModal()" class="flex items-center gap-2 px-5 py-2 text-sm font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-lg shadow-md transition transform active:scale-95"><span>+ Add Account</span></button>
+                        <div class="flex gap-2">
+                             <button onclick="window.downloadPDF()" class="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg shadow-sm"><span>📄 PDF</span></button>
+                             <button onclick="window.openAddModal()" class="flex items-center gap-2 px-5 py-2 text-sm font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-lg shadow-md transition transform active:scale-95"><span>+ Add Account</span></button>
+                        </div>
                     </div>
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                         <div class="overflow-x-auto custom-scroll">
@@ -314,8 +360,8 @@
                                     <tr>
                                         <th class="w-8 px-2 py-3"></th>
                                         <th class="px-2 py-1 w-12 text-center">ID</th>
-                                        <th class="px-2 py-1 min-w-[120px]">Platform</th><th class="px-2 py-1 min-w-[120px]">Category</th><th class="px-2 py-1 min-w-[100px]">Type</th><th class="px-2 py-1 min-w-[150px]">Item Name</th>
-                                        <th class="px-2 py-1 text-right w-24">Cost $</th><th class="px-2 py-1 text-right w-20 bg-red-50/50 text-red-700">Cost DA</th><th class="px-2 py-1 text-right w-20 bg-blue-50/50 text-blue-700">Sell $</th><th class="px-2 py-1 text-right w-24 bg-green-50/50 text-green-700">Sell DA</th><th class="px-2 py-1 text-center w-12">Qty</th><th class="px-2 py-1 text-right font-bold text-slate-700">Profit</th><th class="px-2 py-1 text-right">Margin</th><th class="px-2 py-1 text-right w-20">Act</th>
+                                        <th class="px-2 py-1 min-w-[140px]">Platform</th><th class="px-2 py-1 min-w-[140px]">Category</th><th class="px-2 py-1 min-w-[100px]">Type</th><th class="px-2 py-1 min-w-[200px]">Item Name</th>
+                                        <th class="px-2 py-1 text-right w-24">Cost $</th><th class="px-2 py-1 text-right w-24 bg-red-50/50 text-red-700">Cost DA</th><th class="px-2 py-1 text-right w-20 bg-blue-50/50 text-blue-700">Sell $</th><th class="px-2 py-1 text-right w-24 bg-green-50/50 text-green-700">Sell DA</th><th class="px-2 py-1 text-center w-12">Qty</th><th class="px-2 py-1 text-right font-bold text-slate-700">Profit</th><th class="px-2 py-1 text-right">Margin</th><th class="px-2 py-1 text-right w-24">Act</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100" id="accountsTableBody"></tbody>
@@ -326,7 +372,8 @@
 
                 <!-- CANVA VIEW -->
                 <div id="view-canva" class="hidden space-y-6">
-                    <div class="flex justify-end bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-end bg-white p-4 rounded-xl border border-slate-200 shadow-sm gap-2">
+                        <button onclick="window.downloadPDF()" class="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg shadow-sm"><span>📄 PDF</span></button>
                         <button onclick="window.openAddModal()" class="flex items-center gap-2 px-5 py-2 text-sm font-bold text-white bg-[#6366f1] hover:bg-[#4f46e5] rounded-lg shadow-md transition transform active:scale-95"><span>+ Add Subscription</span></button>
                     </div>
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
@@ -335,8 +382,8 @@
                                 <thead class="bg-slate-50 text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
                                     <tr>
                                         <th class="px-2 py-1 w-12 text-center">ID</th><th class="px-2 py-1 min-w-[150px]">Customer</th><th class="px-2 py-1 min-w-[180px]">Email</th><th class="px-2 py-1 w-24">Start</th><th class="px-2 py-1 w-24">End</th>
-                                        <th class="px-2 py-1 text-right w-24">Cost $</th><th class="px-2 py-1 text-right w-20 bg-red-50/50 text-red-700">Cost DA</th><th class="px-2 py-1 text-right w-20 bg-blue-50/50 text-blue-700">Sell $</th><th class="px-2 py-1 text-right w-24 bg-green-50/50 text-green-700">Sell DA</th>
-                                        <th class="px-2 py-1 text-right font-bold text-slate-700">Profit</th><th class="px-2 py-1 text-right">Margin</th><th class="px-2 py-1 text-right w-16">Act</th>
+                                        <th class="px-2 py-1 text-right w-24">Cost $</th><th class="px-2 py-1 text-right w-24 bg-red-50/50 text-red-700">Cost DA</th><th class="px-2 py-1 text-right w-24 bg-blue-50/50 text-blue-700">Sell $</th><th class="px-2 py-1 text-right w-24 bg-green-50/50 text-green-700">Sell DA</th>
+                                        <th class="px-2 py-1 text-right font-bold text-slate-700">Profit</th><th class="px-2 py-1 text-right">Margin</th><th class="px-2 py-1 text-right w-20">Act</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100" id="canvaTableBody"></tbody>
@@ -367,10 +414,10 @@
                             <table class="w-full text-left text-sm" id="salesTable">
                                 <thead class="bg-slate-50 text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
                                     <tr>
-                                        <th class="px-2 py-1 w-24">Date</th>
-                                        <th class="px-2 py-1 min-w-[150px]">Service / Item</th>
-                                        <th class="px-2 py-1 w-24">Category</th>
-                                        <th class="px-2 py-1 min-w-[150px] text-slate-400">Notes</th>
+                                        <th class="px-2 py-1 w-32">Date</th>
+                                        <th class="px-2 py-1 min-w-[200px]">Service / Item</th>
+                                        <th class="px-2 py-1 w-32">Category</th>
+                                        <th class="px-2 py-1 min-w-[200px] text-slate-400">Notes</th>
                                         <th class="px-2 py-1 w-12 text-center">Qty</th>
                                         <th class="px-2 py-1 text-right text-red-500">Cost</th>
                                         <th class="px-2 py-1 text-right text-blue-600">Rev</th>
@@ -401,7 +448,7 @@
         let userId = null; 
         let currentRate = 255;
         let currentView = 'smm';
-        let smmData=[], canvaData=[], gamesData=[], accountsData=[], salesData=[];
+        let smmData=[], canvaData=[], gamesData=[], keysData=[], accountsData=[], salesData=[];
         
         let smmFilters = { platform: 'all', category: 'all', type: 'all' };
         let gamesFilters = { game: 'all', console: 'all', provider: 'all', category: 'all' };
@@ -416,6 +463,7 @@
             smm: document.getElementById('nav-smm'), 
             canva: document.getElementById('nav-canva'), 
             games: document.getElementById('nav-games'), 
+            keys: document.getElementById('nav-keys'),
             accounts: document.getElementById('nav-accounts'), 
             sales: document.getElementById('nav-sales') 
         };
@@ -423,6 +471,7 @@
             smm: document.getElementById('view-smm'), 
             canva: document.getElementById('view-canva'), 
             games: document.getElementById('view-games'), 
+            keys: document.getElementById('view-keys'),
             accounts: document.getElementById('view-accounts'), 
             sales: document.getElementById('view-sales') 
         };
@@ -444,7 +493,6 @@
 
         onAuthStateChanged(auth, async (user) => {
             if (user) { 
-                if (user.isAnonymous || !user.email) { await signOut(auth); return; } // Force email login
                 userId = user.uid; 
                 document.getElementById('auth-container').classList.add('hidden'); 
                 document.getElementById('app-container').classList.remove('hidden');
@@ -454,7 +502,7 @@
                 userId = null; 
                 document.getElementById('auth-container').classList.remove('hidden'); 
                 document.getElementById('app-container').classList.add('hidden'); 
-                smmData=[]; canvaData=[]; gamesData=[]; accountsData=[]; salesData=[]; 
+                smmData=[]; canvaData=[]; gamesData=[]; keysData=[]; accountsData=[]; salesData=[]; 
             }
         });
 
@@ -467,27 +515,24 @@
             document.getElementById('logoutBtn').onclick = window.handleLogout;
             
             document.getElementById('rateSlider').addEventListener('input', (e) => {
-                const v = parseInt(e.target.value); document.getElementById('rateDisplay').textContent = v.toFixed(1); currentRate = v; updateDashboard(); updateCanvaDashboard(); updateGamesDashboard(); updateAccountsDashboard();
+                const v = parseInt(e.target.value); document.getElementById('rateDisplay').textContent = v.toFixed(1); currentRate = v; updateDashboard(); updateCanvaDashboard(); updateGamesDashboard(); updateAccountsDashboard(); updateKeysDashboard();
                 if(userId) setDoc(doc(db, 'artifacts', appId, 'users', userId, 'settings', 'global'), { rate: v }, { merge: true });
             });
             
-            // SMM Filters
+            // Filters
             document.getElementById('platformFilter').addEventListener('change', (e) => { smmFilters.platform = e.target.value; smmFilters.category='all'; updateSMMCategoryFilter(); updateDashboard(); });
             document.getElementById('categoryFilter').addEventListener('change', (e) => { smmFilters.category = e.target.value; updateSMMTypeFilter(); updateDashboard(); });
             document.getElementById('typeFilter').addEventListener('change', (e) => { smmFilters.type = e.target.value; updateDashboard(); });
             
-            // Games Filters
             document.getElementById('gameNameFilter').addEventListener('change', (e) => { gamesFilters.game = e.target.value; gamesFilters.console='all'; gamesFilters.provider='all'; gamesFilters.category='all'; updateGamesConsoleFilter(); updateGamesDashboard(); });
             document.getElementById('gameConsoleFilter').addEventListener('change', (e) => { gamesFilters.console = e.target.value; gamesFilters.provider='all'; gamesFilters.category='all'; updateGamesProviderFilter(); updateGamesDashboard(); });
             document.getElementById('gameProviderFilter').addEventListener('change', (e) => { gamesFilters.provider = e.target.value; gamesFilters.category='all'; updateGamesCategoryFilter(); updateGamesDashboard(); });
             document.getElementById('gameCategoryFilter').addEventListener('change', (e) => { gamesFilters.category = e.target.value; updateGamesDashboard(); });
 
-            // Accounts Filters
             document.getElementById('accPlatformFilter').addEventListener('change', (e) => { accountsFilters.platform = e.target.value; accountsFilters.category='all'; updateAccountsCategoryFilter(); updateAccountsDashboard(); });
             document.getElementById('accCategoryFilter').addEventListener('change', (e) => { accountsFilters.category = e.target.value; updateAccountsTypeFilter(); updateAccountsDashboard(); });
             document.getElementById('accTypeFilter').addEventListener('change', (e) => { accountsFilters.type = e.target.value; updateAccountsDashboard(); });
             
-            // Sales Filters
             document.getElementById('salesDateFilter').addEventListener('change', (e) => { salesFilters.date = e.target.value; updateSalesDashboard(); });
             document.getElementById('salesSearch').addEventListener('input', (e) => { salesFilters.search = e.target.value.toLowerCase(); updateSalesDashboard(); });
 
@@ -504,6 +549,7 @@
                     let item;
                     if(source==='smm') item = smmData.find(i=>i.docId===id);
                     else if(source==='games') item = gamesData.find(i=>i.docId===id);
+                    else if(source==='keys') item = keysData.find(i=>i.docId===id);
                     else if(source==='accounts') item = accountsData.find(i=>i.docId===id);
                     
                     if(item) {
@@ -529,9 +575,10 @@
             const smmFields = document.querySelectorAll('.smm-field'); 
             const canvaFields = document.querySelectorAll('.canva-field');
             const gameFields = document.querySelectorAll('.game-field');
+            const keysFields = document.querySelectorAll('.keys-field');
             const accountsFields = document.querySelectorAll('.accounts-field');
 
-            document.querySelectorAll('.smm-field, .canva-field, .game-field').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.smm-field, .canva-field, .game-field, .keys-field').forEach(el => el.classList.add('hidden'));
 
             if(currentView === 'smm') {
                 document.getElementById('modalTitle').textContent = "Add Social Media Service";
@@ -542,6 +589,9 @@
             } else if (currentView === 'games') {
                 document.getElementById('modalTitle').textContent = "Add Game Top-up";
                 gameFields.forEach(el => el.classList.remove('hidden'));
+            } else if (currentView === 'keys') {
+                document.getElementById('modalTitle').textContent = "Add Game Key";
+                keysFields.forEach(el => el.classList.remove('hidden'));
             } else if (currentView === 'accounts') {
                 document.getElementById('modalTitle').textContent = "Add Account Product";
                 accountsFields.forEach(el => el.classList.remove('hidden'));
@@ -552,39 +602,31 @@
             document.getElementById('saleModal').classList.remove('hidden');
             document.getElementById('saleDate').valueAsDate = new Date();
             const saleServiceSelect = document.getElementById('saleServiceSelect');
-            // Populate select
             saleServiceSelect.innerHTML = '<option value="">-- Choose from Catalog --</option>';
-            
-            // Group Options
             const addGroup = (label, data, source) => {
                 if(data.length === 0) return;
-                const group = document.createElement('optgroup');
-                group.label = label;
+                const group = document.createElement('optgroup'); group.label = label;
                 data.forEach(item => {
-                    const name = item.service || item.game || item.platform; // Dynamic name logic
-                    const opt = document.createElement('option');
-                    opt.value = `${source}:${item.docId}`;
-                    opt.textContent = name + (item.category ? ` - ${item.category}` : '');
-                    group.appendChild(opt);
+                    const name = item.service || item.game || item.platform || item.name;
+                    const opt = document.createElement('option'); opt.value = `${source}:${item.docId}`;
+                    opt.textContent = name + (item.category ? ` - ${item.category}` : ''); group.appendChild(opt);
                 });
                 saleServiceSelect.appendChild(group);
             };
-
-            addGroup("Social Media", smmData, "smm");
-            addGroup("Games", gamesData, "games");
+            addGroup("Social Media", smmData, "smm"); 
+            addGroup("Games Top-up", gamesData, "games");
+            addGroup("Game Keys", keysData, "keys");
             addGroup("Accounts", accountsData, "accounts");
         };
 
         window.saveSaleRecord = async () => {
             const selectVal = document.getElementById('saleServiceSelect').value;
             if(!selectVal) { alert("Please select a service"); return; }
-            
             const [source, id] = selectVal.split(':');
             let itemName = "", category = "";
-            
-            // Find item to get name ref
             if(source==='smm') { const i = smmData.find(x=>x.docId===id); itemName = i.service; category = i.platform; }
             else if(source==='games') { const i = gamesData.find(x=>x.docId===id); itemName = i.game + " " + i.amount; category = "Games"; }
+            else if(source==='keys') { const i = keysData.find(x=>x.docId===id); itemName = i.game + " (" + i.platform + ")"; category = "Keys"; }
             else { const i = accountsData.find(x=>x.docId===id); itemName = i.service; category = i.platform; }
 
             const sell = parseFloat(document.getElementById('saleSellPrice').value)||0;
@@ -594,49 +636,75 @@
             const notes = document.getElementById('saleNotes').value.trim();
 
             try {
-                // Workers save sales to Admin's record
                 await addDoc(collection(db, 'artifacts', appId, 'users', userId, 'sales_records'), {
-                    service: itemName, category, sell, cost, qty, date, notes,
-                    profit: (sell - cost) * qty, timestamp: Date.now()
+                    service: itemName, category, sell, cost, qty, date, notes, profit: (sell - cost) * qty, timestamp: Date.now()
                 });
                 document.getElementById('saleModal').classList.add('hidden');
                 document.getElementById('saleNotes').value = '';
             } catch(e) { console.error(e); alert("Failed to record sale"); }
         };
         
-        window.deleteSale = async (id) => {
-            if(confirm("Delete this sale record?")) {
-                await deleteDoc(doc(db, 'artifacts', appId, 'users', userId, 'sales_records', id));
-            }
-        };
+        window.deleteSale = async (id) => { if(confirm("Delete this sale record?")) { await deleteDoc(doc(db, 'artifacts', appId, 'users', userId, 'sales_records', id)); } };
 
         window.downloadPDF = () => {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            
-            doc.text("Sales Report", 14, 20);
+            let title = "";
+            let head = [];
+            let body = [];
+            let filename = "";
+
+            if (currentView === 'sales') {
+                title = "Sales Report";
+                filename = "sales_report.pdf";
+                head = [['Date', 'Service', 'Category', 'Qty', 'Cost', 'Sell', 'Profit']];
+                body = getVisibleSales().map(row => [
+                    row.date, row.service, row.category, row.qty, 
+                    row.cost.toFixed(0), row.sell.toFixed(0), row.profit.toFixed(0)
+                ]);
+            } else {
+                const data = getVisibleData(); 
+                if (currentView === 'smm') {
+                    title = "Social Media Services";
+                    filename = "smm_services.pdf";
+                    head = [['ID', 'Platform', 'Category', 'Service', 'Cost ($)', 'Sell (DA)']];
+                    body = data.map(i => [i.customId, i.platform, i.category, i.service, i.buyUSD, i.sellDA]);
+                } else if (currentView === 'games') {
+                    title = "Games Top-up Services";
+                    filename = "games_topup.pdf";
+                    head = [['ID', 'Game', 'Provider', 'Amount', 'Cost ($)', 'Sell (DA)']];
+                    body = data.map(i => [i.customId, i.game, i.provider, i.amount, i.buyUSD, i.sellDA]);
+                } else if (currentView === 'keys') {
+                    title = "Game Keys";
+                    filename = "game_keys.pdf";
+                    head = [['ID', 'Game', 'Platform', 'Edition', 'Cost ($)', 'Sell (DA)']];
+                    body = data.map(i => [i.customId, i.game, i.platform, i.edition, i.buyUSD, i.sellDA]);
+                } else if (currentView === 'accounts') {
+                    title = "Accounts Inventory";
+                    filename = "accounts.pdf";
+                    head = [['ID', 'Platform', 'Type', 'Item', 'Cost ($)', 'Sell (DA)']];
+                    body = data.map(i => [i.customId, i.platform, i.type, i.service, i.buyUSD, i.sellDA]);
+                } else if (currentView === 'canva') {
+                    title = "Canva Subscriptions";
+                    filename = "canva_subs.pdf";
+                    head = [['ID', 'Name', 'Email', 'End Date', 'Sell (DA)']];
+                    body = data.map(i => [i.customId, i.name, i.email, i.endDate, i.sellDA]);
+                }
+            }
+
+            doc.text(title, 14, 20);
             doc.setFontSize(10);
             doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 30);
-
-            // Filtered data for PDF matches view
-            const visibleSales = getVisibleSales();
             
-            const tableData = visibleSales.map(row => [
-                row.date,
-                row.service,
-                row.category,
-                row.qty,
-                row.sell.toFixed(0),
-                row.profit.toFixed(0)
-            ]);
-
             doc.autoTable({
-                head: [['Date', 'Service', 'Category', 'Qty', 'Rev (DA)', 'Profit (DA)']],
-                body: tableData,
+                head: head,
+                body: body,
                 startY: 40,
+                styles: { fontSize: 8 },
+                headStyles: { fillColor: [79, 70, 229] } // Indigo-600
             });
 
-            doc.save('sales_report.pdf');
+            doc.save(filename);
         };
         
         window.exportCSV = () => {
@@ -650,39 +718,16 @@
 
         window.switchView = (view) => {
             currentView = view; toggleSidebar(false);
-            
-            // Hide all views first
             Object.values(views).forEach(v => v.classList.add('hidden'));
+            Object.values(nav).forEach(n => { n.classList.remove('bg-indigo-50', 'text-indigo-700'); n.classList.add('text-slate-600'); });
+            if(views[view]) { views[view].classList.remove('hidden'); document.getElementById(`nav-${view}`).classList.add('bg-indigo-50', 'text-indigo-700'); document.getElementById(`nav-${view}`).classList.remove('text-slate-600'); }
             
-            // Reset nav styles
-            Object.values(nav).forEach(n => {
-                n.classList.remove('bg-indigo-50', 'text-indigo-700');
-                n.classList.add('text-slate-600');
-            });
-
-            // Activate specific view and nav
-            if(views[view]) {
-                views[view].classList.remove('hidden');
-                document.getElementById(`nav-${view}`).classList.add('bg-indigo-50', 'text-indigo-700');
-                document.getElementById(`nav-${view}`).classList.remove('text-slate-600');
-            }
-
-            if(view === 'smm') {
-                pageTitle.textContent = "Social Media Services";
-                updateDashboard();
-            } else if(view === 'canva') {
-                pageTitle.textContent = "Canva Pro Invitations";
-                updateCanvaDashboard();
-            } else if (view === 'games') {
-                pageTitle.textContent = "Games Top-up";
-                updateGamesDashboard();
-            } else if (view === 'accounts') {
-                pageTitle.textContent = "Accounts Shop";
-                updateAccountsDashboard();
-            } else if (view === 'sales') {
-                pageTitle.textContent = "Sales & Ledger";
-                updateSalesDashboard();
-            }
+            if(view === 'smm') { pageTitle.textContent = "Social Media Services"; updateDashboard(); } 
+            else if(view === 'canva') { pageTitle.textContent = "Canva Pro Invitations"; updateCanvaDashboard(); } 
+            else if (view === 'games') { pageTitle.textContent = "Games Top-up"; updateGamesDashboard(); } 
+            else if (view === 'keys') { pageTitle.textContent = "Game Keys"; updateKeysDashboard(); }
+            else if (view === 'accounts') { pageTitle.textContent = "Accounts Shop"; updateAccountsDashboard(); } 
+            else if (view === 'sales') { pageTitle.textContent = "Sales & Ledger"; updateSalesDashboard(); }
         };
 
         window.saveNewService = async () => {
@@ -715,6 +760,14 @@
                         sellDA: parseFloat(document.getElementById('newSell').value) || 0,
                         link: document.getElementById('newLink').value, sortOrder: gamesData.length
                     });
+                } else if (currentView === 'keys') {
+                     await addDoc(collection(db, 'artifacts', appId, 'users', userId, 'keys_services'), { ...common,
+                        game: document.getElementById('newGameName').value, platform: document.getElementById('newKeysPlatform').value,
+                        region: document.getElementById('newKeysRegion').value, edition: document.getElementById('newKeysEdition').value,
+                        buyUSD: parseFloat(document.getElementById('newCost').value) || 0,
+                        sellDA: parseFloat(document.getElementById('newSell').value) || 0,
+                        link: document.getElementById('newLink').value, sortOrder: keysData.length
+                    });
                 }
                 document.getElementById('addModal').classList.add('hidden');
             } catch(e) { console.error(e); alert("Save failed"); }
@@ -723,17 +776,15 @@
         // --- DATA & UI UPDATES ---
         function setupRealtimeListeners() {
             if(!userId) return;
-
-            // Settings
             const settingsDoc = doc(db, 'artifacts', appId, 'users', userId, 'settings', 'global');
-            onSnapshot(settingsDoc, (s) => { if(s.exists()) { currentRate = s.data().rate || 255; document.getElementById('rateSlider').value = currentRate; document.getElementById('rateDisplay').textContent = currentRate.toFixed(1); updateDashboard(); updateCanvaDashboard(); updateGamesDashboard(); updateAccountsDashboard(); } else setDoc(settingsDoc, { rate: 255 }, { merge: true }); });
+            onSnapshot(settingsDoc, (s) => { if(s.exists()) { currentRate = s.data().rate || 255; document.getElementById('rateSlider').value = currentRate; document.getElementById('rateDisplay').textContent = currentRate.toFixed(1); updateDashboard(); updateCanvaDashboard(); updateGamesDashboard(); updateAccountsDashboard(); updateKeysDashboard(); } else setDoc(settingsDoc, { rate: 255 }, { merge: true }); });
             
             const sortFn = (a, b) => (a.sortOrder ?? a.createdAt ?? 0) - (b.sortOrder ?? b.createdAt ?? 0);
             
-            // Listeners for Shared Data
             onSnapshot(collection(db, 'artifacts', appId, 'users', userId, `services`), (s) => { smmData = []; s.forEach(d => smmData.push({...d.data(), docId: d.id})); smmData.sort(sortFn); updateSMMFilters(); updateDashboard(); });
             onSnapshot(collection(db, 'artifacts', appId, 'users', userId, `canva_services`), (s) => { canvaData = []; s.forEach(d => canvaData.push({...d.data(), docId: d.id})); canvaData.sort((a, b) => new Date(b.endDate || 0) - new Date(a.endDate || 0)); updateCanvaDashboard(); });
             onSnapshot(collection(db, 'artifacts', appId, 'users', userId, `games_services`), (s) => { gamesData = []; s.forEach(d => gamesData.push({...d.data(), docId: d.id})); gamesData.sort(sortFn); updateGamesFilters(); updateGamesDashboard(); });
+            onSnapshot(collection(db, 'artifacts', appId, 'users', userId, `keys_services`), (s) => { keysData = []; s.forEach(d => keysData.push({...d.data(), docId: d.id})); keysData.sort(sortFn); updateKeysDashboard(); });
             onSnapshot(collection(db, 'artifacts', appId, 'users', userId, `accounts_services`), (s) => { accountsData = []; s.forEach(d => accountsData.push({...d.data(), docId: d.id})); accountsData.sort(sortFn); updateAccountsFilters(); updateAccountsDashboard(); });
             onSnapshot(collection(db, 'artifacts', appId, 'users', userId, `sales_records`), (s) => { salesData = []; s.forEach(d => salesData.push({...d.data(), docId: d.id})); salesData.sort((a, b) => b.timestamp - a.timestamp); updateSalesDashboard(); });
         }
@@ -907,11 +958,11 @@
                     <td class="px-2 py-1"><input class="table-input font-medium w-24" value="${item.platform}" onchange="${fnBase}('${item.docId}','platform',this.value)"></td>
                     <td class="px-2 py-1"><input class="table-input text-slate-500 text-xs w-24" value="${item.category||''}" onchange="${fnBase}('${item.docId}','category',this.value)"></td>
                     <td class="px-2 py-1"><input class="table-input text-xs text-slate-400 w-20" value="${item.type||''}" onchange="${fnBase}('${item.docId}','type',this.value)"></td>
-                    <td class="px-2 py-1"><input class="table-input w-full" value="${item.service}" onchange="${fnBase}('${item.docId}','service',this.value)"></td>
-                    <td class="px-2 py-1 financial-col"><input class="table-input num-input w-20" value="${item.buyUSD}" onchange="${fnBase}('${item.docId}','buyUSD',this.value)"></td>
-                    <td class="px-2 py-1 text-right font-mono text-red-600 bg-red-50/50 rounded font-medium text-xs w-20">${costDA.toFixed(0)}</td>
-                    <td class="px-2 py-1 text-right font-mono text-blue-600 bg-blue-50/50 rounded font-medium text-xs w-20">${(currentRate>0?item.sellDA/currentRate:0).toFixed(2)}</td>
-                    <td class="px-2 py-1"><input class="table-input num-input font-bold text-green-700 w-20" value="${item.sellDA}" onchange="${fnBase}('${item.docId}','sellDA',this.value)"></td>
+                    <td class="px-2 py-1"><input class="table-input min-w-[150px] w-full" value="${item.service}" onchange="${fnBase}('${item.docId}','service',this.value)"></td>
+                    <td class="px-2 py-1 financial-col"><input class="table-input num-input w-24" value="${item.buyUSD}" onchange="${fnBase}('${item.docId}','buyUSD',this.value)"></td>
+                    <td class="px-2 py-1 text-right font-mono text-red-600 bg-red-50/50 rounded font-medium text-xs w-24">${costDA.toFixed(0)}</td>
+                    <td class="px-2 py-1 text-right font-mono text-blue-600 bg-blue-50/50 rounded font-medium text-xs w-24">${(currentRate>0?item.sellDA/currentRate:0).toFixed(2)}</td>
+                    <td class="px-2 py-1"><input class="table-input num-input font-bold text-green-700 w-24" value="${item.sellDA}" onchange="${fnBase}('${item.docId}','sellDA',this.value)"></td>
                     <td class="px-2 py-1"><input class="table-input num-input w-12" value="${qty}" onchange="${fnBase}('${item.docId}','qty',this.value)"></td>
                     <td class="px-2 py-1 text-right font-bold text-slate-700 text-xs">${profit.toFixed(0)}</td>
                     <td class="px-2 py-1 text-right text-xs text-slate-500">${(item.sellDA>0?(profit/(item.sellDA*qty)*100):0).toFixed(0)}%</td>
@@ -948,14 +999,47 @@
                     <td class="px-2 py-1"><input class="table-input text-xs text-slate-600 w-24" value="${item.provider}" onchange="updGame('${item.docId}','provider',this.value)"></td>
                     <td class="px-2 py-1"><input class="table-input text-slate-500 text-xs w-24" value="${item.category||''}" onchange="updGame('${item.docId}','category',this.value)"></td>
                     <td class="px-2 py-1"><input class="table-input text-slate-500 text-xs w-24" value="${item.amount}" onchange="updGame('${item.docId}','amount',this.value)"></td>
-                    <td class="px-2 py-1 financial-col"><input class="table-input num-input w-20" value="${item.buyUSD}" onchange="updGame('${item.docId}','buyUSD',this.value)"></td>
-                    <td class="px-2 py-1 text-right font-mono text-red-600 bg-red-50/50 rounded font-medium text-xs w-20">${costDA.toFixed(0)}</td>
-                    <td class="px-2 py-1 text-right font-mono text-blue-600 bg-blue-50/50 rounded font-medium text-xs w-20">${(currentRate>0?item.sellDA/currentRate:0).toFixed(2)}</td>
-                    <td class="px-2 py-1"><input class="table-input num-input font-bold text-green-700 w-20" value="${item.sellDA}" onchange="updGame('${item.docId}','sellDA',this.value)"></td>
+                    <td class="px-2 py-1 financial-col"><input class="table-input num-input w-24" value="${item.buyUSD}" onchange="updGame('${item.docId}','buyUSD',this.value)"></td>
+                    <td class="px-2 py-1 text-right font-mono text-red-600 bg-red-50/50 rounded font-medium text-xs w-24">${costDA.toFixed(0)}</td>
+                    <td class="px-2 py-1 text-right font-mono text-blue-600 bg-blue-50/50 rounded font-medium text-xs w-24">${(currentRate>0?item.sellDA/currentRate:0).toFixed(2)}</td>
+                    <td class="px-2 py-1"><input class="table-input num-input font-bold text-green-700 w-24" value="${item.sellDA}" onchange="updGame('${item.docId}','sellDA',this.value)"></td>
                     <td class="px-2 py-1 text-right font-bold text-slate-700 text-xs">${profit.toFixed(0)}</td>
                     <td class="px-2 py-1 text-right text-xs text-slate-500">${(item.sellDA>0?(profit/item.sellDA*100):0).toFixed(0)}%</td>
                     <td class="px-2 py-1 text-right whitespace-nowrap">${btns}</td>`;
                 if(gamesFilters.provider==='all' && gamesFilters.game==='all' && gamesFilters.category==='all') addDragEvents(tr, idx); else tr.querySelector('.drag-handle').classList.add('opacity-0','pointer-events-none');
+                tbody.appendChild(tr);
+            });
+            updateKPIs(tCostUSD, tCostDA, tRev, tProfit);
+        }
+
+        // --- KEYS LOGIC ---
+        function updateKeysDashboard() {
+            if(currentView !== 'keys') return;
+            const visible = keysData; // Add filters later if needed
+            let tCostUSD=0, tCostDA=0, tRev=0, tProfit=0;
+            const tbody = document.getElementById('keysTableBody'); tbody.innerHTML = '';
+            
+            visible.forEach((item, idx) => {
+                const costDA = item.buyUSD * currentRate; const profit = item.sellDA - costDA;
+                tCostUSD += item.buyUSD; tCostDA += costDA; tRev += item.sellDA; tProfit += profit;
+                let btns = `<button onclick="window.delKey('${item.docId}')" class="text-red-500 hover:bg-red-50 p-1 rounded transition">&times;</button>`;
+                if(item.link) btns = `<a href="${item.link}" target="_blank" class="text-blue-500 hover:bg-blue-50 p-1 mr-1 transition">↗</a>` + btns;
+                const tr = document.createElement('tr'); tr.className = "hover:bg-slate-50 border-b border-slate-100 last:border-0 draggable-row group";
+                tr.innerHTML = `
+                    <td class="px-2 py-1 text-center drag-handle text-slate-300 hover:text-slate-600"><span class="text-xl">≡</span></td>
+                    <td class="px-2 py-1"><input class="table-input num-input text-xs text-slate-400 w-12" value="${item.customId||0}" onchange="updKey('${item.docId}','customId',this.value)"></td>
+                    <td class="px-2 py-1"><input class="table-input w-40 font-medium" value="${item.game}" onchange="updKey('${item.docId}','game',this.value)"></td>
+                    <td class="px-2 py-1"><input class="table-input text-slate-500 text-xs w-32" value="${item.edition}" onchange="updKey('${item.docId}','edition',this.value)"></td>
+                    <td class="px-2 py-1"><input class="table-input text-xs text-slate-600 w-24" value="${item.platform}" onchange="updKey('${item.docId}','platform',this.value)"></td>
+                    <td class="px-2 py-1"><input class="table-input text-xs text-slate-600 w-24" value="${item.region}" onchange="updKey('${item.docId}','region',this.value)"></td>
+                    <td class="px-2 py-1 financial-col"><input class="table-input num-input w-24" value="${item.buyUSD}" onchange="updKey('${item.docId}','buyUSD',this.value)"></td>
+                    <td class="px-2 py-1 text-right font-mono text-red-600 bg-red-50/50 rounded font-medium text-xs w-24">${costDA.toFixed(0)}</td>
+                    <td class="px-2 py-1 text-right font-mono text-blue-600 bg-blue-50/50 rounded font-medium text-xs w-24">${(currentRate>0?item.sellDA/currentRate:0).toFixed(2)}</td>
+                    <td class="px-2 py-1"><input class="table-input num-input font-bold text-green-700 w-24" value="${item.sellDA}" onchange="updKey('${item.docId}','sellDA',this.value)"></td>
+                    <td class="px-2 py-1 text-right font-bold text-slate-700 text-xs">${profit.toFixed(0)}</td>
+                    <td class="px-2 py-1 text-right text-xs text-slate-500">${(item.sellDA>0?(profit/item.sellDA*100):0).toFixed(0)}%</td>
+                    <td class="px-2 py-1 text-right whitespace-nowrap">${btns}</td>`;
+                 // Add drag events if needed
                 tbody.appendChild(tr);
             });
             updateKPIs(tCostUSD, tCostDA, tRev, tProfit);
@@ -1025,6 +1109,7 @@
             if(currentView === 'smm') return smmData;
             if(currentView === 'games') return gamesData;
             if(currentView === 'accounts') return accountsData;
+            if(currentView === 'keys') return keysData;
             return canvaData;
         }
 
@@ -1038,8 +1123,13 @@
 
         window.updCanva = async (id, f, v) => { let val=v; if(['buyUSD','sellDA','customId','buyDA'].includes(f)) val=parseFloat(v)||0; await updateDoc(doc(db,'artifacts',appId,'users',userId,'canva_services',id), {[f]:val}); };
         window.delCanva = async (id) => { if(confirm("Delete?")) await deleteDoc(doc(db,'artifacts',appId,'users',userId,'canva_services',id)); };
+        
         window.updGame = async (id, f, v) => { let val=v; if(['buyUSD','sellDA','customId'].includes(f)) val=parseFloat(v)||0; await updateDoc(doc(db,'artifacts',appId,'users',userId,'games_services',id), {[f]:val}); };
         window.delGame = async (id) => { if(confirm("Delete?")) await deleteDoc(doc(db,'artifacts',appId,'users',userId,'games_services',id)); };
+
+        window.updKey = async (id, f, v) => { let val=v; if(['buyUSD','sellDA','customId'].includes(f)) val=parseFloat(v)||0; await updateDoc(doc(db,'artifacts',appId,'users',userId,'keys_services',id), {[f]:val}); };
+        window.delKey = async (id) => { if(confirm("Delete?")) await deleteDoc(doc(db,'artifacts',appId,'users',userId,'keys_services',id)); };
+
         window.deleteSale = async (id) => { if(confirm("Delete this sale record?")) { await deleteDoc(doc(db, 'artifacts', appId, 'users', userId, 'sales_records', id)); } };
 
         // --- CHARTS & DRAG ---
