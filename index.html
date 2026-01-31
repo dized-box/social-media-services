@@ -648,7 +648,8 @@
 
         window.downloadPDF = () => {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
+            // Landscape orientation to fit Link column
+            const doc = new jsPDF({ orientation: 'landscape' });
             let title = "";
             let head = [];
             let body = [];
@@ -667,23 +668,23 @@
                 if (currentView === 'smm') {
                     title = "Social Media Services";
                     filename = "smm_services.pdf";
-                    head = [['ID', 'Platform', 'Category', 'Service', 'Cost ($)', 'Sell (DA)']];
-                    body = data.map(i => [i.customId, i.platform, i.category, i.service, i.buyUSD, i.sellDA]);
+                    head = [['ID', 'Platform', 'Category', 'Service', 'Cost ($)', 'Sell (DA)', 'Link']];
+                    body = data.map(i => [i.customId, i.platform, i.category, i.service, i.buyUSD, i.sellDA, i.link||'']);
                 } else if (currentView === 'games') {
                     title = "Games Top-up Services";
                     filename = "games_topup.pdf";
-                    head = [['ID', 'Game', 'Provider', 'Amount', 'Cost ($)', 'Sell (DA)']];
-                    body = data.map(i => [i.customId, i.game, i.provider, i.amount, i.buyUSD, i.sellDA]);
+                    head = [['ID', 'Game', 'Provider', 'Amount', 'Cost ($)', 'Sell (DA)', 'Link']];
+                    body = data.map(i => [i.customId, i.game, i.provider, i.amount, i.buyUSD, i.sellDA, i.link||'']);
                 } else if (currentView === 'keys') {
                     title = "Game Keys";
                     filename = "game_keys.pdf";
-                    head = [['ID', 'Game', 'Platform', 'Edition', 'Cost ($)', 'Sell (DA)']];
-                    body = data.map(i => [i.customId, i.game, i.platform, i.edition, i.buyUSD, i.sellDA]);
+                    head = [['ID', 'Game', 'Platform', 'Edition', 'Cost ($)', 'Sell (DA)', 'Link']];
+                    body = data.map(i => [i.customId, i.game, i.platform, i.edition, i.buyUSD, i.sellDA, i.link||'']);
                 } else if (currentView === 'accounts') {
                     title = "Accounts Inventory";
                     filename = "accounts.pdf";
-                    head = [['ID', 'Platform', 'Type', 'Item', 'Cost ($)', 'Sell (DA)']];
-                    body = data.map(i => [i.customId, i.platform, i.type, i.service, i.buyUSD, i.sellDA]);
+                    head = [['ID', 'Platform', 'Type', 'Item', 'Cost ($)', 'Sell (DA)', 'Link']];
+                    body = data.map(i => [i.customId, i.platform, i.type, i.service, i.buyUSD, i.sellDA, i.link||'']);
                 } else if (currentView === 'canva') {
                     title = "Canva Subscriptions";
                     filename = "canva_subs.pdf";
@@ -700,7 +701,10 @@
                 head: head,
                 body: body,
                 startY: 40,
-                styles: { fontSize: 8 },
+                styles: { fontSize: 8, cellWidth: 'wrap' },
+                columnStyles: {
+                    6: { cellWidth: 50 } // Constrain link column width
+                },
                 headStyles: { fillColor: [79, 70, 229] } // Indigo-600
             });
 
