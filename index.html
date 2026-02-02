@@ -129,7 +129,7 @@
                         <div class="col-span-1 canva-field hidden"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Customer Name</label><input type="text" id="newName" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
                     </div>
                     
-                    <!-- KEY EDITION (Immediate next to name for Keys) -->
+                    <!-- KEY EDITION -->
                     <div class="keys-field hidden"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Edition</label><input type="text" id="newKeysEdition" placeholder="Standard, Ultimate..." class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
 
                     <!-- Category / Type Row -->
@@ -139,9 +139,10 @@
                     </div>
                     
                     <!-- Games Top-up Specific -->
-                    <div class="grid grid-cols-2 gap-4 game-field hidden">
-                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Console</label><input type="text" id="newGameConsole" placeholder="Mobile, PC..." list="consoleList" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"><datalist id="consoleList"><option value="Mobile"><option value="PC"><option value="Xbox"></datalist></div>
-                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Provider</label><input type="text" id="newProvider" placeholder="Supplier Name" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="game-field hidden"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Console</label><input type="text" id="newGameConsole" placeholder="Mobile, PC..." list="consoleList" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"><datalist id="consoleList"><option value="Mobile"><option value="PC"><option value="Xbox"></datalist></div>
+                        <!-- Provider (Shared for Games and Accounts) -->
+                        <div class="game-field accounts-field hidden"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Provider</label><input type="text" id="newProvider" placeholder="Supplier Name" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
                     </div>
                     
                     <!-- KEYS Specific (Platform/Region) -->
@@ -360,7 +361,7 @@
                                     <tr>
                                         <th class="w-8 px-2 py-3"></th>
                                         <th class="px-2 py-1 w-12 text-center">ID</th>
-                                        <th class="px-2 py-1 min-w-[140px]">Platform</th><th class="px-2 py-1 min-w-[140px]">Category</th><th class="px-2 py-1 min-w-[100px]">Type</th><th class="px-2 py-1 min-w-[200px]">Item Name</th>
+                                        <th class="px-2 py-1 min-w-[140px]">Platform</th><th class="px-2 py-1 min-w-[140px]">Provider</th><th class="px-2 py-1 min-w-[140px]">Category</th><th class="px-2 py-1 min-w-[100px]">Type</th><th class="px-2 py-1 min-w-[200px]">Item Name</th>
                                         <th class="px-2 py-1 text-right w-24">Cost $</th><th class="px-2 py-1 text-right w-24 bg-red-50/50 text-red-700">Cost DA</th><th class="px-2 py-1 text-right w-20 bg-blue-50/50 text-blue-700">Sell $</th><th class="px-2 py-1 text-right w-24 bg-green-50/50 text-green-700">Sell DA</th><th class="px-2 py-1 text-center w-12">Qty</th><th class="px-2 py-1 text-right font-bold text-slate-700">Profit</th><th class="px-2 py-1 text-right">Margin</th><th class="px-2 py-1 text-right w-24">Act</th>
                                     </tr>
                                 </thead>
@@ -417,7 +418,7 @@
                                         <th class="px-2 py-1 w-32">Date</th>
                                         <th class="px-2 py-1 min-w-[200px]">Service / Item</th>
                                         <th class="px-2 py-1 w-32">Category</th>
-                                        <th class="px-2 py-1 min-w-[200px] text-slate-400">Notes</th>
+                                        <th class="px-2 py-1 min-w-[180px] text-slate-400">Notes</th>
                                         <th class="px-2 py-1 w-12 text-center">Qty</th>
                                         <th class="px-2 py-1 text-right text-red-500">Cost</th>
                                         <th class="px-2 py-1 text-right text-blue-600">Rev</th>
@@ -683,8 +684,8 @@
                 } else if (currentView === 'accounts') {
                     title = "Accounts Inventory";
                     filename = "accounts.pdf";
-                    head = [['ID', 'Platform', 'Type', 'Item', 'Cost ($)', 'Sell (DA)', 'Link']];
-                    body = data.map(i => [i.customId, i.platform, i.type, i.service, i.buyUSD, i.sellDA, i.link||'']);
+                    head = [['ID', 'Platform', 'Provider', 'Category', 'Type', 'Item', 'Cost ($)', 'Sell (DA)', 'Link']];
+                    body = data.map(i => [i.customId, i.platform, i.provider, i.category, i.type, i.service, i.buyUSD, i.sellDA, i.link||'']);
                 } else if (currentView === 'canva') {
                     title = "Canva Subscriptions";
                     filename = "canva_subs.pdf";
@@ -743,6 +744,8 @@
                     await addDoc(collection(db, 'artifacts', appId, 'users', userId, colName), { ...common,
                         platform: document.getElementById('newPlatform').value, category: document.getElementById('newCategory').value,
                         type: document.getElementById('newType').value, service: document.getElementById('newService').value,
+                        // Added provider saving for accounts
+                        provider: currentView === 'accounts' ? document.getElementById('newProvider').value : '',
                         buyUSD: parseFloat(document.getElementById('newCost').value) || 0,
                         sellDA: parseFloat(document.getElementById('newSell').value) || 0,
                         qty: parseInt(document.getElementById('newQty').value)||1, link: document.getElementById('newLink').value, sortOrder: getGlobalData().length
@@ -956,10 +959,14 @@
                 let btns = `<button onclick="window.${dupFn}('${item.docId}')" class="text-indigo-400 hover:text-indigo-600 p-1 mr-1 transition" title="Duplicate">❐</button><button onclick="window.${delFn}('${item.docId}')" class="text-slate-400 hover:text-red-500 p-1 transition" title="Delete">&times;</button>`;
                 if(item.link) btns = `<a href="${item.link}" target="_blank" class="text-blue-500 hover:text-blue-700 p-1 mr-1 transition" title="Link">↗</a>` + btns;
 
+                // Check if current view is accounts to render provider column
+                const isAccount = currentView === 'accounts';
+
                 tr.innerHTML = `
                     <td class="px-2 py-1 text-center drag-handle text-slate-300 hover:text-slate-600"><span class="text-lg">≡</span></td>
                     <td class="px-2 py-1"><input class="table-input num-input text-xs text-slate-400 w-12" value="${item.customId||0}" onchange="${fnBase}('${item.docId}','customId',this.value)"></td>
                     <td class="px-2 py-1"><input class="table-input font-medium w-24" value="${item.platform}" onchange="${fnBase}('${item.docId}','platform',this.value)"></td>
+                    ${isAccount ? `<td class="px-2 py-1"><input class="table-input text-xs text-slate-600 w-24" value="${item.provider||''}" onchange="${fnBase}('${item.docId}','provider',this.value)"></td>` : ''}
                     <td class="px-2 py-1"><input class="table-input text-slate-500 text-xs w-24" value="${item.category||''}" onchange="${fnBase}('${item.docId}','category',this.value)"></td>
                     <td class="px-2 py-1"><input class="table-input text-xs text-slate-400 w-20" value="${item.type||''}" onchange="${fnBase}('${item.docId}','type',this.value)"></td>
                     <td class="px-2 py-1"><input class="table-input min-w-[150px] w-full" value="${item.service}" onchange="${fnBase}('${item.docId}','service',this.value)"></td>
@@ -972,12 +979,7 @@
                     <td class="px-2 py-1 text-right text-xs text-slate-500">${(item.sellDA>0?(profit/(item.sellDA*qty)*100):0).toFixed(0)}%</td>
                     <td class="px-2 py-1 text-right whitespace-nowrap">${btns}</td>`;
                 
-                let allow = false;
-                if(currentView==='smm' && smmFilters.platform==='all' && smmFilters.category==='all') allow=true;
-                if(currentView==='accounts' && accountsFilters.platform==='all' && accountsFilters.category==='all') allow=true;
-
-                if(allow) addDragEvents(tr, idx); else tr.querySelector('.drag-handle').classList.add('opacity-0','pointer-events-none');
-                tbody.appendChild(tr);
+                addDragEvents(tr, idx); tbody.appendChild(tr);
             });
             updateKPIs(tCostUSD, tCostDA, tRev, tProfit); 
             if(currentView==='smm') updateCharts(data);
