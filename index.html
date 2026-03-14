@@ -91,8 +91,11 @@
             <button onclick="switchView('keys')" id="nav-keys" class="w-full text-left px-3 py-2.5 rounded-lg font-medium text-slate-600 hover:bg-slate-50 transition flex items-center gap-3">
                 <span class="text-lg w-6 text-center">🕹️</span> Game Keys
             </button>
+            <button onclick="switchView('gameaccounts')" id="nav-gameaccounts" class="w-full text-left px-3 py-2.5 rounded-lg font-medium text-slate-600 hover:bg-slate-50 transition flex items-center gap-3">
+                <span class="text-lg w-6 text-center">🎮</span> Game Accounts
+            </button>
             <button onclick="switchView('accounts')" id="nav-accounts" class="w-full text-left px-3 py-2.5 rounded-lg font-medium text-slate-600 hover:bg-slate-50 transition flex items-center gap-3">
-                <span class="text-lg w-6 text-center">🔐</span> Accounts Shop
+                <span class="text-lg w-6 text-center">📺</span> Subscriptions
             </button>
             <button onclick="switchView('canva')" id="nav-canva" class="w-full text-left px-3 py-2.5 rounded-lg font-medium text-slate-600 hover:bg-slate-50 transition flex items-center gap-3">
                 <span class="text-lg w-6 text-center">🎨</span> Canva Pro
@@ -125,7 +128,7 @@
                         
                         <!-- Section Specific Inputs -->
                         <div class="col-span-1 smm-field accounts-field"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Platform</label><input type="text" id="newPlatform" placeholder="e.g. Netflix" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
-                        <div class="col-span-1 game-field keys-field hidden"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Game Name</label><input type="text" id="newGameName" placeholder="e.g. Free Fire" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
+                        <div class="col-span-1 game-field keys-field gameaccounts-field hidden"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Game Name</label><input type="text" id="newGameName" placeholder="e.g. Free Fire" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
                         <div class="col-span-1 canva-field hidden"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Customer Name</label><input type="text" id="newName" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
                     </div>
                     
@@ -145,6 +148,17 @@
                         <div class="game-field accounts-field hidden"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Provider</label><input type="text" id="newProvider" placeholder="Supplier Name" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"></div>
                     </div>
                     
+                    <!-- GAME ACCOUNTS Specific (Platform/Type) -->
+                    <div class="grid grid-cols-2 gap-4 gameaccounts-field hidden">
+                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Platform</label><input type="text" id="newGameAccPlatform" placeholder="Steam, Xbox..." list="gameAccPlats" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"><datalist id="gameAccPlats"><option value="Steam"><option value="Xbox"><option value="PlayStation"><option value="Epic Games"><option value="Ubisoft"><option value="Battle.net"><option value="EA App"></datalist></div>
+                        <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Account Type</label>
+                            <select id="newGameAccType" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500 bg-white">
+                                <option value="Offline">Offline</option>
+                                <option value="Online">Online</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <!-- KEYS Specific (Platform/Region) -->
                     <div class="grid grid-cols-2 gap-4 keys-field hidden">
                         <div><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Platform</label><input type="text" id="newKeysPlatform" placeholder="Steam, Origin..." list="keyPlatList" class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500"><datalist id="keyPlatList"><option value="Steam"><option value="Battle.net"><option value="Xbox"><option value="PlayStation"></datalist></div>
@@ -168,14 +182,15 @@
 
                     <!-- Financials -->
                     <div class="grid grid-cols-3 gap-4 bg-slate-50 p-3 rounded-lg border border-slate-100">
-                        <div class="smm-field game-field accounts-field keys-field"><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Cost ($)</label><input type="number" id="newCost" step="0.01" class="w-full p-2 border border-slate-200 rounded-md outline-none"></div>
+                        <div class="smm-field game-field accounts-field keys-field gameaccounts-field"><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Cost ($)</label><input type="number" id="newCost" step="0.01" class="w-full p-2 border border-slate-200 rounded-md outline-none"></div>
                         <div class="canva-field hidden"><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Cost (DA)</label><input type="number" id="newCostDA" step="10" class="w-full p-2 border border-slate-200 rounded-md outline-none"></div>
                         <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Sell (DA)</label><input type="number" id="newSell" step="10" class="w-full p-2 border border-slate-200 rounded-md outline-none"></div>
-                        <div class="smm-field accounts-field keys-field"><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Qty</label><input type="number" id="newQty" value="1" class="w-full p-2 border border-slate-200 rounded-md outline-none"></div>
+                        <div class="smm-field accounts-field keys-field gameaccounts-field"><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Qty</label><input type="number" id="newQty" value="1" class="w-full p-2 border border-slate-200 rounded-md outline-none"></div>
                     </div>
 
-                    <div class="smm-field game-field accounts-field keys-field"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Purchase Link</label><input type="url" id="newLink" placeholder="https://..." class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500 text-blue-600"></div>
+                    <div class="smm-field game-field accounts-field keys-field gameaccounts-field"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Purchase Link</label><input type="url" id="newLink" placeholder="https://..." class="w-full p-2.5 border border-slate-200 rounded-lg outline-none focus:border-indigo-500 text-blue-600"></div>
                 </div>
+
                 <div class="px-6 py-4 bg-slate-50 flex justify-end gap-3 border-t border-slate-100">
                     <button id="cancelModalBtn" class="px-5 py-2 text-sm font-bold text-slate-500 hover:bg-slate-200 rounded-lg transition">Cancel</button>
                     <button id="saveServiceBtn" class="px-5 py-2 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-md transition transform active:scale-95">Save Item</button>
@@ -341,7 +356,37 @@
                     </div>
                 </div>
 
-                <!-- ACCOUNTS VIEW -->
+                <!-- GAME ACCOUNTS VIEW -->
+                <div id="view-gameaccounts" class="hidden space-y-6">
+                    <div class="flex flex-col md:flex-row justify-between gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="flex flex-wrap gap-2 items-center">
+                            <select id="gameAccPlatformFilter" class="bg-slate-50 text-sm font-semibold text-slate-600 rounded-lg px-3 py-2 outline-none border border-slate-200"><option value="all">All Platforms</option></select>
+                            <select id="gameAccTypeFilter" class="bg-slate-50 text-sm font-semibold text-slate-600 rounded-lg px-3 py-2 outline-none border border-slate-200"><option value="all">All Types</option></select>
+                        </div>
+                        <div class="flex gap-2">
+                             <button onclick="window.downloadPDF()" class="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg shadow-sm"><span>📄 PDF</span></button>
+                             <button onclick="window.openAddModal()" class="flex items-center gap-2 px-5 py-2 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md transition transform active:scale-95"><span>+ Add Game Acc</span></button>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                         <div class="overflow-x-auto custom-scroll">
+                            <table class="w-full text-left text-sm" id="gameAccountsTable">
+                                <thead class="bg-slate-50 text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                                    <tr>
+                                        <th class="w-8 px-2 py-3"></th>
+                                        <th class="px-2 py-1 w-12 text-center">ID</th>
+                                        <th class="px-2 py-1 min-w-[200px]">Game Name</th><th class="px-2 py-1 min-w-[120px]">Platform</th><th class="px-2 py-1 min-w-[100px]">Type</th>
+                                        <th class="px-2 py-1 text-right w-24">Cost $</th><th class="px-2 py-1 text-right w-24 bg-red-50/50 text-red-700">Cost DA</th><th class="px-2 py-1 text-right w-24 bg-blue-50/50 text-blue-700">Sell $</th><th class="px-2 py-1 text-right w-24 bg-green-50/50 text-green-700">Sell DA</th><th class="px-2 py-1 text-center w-12">Qty</th>
+                                        <th class="px-2 py-1 text-right font-bold text-slate-700">Profit</th><th class="px-2 py-1 text-right">Margin</th><th class="px-2 py-1 text-right w-20">Act</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100" id="gameAccountsTableBody"></tbody>
+                            </table>
+                         </div>
+                    </div>
+                </div>
+
+                <!-- SUBSCRIPTIONS VIEW (Previously Accounts) -->
                 <div id="view-accounts" class="hidden space-y-6">
                     <div class="flex flex-col md:flex-row justify-between gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                         <div class="flex flex-wrap gap-2 items-center">
@@ -351,7 +396,7 @@
                         </div>
                         <div class="flex gap-2">
                              <button onclick="window.downloadPDF()" class="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg shadow-sm"><span>📄 PDF</span></button>
-                             <button onclick="window.openAddModal()" class="flex items-center gap-2 px-5 py-2 text-sm font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-lg shadow-md transition transform active:scale-95"><span>+ Add Account</span></button>
+                             <button onclick="window.openAddModal()" class="flex items-center gap-2 px-5 py-2 text-sm font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-lg shadow-md transition transform active:scale-95"><span>+ Add Sub</span></button>
                         </div>
                     </div>
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
@@ -449,11 +494,12 @@
         let userId = null; 
         let currentRate = 255;
         let currentView = 'smm';
-        let smmData=[], canvaData=[], gamesData=[], keysData=[], accountsData=[], salesData=[];
+        let smmData=[], canvaData=[], gamesData=[], keysData=[], gameAccountsData=[], accountsData=[], salesData=[];
         
         let smmFilters = { platform: 'all', category: 'all', type: 'all' };
         let gamesFilters = { game: 'all', console: 'all', provider: 'all', category: 'all' };
         let accountsFilters = { platform: 'all', category: 'all', type: 'all' };
+        let gameAccountsFilters = { platform: 'all', type: 'all' };
         let salesFilters = { date: 'all', search: '' };
         
         let smmChart = null; let smmDistChart = null;
@@ -465,6 +511,7 @@
             canva: document.getElementById('nav-canva'), 
             games: document.getElementById('nav-games'), 
             keys: document.getElementById('nav-keys'),
+            gameaccounts: document.getElementById('nav-gameaccounts'),
             accounts: document.getElementById('nav-accounts'), 
             sales: document.getElementById('nav-sales') 
         };
@@ -473,6 +520,7 @@
             canva: document.getElementById('view-canva'), 
             games: document.getElementById('view-games'), 
             keys: document.getElementById('view-keys'),
+            gameaccounts: document.getElementById('view-gameaccounts'),
             accounts: document.getElementById('view-accounts'), 
             sales: document.getElementById('view-sales') 
         };
@@ -503,7 +551,7 @@
                 userId = null; 
                 document.getElementById('auth-container').classList.remove('hidden'); 
                 document.getElementById('app-container').classList.add('hidden'); 
-                smmData=[]; canvaData=[]; gamesData=[]; keysData=[]; accountsData=[]; salesData=[]; 
+                smmData=[]; canvaData=[]; gamesData=[]; keysData=[]; gameAccountsData=[]; accountsData=[]; salesData=[]; 
             }
         });
 
@@ -516,7 +564,7 @@
             document.getElementById('logoutBtn').onclick = window.handleLogout;
             
             document.getElementById('rateSlider').addEventListener('input', (e) => {
-                const v = parseInt(e.target.value); document.getElementById('rateDisplay').textContent = v.toFixed(1); currentRate = v; updateDashboard(); updateCanvaDashboard(); updateGamesDashboard(); updateAccountsDashboard(); updateKeysDashboard();
+                const v = parseInt(e.target.value); document.getElementById('rateDisplay').textContent = v.toFixed(1); currentRate = v; updateDashboard(); updateCanvaDashboard(); updateGamesDashboard(); updateAccountsDashboard(); updateKeysDashboard(); updateGameAccountsDashboard();
                 if(userId) setDoc(doc(db, 'artifacts', appId, 'users', userId, 'settings', 'global'), { rate: v }, { merge: true });
             });
             
@@ -533,6 +581,9 @@
             document.getElementById('accPlatformFilter').addEventListener('change', (e) => { accountsFilters.platform = e.target.value; accountsFilters.category='all'; updateAccountsCategoryFilter(); updateAccountsDashboard(); });
             document.getElementById('accCategoryFilter').addEventListener('change', (e) => { accountsFilters.category = e.target.value; updateAccountsTypeFilter(); updateAccountsDashboard(); });
             document.getElementById('accTypeFilter').addEventListener('change', (e) => { accountsFilters.type = e.target.value; updateAccountsDashboard(); });
+
+            document.getElementById('gameAccPlatformFilter').addEventListener('change', (e) => { gameAccountsFilters.platform = e.target.value; updateGameAccountsDashboard(); });
+            document.getElementById('gameAccTypeFilter').addEventListener('change', (e) => { gameAccountsFilters.type = e.target.value; updateGameAccountsDashboard(); });
             
             document.getElementById('salesDateFilter').addEventListener('change', (e) => { salesFilters.date = e.target.value; updateSalesDashboard(); });
             document.getElementById('salesSearch').addEventListener('input', (e) => { salesFilters.search = e.target.value.toLowerCase(); updateSalesDashboard(); });
@@ -551,6 +602,7 @@
                     if(source==='smm') item = smmData.find(i=>i.docId===id);
                     else if(source==='games') item = gamesData.find(i=>i.docId===id);
                     else if(source==='keys') item = keysData.find(i=>i.docId===id);
+                    else if(source==='gameaccounts') item = gameAccountsData.find(i=>i.docId===id);
                     else if(source==='accounts') item = accountsData.find(i=>i.docId===id);
                     
                     if(item) {
@@ -577,9 +629,10 @@
             const canvaFields = document.querySelectorAll('.canva-field');
             const gameFields = document.querySelectorAll('.game-field');
             const keysFields = document.querySelectorAll('.keys-field');
+            const gameAccFields = document.querySelectorAll('.gameaccounts-field');
             const accountsFields = document.querySelectorAll('.accounts-field');
 
-            document.querySelectorAll('.smm-field, .canva-field, .game-field, .keys-field').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.smm-field, .canva-field, .game-field, .keys-field, .gameaccounts-field, .accounts-field').forEach(el => el.classList.add('hidden'));
 
             if(currentView === 'smm') {
                 document.getElementById('modalTitle').textContent = "Add Social Media Service";
@@ -593,8 +646,11 @@
             } else if (currentView === 'keys') {
                 document.getElementById('modalTitle').textContent = "Add Game Key";
                 keysFields.forEach(el => el.classList.remove('hidden'));
+            } else if (currentView === 'gameaccounts') {
+                document.getElementById('modalTitle').textContent = "Add Game Account";
+                gameAccFields.forEach(el => el.classList.remove('hidden'));
             } else if (currentView === 'accounts') {
-                document.getElementById('modalTitle').textContent = "Add Account Product";
+                document.getElementById('modalTitle').textContent = "Add Subscription Account";
                 accountsFields.forEach(el => el.classList.remove('hidden'));
             }
         };
@@ -617,7 +673,8 @@
             addGroup("Social Media", smmData, "smm"); 
             addGroup("Games Top-up", gamesData, "games");
             addGroup("Game Keys", keysData, "keys");
-            addGroup("Accounts", accountsData, "accounts");
+            addGroup("Game Accounts", gameAccountsData, "gameaccounts");
+            addGroup("Subscriptions", accountsData, "accounts");
         };
 
         window.saveSaleRecord = async () => {
@@ -628,6 +685,7 @@
             if(source==='smm') { const i = smmData.find(x=>x.docId===id); itemName = i.service; category = i.platform; }
             else if(source==='games') { const i = gamesData.find(x=>x.docId===id); itemName = i.game + " " + i.amount; category = "Games"; }
             else if(source==='keys') { const i = keysData.find(x=>x.docId===id); itemName = i.game + " (" + i.platform + ")"; category = "Keys"; }
+            else if(source==='gameaccounts') { const i = gameAccountsData.find(x=>x.docId===id); itemName = i.game + " (" + i.type + ")"; category = i.platform; }
             else { const i = accountsData.find(x=>x.docId===id); itemName = i.service; category = i.platform; }
 
             const sell = parseFloat(document.getElementById('saleSellPrice').value)||0;
@@ -681,9 +739,14 @@
                     filename = "game_keys.pdf";
                     head = [['ID', 'Game', 'Platform', 'Edition', 'Cost ($)', 'Sell (DA)', 'Link']];
                     body = data.map(i => [i.customId, i.game, i.platform, i.edition, i.buyUSD, i.sellDA, i.link||'']);
+                } else if (currentView === 'gameaccounts') {
+                    title = "Game Accounts";
+                    filename = "game_accounts.pdf";
+                    head = [['ID', 'Game', 'Platform', 'Type', 'Cost ($)', 'Sell (DA)', 'Link']];
+                    body = data.map(i => [i.customId, i.game, i.platform, i.type, i.buyUSD, i.sellDA, i.link||'']);
                 } else if (currentView === 'accounts') {
-                    title = "Accounts Inventory";
-                    filename = "accounts.pdf";
+                    title = "Subscriptions Accounts";
+                    filename = "subscriptions.pdf";
                     head = [['ID', 'Platform', 'Provider', 'Category', 'Type', 'Item', 'Cost ($)', 'Sell (DA)', 'Link']];
                     body = data.map(i => [i.customId, i.platform, i.provider, i.category, i.type, i.service, i.buyUSD, i.sellDA, i.link||'']);
                 } else if (currentView === 'canva') {
@@ -731,7 +794,8 @@
             else if(view === 'canva') { pageTitle.textContent = "Canva Pro Invitations"; updateCanvaDashboard(); } 
             else if (view === 'games') { pageTitle.textContent = "Games Top-up"; updateGamesDashboard(); } 
             else if (view === 'keys') { pageTitle.textContent = "Game Keys"; updateKeysDashboard(); }
-            else if (view === 'accounts') { pageTitle.textContent = "Accounts Shop"; updateAccountsDashboard(); } 
+            else if (view === 'gameaccounts') { pageTitle.textContent = "Game Accounts"; updateGameAccountsDashboard(); }
+            else if (view === 'accounts') { pageTitle.textContent = "Subscriptions"; updateAccountsDashboard(); } 
             else if (view === 'sales') { pageTitle.textContent = "Sales & Ledger"; updateSalesDashboard(); }
         };
 
@@ -775,6 +839,14 @@
                         sellDA: parseFloat(document.getElementById('newSell').value) || 0,
                         link: document.getElementById('newLink').value, sortOrder: keysData.length
                     });
+                } else if (currentView === 'gameaccounts') {
+                     await addDoc(collection(db, 'artifacts', appId, 'users', userId, 'gameaccounts_services'), { ...common,
+                        game: document.getElementById('newGameName').value, platform: document.getElementById('newGameAccPlatform').value,
+                        type: document.getElementById('newGameAccType').value,
+                        buyUSD: parseFloat(document.getElementById('newCost').value) || 0,
+                        sellDA: parseFloat(document.getElementById('newSell').value) || 0,
+                        qty: parseInt(document.getElementById('newQty').value)||1, link: document.getElementById('newLink').value, sortOrder: gameAccountsData.length
+                    });
                 }
                 document.getElementById('addModal').classList.add('hidden');
             } catch(e) { console.error(e); alert("Save failed"); }
@@ -784,7 +856,7 @@
         function setupRealtimeListeners() {
             if(!userId) return;
             const settingsDoc = doc(db, 'artifacts', appId, 'users', userId, 'settings', 'global');
-            onSnapshot(settingsDoc, (s) => { if(s.exists()) { currentRate = s.data().rate || 255; document.getElementById('rateSlider').value = currentRate; document.getElementById('rateDisplay').textContent = currentRate.toFixed(1); updateDashboard(); updateCanvaDashboard(); updateGamesDashboard(); updateAccountsDashboard(); updateKeysDashboard(); } else setDoc(settingsDoc, { rate: 255 }, { merge: true }); });
+            onSnapshot(settingsDoc, (s) => { if(s.exists()) { currentRate = s.data().rate || 255; document.getElementById('rateSlider').value = currentRate; document.getElementById('rateDisplay').textContent = currentRate.toFixed(1); updateDashboard(); updateCanvaDashboard(); updateGamesDashboard(); updateAccountsDashboard(); updateKeysDashboard(); updateGameAccountsDashboard(); } else setDoc(settingsDoc, { rate: 255 }, { merge: true }); });
             
             const sortFn = (a, b) => (a.sortOrder ?? a.createdAt ?? 0) - (b.sortOrder ?? b.createdAt ?? 0);
             
@@ -792,6 +864,7 @@
             onSnapshot(collection(db, 'artifacts', appId, 'users', userId, `canva_services`), (s) => { canvaData = []; s.forEach(d => canvaData.push({...d.data(), docId: d.id})); canvaData.sort((a, b) => new Date(b.endDate || 0) - new Date(a.endDate || 0)); updateCanvaDashboard(); });
             onSnapshot(collection(db, 'artifacts', appId, 'users', userId, `games_services`), (s) => { gamesData = []; s.forEach(d => gamesData.push({...d.data(), docId: d.id})); gamesData.sort(sortFn); updateGamesFilters(); updateGamesDashboard(); });
             onSnapshot(collection(db, 'artifacts', appId, 'users', userId, `keys_services`), (s) => { keysData = []; s.forEach(d => keysData.push({...d.data(), docId: d.id})); keysData.sort(sortFn); updateKeysDashboard(); });
+            onSnapshot(collection(db, 'artifacts', appId, 'users', userId, `gameaccounts_services`), (s) => { gameAccountsData = []; s.forEach(d => gameAccountsData.push({...d.data(), docId: d.id})); gameAccountsData.sort(sortFn); updateGameAccountsFilters(); updateGameAccountsDashboard(); });
             onSnapshot(collection(db, 'artifacts', appId, 'users', userId, `accounts_services`), (s) => { accountsData = []; s.forEach(d => accountsData.push({...d.data(), docId: d.id})); accountsData.sort(sortFn); updateAccountsFilters(); updateAccountsDashboard(); });
             onSnapshot(collection(db, 'artifacts', appId, 'users', userId, `sales_records`), (s) => { salesData = []; s.forEach(d => salesData.push({...d.data(), docId: d.id})); salesData.sort((a, b) => b.timestamp - a.timestamp); updateSalesDashboard(); });
         }
@@ -877,6 +950,18 @@
             const tf = document.getElementById('accTypeFilter');
             tf.innerHTML = '<option value="all">All Types</option>' + types.map(t => `<option value="${t}">${t}</option>`).join('');
             if(types.includes(accountsFilters.type)) tf.value = accountsFilters.type;
+        }
+        
+        function updateGameAccountsFilters() {
+            const plats = [...new Set(gameAccountsData.map(i => i.platform || "Uncat"))].sort();
+            const pf = document.getElementById('gameAccPlatformFilter');
+            pf.innerHTML = '<option value="all">All Platforms</option>' + plats.map(p => `<option value="${p}">${p}</option>`).join('');
+            if(plats.includes(gameAccountsFilters.platform)) pf.value = gameAccountsFilters.platform;
+            
+            const types = [...new Set(gameAccountsData.map(i => i.type || "Offline"))].sort();
+            const tf = document.getElementById('gameAccTypeFilter');
+            tf.innerHTML = '<option value="all">All Types</option>' + types.map(t => `<option value="${t}">${t}</option>`).join('');
+            if(types.includes(gameAccountsFilters.type)) tf.value = gameAccountsFilters.type;
         }
 
         // --- DASHBOARDS ---
@@ -1051,6 +1136,50 @@
             updateKPIs(tCostUSD, tCostDA, tRev, tProfit);
         }
 
+        // --- GAME ACCOUNTS LOGIC ---
+        function updateGameAccountsDashboard() {
+            if(currentView !== 'gameaccounts') return;
+            const visible = gameAccountsData.filter(i => (gameAccountsFilters.platform==='all'||i.platform===gameAccountsFilters.platform) && (gameAccountsFilters.type==='all'||(i.type||"")===gameAccountsFilters.type));
+            
+            let tCostUSD=0, tCostDA=0, tRev=0, tProfit=0;
+            const tbody = document.getElementById('gameAccountsTableBody'); tbody.innerHTML = '';
+            
+            if(visible.length === 0) tbody.innerHTML = '<tr><td colspan="14" class="text-center py-8 text-slate-400">No game accounts found.</td></tr>';
+            
+            visible.forEach((item, idx) => {
+                const qty = item.qty||1; const costDA = item.buyUSD * currentRate; const profit = (item.sellDA - costDA) * qty;
+                tCostUSD += item.buyUSD*qty; tCostDA += costDA*qty; tRev += item.sellDA*qty; tProfit += profit;
+                
+                let btns = `<button onclick="window.dupGameAcc('${item.docId}')" class="text-indigo-400 hover:text-indigo-600 p-1 mr-1 transition" title="Duplicate">❐</button><button onclick="window.delGameAcc('${item.docId}')" class="text-slate-400 hover:text-red-500 p-1 transition" title="Delete">&times;</button>`;
+                if(item.link) btns = `<a href="${item.link}" target="_blank" class="text-blue-500 hover:text-blue-700 p-1 mr-1 transition" title="Link">↗</a>` + btns;
+                
+                const tr = document.createElement('tr'); tr.className = "hover:bg-slate-50 border-b border-slate-100 last:border-0 draggable-row group";
+                tr.innerHTML = `
+                    <td class="px-2 py-1 text-center drag-handle text-slate-300 hover:text-slate-600"><span class="text-lg">≡</span></td>
+                    <td class="px-2 py-1"><input class="table-input num-input text-xs text-slate-400 w-12" value="${item.customId||0}" onchange="updGameAcc('${item.docId}','customId',this.value)"></td>
+                    <td class="px-2 py-1"><input class="table-input w-full font-medium min-w-[200px]" value="${item.game}" onchange="updGameAcc('${item.docId}','game',this.value)"></td>
+                    <td class="px-2 py-1"><input class="table-input text-xs text-slate-600 w-28" value="${item.platform}" onchange="updGameAcc('${item.docId}','platform',this.value)"></td>
+                    <td class="px-2 py-1">
+                         <select class="table-input text-xs text-slate-600 w-24 bg-transparent outline-none" onchange="updGameAcc('${item.docId}','type',this.value)">
+                            <option value="Offline" ${item.type==='Offline'?'selected':''}>Offline</option>
+                            <option value="Online" ${item.type==='Online'?'selected':''}>Online</option>
+                         </select>
+                    </td>
+                    <td class="px-2 py-1 financial-col"><input class="table-input num-input w-24" value="${item.buyUSD}" onchange="updGameAcc('${item.docId}','buyUSD',this.value)"></td>
+                    <td class="px-2 py-1 text-right font-mono text-red-600 bg-red-50/50 rounded font-medium text-xs w-24">${costDA.toFixed(0)}</td>
+                    <td class="px-2 py-1 text-right font-mono text-blue-600 bg-blue-50/50 rounded font-medium text-xs w-24">${(currentRate>0?item.sellDA/currentRate:0).toFixed(2)}</td>
+                    <td class="px-2 py-1"><input class="table-input num-input font-bold text-green-700 w-24" value="${item.sellDA}" onchange="updGameAcc('${item.docId}','sellDA',this.value)"></td>
+                    <td class="px-2 py-1"><input class="table-input num-input w-12" value="${qty}" onchange="updGameAcc('${item.docId}','qty',this.value)"></td>
+                    <td class="px-2 py-1 text-right font-bold text-slate-700 text-xs">${profit.toFixed(0)}</td>
+                    <td class="px-2 py-1 text-right text-xs text-slate-500">${(item.sellDA>0?(profit/(item.sellDA*qty)*100):0).toFixed(0)}%</td>
+                    <td class="px-2 py-1 text-right whitespace-nowrap">${btns}</td>`;
+                 
+                if(gameAccountsFilters.platform==='all' && gameAccountsFilters.type==='all') addDragEvents(tr, idx); else tr.querySelector('.drag-handle').classList.add('opacity-0','pointer-events-none');
+                tbody.appendChild(tr);
+            });
+            updateKPIs(tCostUSD, tCostDA, tRev, tProfit);
+        }
+
         // --- CANVA LOGIC ---
         function updateCanvaDashboard() {
             if(currentView !== 'canva') return;
@@ -1105,8 +1234,12 @@
                 return smmData.filter(i => (smmFilters.platform==='all'||i.platform===smmFilters.platform) && (smmFilters.category==='all'||(i.category||"Gen")===smmFilters.category) && (smmFilters.type==='all'||(i.type||"")===smmFilters.type));
             } else if(currentView === 'games') {
                 return gamesData.filter(i => (gamesFilters.game==='all'||(i.game||"Unk")===gamesFilters.game) && (gamesFilters.console==='all'||(i.console||"PC")===gamesFilters.console) && (gamesFilters.provider==='all'||i.provider===gamesFilters.provider) && (gamesFilters.category==='all'||(i.category||"General")===gamesFilters.category));
+            } else if(currentView === 'gameaccounts') {
+                return gameAccountsData.filter(i => (gameAccountsFilters.platform==='all'||i.platform===gameAccountsFilters.platform) && (gameAccountsFilters.type==='all'||(i.type||"")===gameAccountsFilters.type));
             } else if(currentView === 'accounts') {
                 return accountsData.filter(i => (accountsFilters.platform==='all'||i.platform===accountsFilters.platform) && (accountsFilters.category==='all'||(i.category||"Gen")===accountsFilters.category) && (accountsFilters.type==='all'||(i.type||"")===accountsFilters.type));
+            } else if(currentView === 'keys') {
+                return keysData;
             } else {
                 return canvaData;
             }
@@ -1114,6 +1247,7 @@
         function getGlobalData() {
             if(currentView === 'smm') return smmData;
             if(currentView === 'games') return gamesData;
+            if(currentView === 'gameaccounts') return gameAccountsData;
             if(currentView === 'accounts') return accountsData;
             if(currentView === 'keys') return keysData;
             return canvaData;
@@ -1132,6 +1266,10 @@
         
         window.updGame = async (id, f, v) => { let val=v; if(['buyUSD','sellDA','customId'].includes(f)) val=parseFloat(v)||0; await updateDoc(doc(db,'artifacts',appId,'users',userId,'games_services',id), {[f]:val}); };
         window.delGame = async (id) => { if(confirm("Delete?")) await deleteDoc(doc(db,'artifacts',appId,'users',userId,'games_services',id)); };
+
+        window.updGameAcc = async (id, f, v) => { let val=v; if(['buyUSD','sellDA','qty','customId'].includes(f)) val=parseFloat(v)||0; await updateDoc(doc(db,'artifacts',appId,'users',userId,'gameaccounts_services',id), {[f]:val}); };
+        window.delGameAcc = async (id) => { if(confirm("Delete?")) await deleteDoc(doc(db,'artifacts',appId,'users',userId,'gameaccounts_services',id)); };
+        window.dupGameAcc = async (id) => { const item=gameAccountsData.find(i=>i.docId===id); const newItem={...item,customId:(Math.max(...gameAccountsData.map(i=>i.customId||0)))+1,sortOrder:gameAccountsData.length,createdAt:Date.now()}; delete newItem.docId; await addDoc(collection(db,'artifacts',appId,'users',userId,'gameaccounts_services'),newItem); };
 
         window.updKey = async (id, f, v) => { let val=v; if(['buyUSD','sellDA','customId'].includes(f)) val=parseFloat(v)||0; await updateDoc(doc(db,'artifacts',appId,'users',userId,'keys_services',id), {[f]:val}); };
         window.delKey = async (id) => { if(confirm("Delete?")) await deleteDoc(doc(db,'artifacts',appId,'users',userId,'keys_services',id)); };
@@ -1167,6 +1305,7 @@
                 let allow = false;
                 if(currentView === 'smm' && smmFilters.platform==='all' && smmFilters.category==='all') allow = true;
                 if(currentView === 'games' && gamesFilters.provider==='all' && gamesFilters.game==='all' && gamesFilters.category==='all' && gamesFilters.console==='all') allow = true;
+                if(currentView === 'gameaccounts' && gameAccountsFilters.platform==='all' && gameAccountsFilters.type==='all') allow = true;
                 if(currentView === 'accounts' && accountsFilters.platform==='all' && accountsFilters.category==='all') allow = true;
                 
                 if(!allow) { alert("Please clear filters to reorder items."); return false; }
@@ -1184,6 +1323,7 @@
             let collectionName;
             if (currentView === 'smm') collectionName = `services`;
             else if (currentView === 'games') collectionName = `games_services`;
+            else if (currentView === 'gameaccounts') collectionName = `gameaccounts_services`;
             else if (currentView === 'accounts') collectionName = `accounts_services`;
             else collectionName = `canva_services`;
 
